@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Configuración y Personalización' }) %>
+        <link rel="stylesheet" href="/css/configuracion.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body class="configuracion-body theme-light">
+    <%- include('../partials/navbar') %>
+
+        <main class="configuracion-wrapper">
+            <header class="configuracion-hero" data-aos="fade-up">
+                <div class="configuracion-hero__left">
+                    <div class="configuracion-hero__badge">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Centro de personalización</span>
+                    </div>
+                    <div class="configuracion-hero__title">
+                        <h1>Módulo de Configuración</h1>
+                        <p>Controla la experiencia visual, accede a información institucional y obtén ayuda técnica
+                            desde un solo lugar.</p>
+                    </div>
+                    <div class="configuracion-hero__meta">
+                        <div class="meta-card">
+                            <span class="meta-card__label">Perfil activo</span>
+                            <p class="meta-card__value">
+                                <%= usuario ? usuario.nombre : 'Invitado' %>
+                            </p>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-card__label">Rol</span>
+                            <p class="meta-card__value">
+                                <%= usuario ? usuario.rol : 'Sin sesión' %>
+                            </p>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-card__label">Última sincronización</span>
+                            <p class="meta-card__value">Hace 2 min</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="configuracion-hero__right" data-theme-preview>
+                    <div class="preview-card">
+                        <div class="preview-card__header">
+                            <span>Vista previa inmediata</span>
+                            <button class="preview-card__sync" type="button">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
+                        <div class="preview-card__body">
+                            <div class="preview-theme preview-theme--light">
+                                <span>Claro</span>
+                            </div>
+                            <div class="preview-theme preview-theme--dark">
+                                <span>Oscuro</span>
+                            </div>
+                        </div>
+                        <small>Los cambios se aplican al instante y se guardan en tu dispositivo.</small>
+                    </div>
+                </div>
+            </header>
+
+            <section class="configuracion-grid" aria-label="Preferencias visuales">
+                <article class="config-card" data-aos="fade-up" data-aos-delay="50">
+                    <div class="config-card__header">
+                        <div>
+                            <p class="config-card__eyebrow">Tema general</p>
+                            <h2>Modo claro / oscuro</h2>
+                        </div>
+                        <label class="theme-switch">
+                            <input type="checkbox" data-theme-toggle>
+                            <span class="theme-switch__track"></span>
+                            <span class="theme-switch__thumb">
+                                <i class="fa-solid fa-sun"></i>
+                                <i class="fa-solid fa-moon"></i>
+                            </span>
+                        </label>
+                    </div>
+                    <p class="config-card__description">Alterna entre modos para reducir fatiga visual en entornos
+                        nocturnos o mantener la versión institucional clara.</p>
+                    <div class="theme-options">
+                        <button class="theme-chip is-active" data-theme-option="light">
+                            <i class="fa-solid fa-cloud-sun"></i>
+                            Claro
+                        </button>
+                        <button class="theme-chip" data-theme-option="dark">
+                            <i class="fa-solid fa-moon-stars"></i>
+                            Oscuro
+                        </button>
+                        <button class="theme-chip" data-theme-auto>
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Automático
+                        </button>
+                    </div>
+                </article>
+
+
+            </section>
+
+            <section class="configuracion-grid configuracion-grid--two" aria-label="Información institucional">
+                <article class="config-card" data-aos="fade-right">
+                    <div class="config-card__header">
+                        <div>
+                            <p class="config-card__eyebrow">Identidad</p>
+                            <h2>Información institucional</h2>
+                        </div>
+                        <span class="pill pill--brand">UNH</span>
+                    </div>
+                    <ul class="info-list">
+                        <li>
+                            <i class="fa-solid fa-location-dot"></i>
+                            <div>
+                                <p class="info-label">Dirección</p>
+                                <p>Jr. Manco Capac, Pampas, Perú</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <div>
+                                <p class="info-label">Institución</p>
+                                <p>Biblioteca Escolar - I.E. Daniel Hernández</p>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fa-solid fa-clock"></i>
+                            <div>
+                                <p class="info-label">Horario de atención</p>
+                                <p>Lunes a Viernes · 8:00 a.m. - 4:30 p.m.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </article>
+
+                <article class="config-card" data-aos="fade-left" data-delay="50">
+                    <div class="config-card__header">
+                        <div>
+                            <p class="config-card__eyebrow">Soporte</p>
+                            <h2>Equipo de ayuda técnica</h2>
+                        </div>
+                        <span class="pill pill--success">Activo</span>
+                    </div>
+                    <div class="support-grid">
+                        <div class="support-person">
+                            <div class="avatar avatar--primary">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <div>
+                                <p class="support-name">Ing. Paolo Aponte</p>
+                                <p class="support-role">Coordinadora TI</p>
+                                <a href="mailto:soporte@unh.edu.pe">soporte@unh.edu.pe</a>
+                            </div>
+                        </div>
+                        <div class="support-person">
+                            <div class="avatar avatar--accent">
+                                <i class="fa-solid fa-screwdriver-wrench"></i>
+                            </div>
+                            <div>
+                                <p class="support-name">Ing. Raul Boza Alanya</p>
+                                <p class="support-role">Mesa de ayuda</p>
+                                <a href="tel:+51987654321">+51 987 654 321</a>
+                            </div>
+                        </div>
+                        <div class="support-person">
+                            <div class="avatar">
+                                <i class="fa-solid fa-shield-heart"></i>
+                            </div>
+                            <div>
+                                <p class="support-name">Equipo Biblioteca</p>
+                                <p class="support-role">Acompañamiento académico</p>
+                                <span class="tag">Tiempo de respuesta &lt; 2h</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <% if (usuario && usuario.rol==='admin' ) { %>
+                <!-- Zona de Peligro - Solo para Admin -->
+                <section class="configuracion-grid" aria-label="Zona de peligro">
+                    <article class="config-card config-card--danger" data-aos="fade-up">
+                        <div class="config-card__header">
+                            <div>
+                                <p class="config-card__eyebrow">
+                                    <i class="fa-solid fa-triangle-exclamation"
+                                        style="color: #ef4444; margin-right: 0.5rem;"></i>
+                                    Acciones críticas
+                                </p>
+                                <h2>Zona de Peligro</h2>
+                            </div>
+                            <span class="pill pill--danger">Irreversible</span>
+                        </div>
+                        <p class="config-card__description">
+                            Acciones críticas de gestión escolar irreversibles. Estas operaciones no se pueden deshacer.
+                        </p>
+                        <div class="danger-zone-content">
+                            <button type="button" id="btnCerrarAnioEscolar" class="btn btn--danger btn--lg">
+                                <i class="fa-solid fa-calendar-xmark"></i>
+                                Cerrar Año Escolar
+                            </button>
+                            <p class="danger-zone-warning">
+                                <i class="fa-solid fa-exclamation-circle"></i>
+                                <strong>Esta acción realizará cambios irreversibles:</strong>
+                            </p>
+                            <ul
+                                style="color: #64748b; font-size: 0.9rem; margin-top: 10px; margin-left: 20px; list-style-type: disc;">
+                                <li>Elimina cuentas y datos de estudiantes de 5to grado.</li>
+                                <li>Promueve a estudiantes de 1° a 4° al siguiente nivel.</li>
+                                <li>Reinicia historial de préstamos y actividades (Estudiantes y Docentes).</li>
+                                <li>Purga registros de usuarios eliminados anteriormente.</li>
+                                <li><strong>Mantiene:</strong> Libros, Reseñas, Favoritos y Documentos Docentes.</li>
+                            </ul>
+                        </div>
+                    </article>
+                </section>
+                <% } %>
+
+
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script src="/js/configuracion.js" defer></script>
+
+        <% if (usuario && usuario.rol==='admin' ) { %>
+            <!-- Script para Cerrar Año Escolar -->
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const btnCerrarAnio = document.getElementById('btnCerrarAnioEscolar');
+                    if (btnCerrarAnio) {
+                        btnCerrarAnio.addEventListener('click', function () {
+                            Swal.fire({
+                                title: '¿Cerrar Año Escolar?',
+                                html: `
+                                <div style="text-align: left;">
+                                    <p>Esta acción realizará los siguientes cambios <strong>irreversibles</strong>:</p>
+                                    <ul style="margin-left: 20px; list-style-type: disc; margin-top: 10px; margin-bottom: 15px;">
+                                        <li>Se <strong>eliminarán</strong> todas las cuentas de estudiantes de <strong>5to grado</strong>.</li>
+                                        <li>Se <strong>promoverán</strong> los estudiantes de 1° a 4° grado al siguiente nivel.</li>
+                                        <li>Se <strong>eliminarán</strong> todos los préstamos y datos relacionados de los graduados.</li>
+                                        <li>Se <strong>reiniciarán</strong> los historiales y progresos del resto de estudiantes.</li>
+                                        <li>Se <strong>purgarán</strong> definitivamente los usuarios eliminados anteriormente.</li>
+                                    </ul>
+                                    <p style="margin-top: 15px; color: #ef4444; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                        Esta acción NO se puede deshacer.
+                                    </p>
+                                </div>
+                            `,
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#ef4444',
+                                cancelButtonColor: '#6b7280',
+                                confirmButtonText: 'Sí, cerrar año escolar',
+                                cancelButtonText: 'Cancelar',
+                                reverseButtons: true,
+                                focusCancel: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    // Confirmación adicional
+                                    Swal.fire({
+                                        title: 'Confirmación Final',
+                                        text: 'Estás a punto de borrar datos históricos importantes. ¿Confirmas que deseas proceder?',
+                                        icon: 'error',
+                                        showCancelButton: true,
+                                        confirmButtonColor: '#ef4444',
+                                        cancelButtonColor: '#6b7280',
+                                        confirmButtonText: '¡SÍ, PROCEDER!',
+                                        cancelButtonText: 'Cancelar',
+                                        reverseButtons: true
+                                    }).then((confirmResult) => {
+                                        if (confirmResult.isConfirmed) {
+                                            // Loading state
+                                            Swal.fire({
+                                                title: 'Procesando...',
+                                                text: 'Cerrando el año escolar y actualizando registros.',
+                                                allowOutsideClick: false,
+                                                didOpen: () => {
+                                                    Swal.showLoading();
+                                                }
+                                            });
+
+                                            // Realizar la petición
+                                            fetch('/configuracion/cerrar-anio', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                }
+                                            })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if (data.success) {
+                                                        Swal.fire({
+                                                            title: '¡Año escolar cerrado!',
+                                                            html: `
+                                                        <p>${data.message}</p>
+                                                        <div style="background: #f0fdf4; padding: 10px; border-radius: 8px; margin-top: 10px; text-align: left;">
+                                                            <ul style="list-style: none; padding: 0; color: #166534;">
+                                                                <li><i class="fa-solid fa-check"></i> ${data.data.graduados_eliminados} graduados eliminados</li>
+                                                                <li><i class="fa-solid fa-check"></i> ${data.data.promovidos} estudiantes promovidos</li>
+                                                                <li><i class="fa-solid fa-check"></i>Registros antiguos purgados</li>
+                                                            </ul>
+                                                        </div>
+                                                    `,
+                                                            icon: 'success',
+                                                            confirmButtonText: 'Entendido'
+                                                        }).then(() => {
+                                                            location.reload();
+                                                        });
+                                                    } else {
+                                                        Swal.fire({
+                                                            title: 'Error',
+                                                            text: data.message || 'No se pudo cerrar el año escolar',
+                                                            icon: 'error',
+                                                            confirmButtonText: 'Aceptar'
+                                                        });
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                    Swal.fire({
+                                                        title: 'Error',
+                                                        text: 'Ocurrió un error de conexión.',
+                                                        icon: 'error',
+                                                        confirmButtonText: 'Aceptar'
+                                                    });
+                                                });
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            </script>
+            <% } %>
+</body>
+
+</html>

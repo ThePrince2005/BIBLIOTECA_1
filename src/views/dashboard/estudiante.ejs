@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Mi Dashboard - Biblioteca Escolar' }) %>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="/css/dashboard.css?v=4">
+</head>
+
+<body class="dashboard-body">
+    <script type="application/json"
+        id="historicoLabels"><%- JSON.stringify(stats.historicoMensual.labels || []) %></script>
+    <script type="application/json" id="historicoData"><%- JSON.stringify(stats.historicoMensual.data || []) %></script>
+    <script type="application/json" id="categoriasLabels"><%- JSON.stringify(stats.categorias.labels || []) %></script>
+    <script type="application/json" id="categoriasData"><%- JSON.stringify(stats.categorias.data || []) %></script>
+    <script type="application/json"
+        id="autoresLabels"><%- JSON.stringify((stats.autores || []).map(a => a.nombre)) %></script>
+    <script type="application/json"
+        id="autoresData"><%- JSON.stringify((stats.autores || []).map(a => a.total)) %></script>
+
+    <%- include('../partials/navbar') %>
+
+        <main class="dashboard-wrapper">
+            <section class="dashboard-hero">
+                <span class="glow-orb glow-orb--right"></span>
+                <span class="glow-orb glow-orb--bottom"></span>
+
+                <div class="dashboard-hero__content">
+                    <span class="dashboard-hero__badge">
+                        <i class="fa-solid fa-star"></i>
+                        Hola, <%= user ? user.nombre : 'Estudiante' %>
+                    </span>
+                    <div class="dashboard-hero__title">
+                        <h1>Tu ruta de lectura personalizada</h1>
+                        <p>Consulta tu progreso, organiza devoluciones y descubre recomendaciones para seguir sumando
+                            logros.</p>
+                    </div>
+                    <div class="dashboard-hero__meta">
+                        <div class="meta-chip">
+                            <span>Meta mensual</span>
+                            <strong>
+                                <%= stats.progreso?.siguiente || '—' %>
+                            </strong>
+                        </div>
+                        <div class="meta-chip">
+                            <span>Prestamos activos</span>
+                            <strong>
+                                <%= stats.prestamosActivos %>
+                            </strong>
+                        </div>
+                        <div class="meta-chip">
+                            <span>Favoritos</span>
+                            <strong>
+                                <%= stats.librosFavoritos %>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-hero__status">
+                    <div class="hero-highlight">
+                        <div class="hero-highlight__content">
+                            <span class="hero-highlight__label">Total libros leídos</span>
+                            <span class="hero-highlight__value">
+                                <%= stats.progreso ? stats.progreso.total : 0 %>
+                            </span>
+                            <small>Sigue leyendo para alcanzar tu próxima insignia.</small>
+                        </div>
+                        <div class="hero-highlight__decoration">
+                            <i class="fa-solid fa-book-reader"></i>
+                        </div>
+                    </div>
+                    <div class="panel-meta">
+                        <span class="chip positive">Logros desbloqueados</span>
+                        <span class="chip warning">Próximas devoluciones: <%= stats.proximasDevoluciones.length %>
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-grid">
+                <article class="stat-card" data-color="blue">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Libros prestados</h3>
+                        <div class="stat-card__value">
+                            <%= stats.prestamosActivos %>
+                        </div>
+                        <p class="stat-card__meta">Actualmente en tu poder.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="green">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Total leídos</h3>
+                        <div class="stat-card__value">
+                            <%= stats.progreso ? stats.progreso.total : 0 %>
+                        </div>
+                        <p class="stat-card__meta">Libros completados.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="amber">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-heart"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Favoritos guardados</h3>
+                        <div class="stat-card__value">
+                            <%= stats.librosFavoritos %>
+                        </div>
+                        <p class="stat-card__meta">Libros que amas.</p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Maratones Activas -->
+
+
+            <section class="dashboard-panels">
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Tu progreso de lectura</h3>
+                            <p>Lleva la barra a 100% para desbloquear una nueva insignia.</p>
+                        </div>
+                    </div>
+                    <div class="progress-card">
+                        <% const progresoPorcentaje=stats.progreso ? stats.progreso.porcentaje : 0; %>
+                            <div class="progress-bar">
+                                <div class="progress-bar__fill" data-progress="<%= progresoPorcentaje %>"
+                                    style="width: <%= progresoPorcentaje %>%"></div>
+                            </div>
+                            <div class="panel-meta">
+                                <span>Has leído <strong>
+                                        <%= stats.progreso ? stats.progreso.total : 0 %>
+                                    </strong> libros</span>
+                                <span>Próximo logro: <strong>
+                                        <%= stats.progreso ? stats.progreso.siguiente : '-' %>
+                                    </strong></span>
+                            </div>
+                    </div>
+                </article>
+
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Mis préstamos por mes</h3>
+                            <p>Evolución mensual de tu actividad.</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="historicoPrestamosMes"></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <section class="dashboard-panels">
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Mis categorías favoritas</h3>
+                            <p>Descubre dónde inviertes más tu tiempo.</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="categoriasFavoritas"></canvas>
+                    </div>
+                </article>
+
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Autores más leídos</h3>
+                            <p>Autores que te inspiran.</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="autoresMasLeidos"></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <section class="dashboard-panels">
+                <article class="dash-panel dash-panel--full">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Recomendados para ti</h3>
+                            <p>Basado en tu historial y preferencias.</p>
+                        </div>
+                    </div>
+                    <%- include('../partials/recomendados', { stats: stats }) %>
+                </article>
+            </section>
+
+            <section class="dashboard-panels">
+                <article class="dash-panel dash-panel--full">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Próximas devoluciones</h3>
+                            <p>Mantén tus préstamos al día.</p>
+                        </div>
+                    </div>
+                    <% if (stats.proximasDevoluciones.length) { %>
+                        <div class="table-surface">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Libro</th>
+                                        <th>Préstamo</th>
+                                        <th>Devolución</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% stats.proximasDevoluciones.forEach(prestamo=> {
+                                        // Normalizar fechas para ignorar horas
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+
+                                        const due = new Date(prestamo.fecha_devolucion_esperada);
+                                        due.setHours(0, 0, 0, 0);
+
+                                        // Diferencia en milisegundos convertida a días
+                                        const diffTime = due - today;
+                                        const diasRestantes = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                                        const estadoClase = diasRestantes < 0 ? 'chip warning' : (diasRestantes <=2
+                                            ? 'chip warning' : 'chip positive' ); %>
+                                            <tr>
+                                                <td data-label="Libro">
+                                                    <div class="top-user">
+                                                        <span class="top-user__name">
+                                                            <%= prestamo.titulo %>
+                                                        </span>
+                                                        <span class="top-user__meta">
+                                                            <%= prestamo.autor %>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Préstamo">
+                                                    <%= new Date(prestamo.fecha_prestamo).toLocaleString('es-PE', {
+                                                        timeZone: 'America/Lima' , hour12: true }) %>
+                                                </td>
+                                                <td data-label="Devolución">
+                                                    <%= new
+                                                        Date(prestamo.fecha_devolucion_esperada).toLocaleString('es-PE',
+                                                        { timeZone: 'America/Lima' , hour12: true }) %>
+                                                </td>
+                                                <td data-label="Estado">
+                                                    <span class="<%= estadoClase %>">
+                                                        <%= diasRestantes < 0 ? 'Vencido' : (diasRestantes===0 ? 'Hoy' :
+                                                            (diasRestantes===1 ? 'Mañana' : diasRestantes + ' días' ))
+                                                            %>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                        <% } else { %>
+                            <div class="table-empty">No tienes devoluciones próximas.</div>
+                            <% } %>
+                </article>
+            </section>
+        </main>
+
+        <script>
+            // Debug logging
+            console.log('Estudiante dashboard script loaded');
+            console.log('Stats data:', '<%= JSON.stringify(stats) %>');
+
+            // Data storage (parsed once)
+            const historicoLabels = JSON.parse(document.getElementById('historicoLabels').textContent || '[]');
+            const historicoData = JSON.parse(document.getElementById('historicoData').textContent || '[]');
+            const categoriasLabels = JSON.parse(document.getElementById('categoriasLabels').textContent || '[]');
+            const categoriasData = JSON.parse(document.getElementById('categoriasData').textContent || '[]');
+            const autoresLabels = JSON.parse(document.getElementById('autoresLabels').textContent || '[]');
+            const autoresData = JSON.parse(document.getElementById('autoresData').textContent || '[]');
+
+            // Chart instances
+            let charts = {};
+
+            function getThemeColors() {
+                // Fix: Read from .dashboard-body to get correct Dark Mode variables
+                const dashboardBody = document.querySelector('.dashboard-body') || document.body;
+                const cssVars = getComputedStyle(dashboardBody);
+
+                return {
+                    accent: (cssVars.getPropertyValue('--accent-blue') || '#00B4D8').trim(),
+                    accentDark: (cssVars.getPropertyValue('--accent-blue-dark') || '#0077B6').trim(),
+                    warning: (cssVars.getPropertyValue('--warning-yellow') || '#F59E0B').trim(),
+                    success: (cssVars.getPropertyValue('--success-green') || '#10B981').trim(),
+                    purple: (cssVars.getPropertyValue('--purple') || '#7C3AED').trim(),
+                    // Use --dash-text for better contrast in both modes
+                    text: (cssVars.getPropertyValue('--dash-subtext') || '#475569').trim(),
+                    grid: (cssVars.getPropertyValue('--dash-card-border') || 'rgba(148, 224, 239, 0.2)').trim()
+                };
+            }
+
+            function initCharts() {
+                const colors = getThemeColors();
+
+                Chart.defaults.font.family = '"Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+                Chart.defaults.color = colors.text;
+                Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+                // 1. Prestamos Chart
+                const graphPrestamos = document.getElementById('historicoPrestamosMes');
+                if (graphPrestamos) {
+                    if (charts.prestamos) charts.prestamos.destroy();
+                    charts.prestamos = new Chart(graphPrestamos, {
+                        type: 'line',
+                        data: {
+                            labels: historicoLabels,
+                            datasets: [{
+                                label: 'Préstamos',
+                                data: historicoData,
+                                borderColor: colors.accentDark,
+                                backgroundColor: 'rgba(0, 180, 216, 0.15)',
+                                tension: 0.35,
+                                fill: true,
+                                borderWidth: 3
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: colors.grid },
+                                    ticks: { color: colors.text }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { color: colors.text }
+                                }
+                            }
+                        }
+                    });
+                }
+
+                // 2. Categorias Chart
+                const chartCategorias = document.getElementById('categoriasFavoritas');
+                if (chartCategorias) {
+                    if (charts.categorias) charts.categorias.destroy();
+                    // Handle empty data for doughnut chart to avoid blank rendering
+                    const hasData = categoriasData.some(val => val > 0);
+
+                    charts.categorias = new Chart(chartCategorias, {
+                        type: 'doughnut',
+                        data: {
+                            labels: hasData ? categoriasLabels : ['Sin datos'],
+                            datasets: [{
+                                data: hasData ? categoriasData : [1],
+                                backgroundColor: hasData ?
+                                    [colors.accentDark, colors.accent, colors.purple, colors.warning, colors.success] :
+                                    ['rgba(148, 224, 239, 0.2)'],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            cutout: '65%',
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom', labels: { color: colors.text } },
+                                tooltip: { enabled: hasData }
+                            }
+                        }
+                    });
+                }
+
+                // 3. Autores Chart
+                const chartAutores = document.getElementById('autoresMasLeidos');
+                if (chartAutores) {
+                    if (charts.autores) charts.autores.destroy();
+                    charts.autores = new Chart(chartAutores, {
+                        type: 'bar',
+                        data: {
+                            labels: autoresLabels,
+                            datasets: [{
+                                label: 'Veces leídas',
+                                data: autoresData,
+                                backgroundColor: colors.accentDark,
+                                borderRadius: 6,
+                                maxBarThickness: 32
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: colors.grid },
+                                    ticks: { color: colors.text }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { color: colors.text }
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Init on load
+            document.addEventListener('DOMContentLoaded', initCharts);
+
+            // Listen for theme changes from ThemeManager
+            if (window.themeManager) {
+                window.themeManager.listeners.push((theme) => {
+                    setTimeout(initCharts, 50); // Small delay to allow CSS var update
+                });
+            } else {
+                // Fallback observer
+                const observer = new MutationObserver(() => {
+                    setTimeout(initCharts, 50);
+                });
+                observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'class'] });
+            }
+        </script>
+</body>
+
+</html>

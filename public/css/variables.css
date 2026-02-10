@@ -1,0 +1,150 @@
+/* ========================================================================
+   BIBLIOTECA ESCOLAR DANIEL HERNÁNDEZ
+   Archivo: /public/css/variables.css
+   Propósito: Variables globales, reseteo y estilos base del proyecto.
+   ======================================================================== */
+
+/* --- Variables de Color y Diseño --- */
+:root {
+    /* Tipografía */
+    --font-family: 'Poppins', sans-serif;
+
+    /* Layout */
+    --container-max: 1280px;
+
+    /* Colores Institucionales - TEMA CLARO (Colegio de Varones) */
+    --color-primary: #1E40AF;
+    /* Azul oscuro fuerte */
+    --color-primary-dark: #1E3A8A;
+    /* Azul muy oscuro */
+    --color-primary-light: #3B82F6;
+    /* Azul medio */
+    --color-success: #059669;
+    /* Verde esmeralda oscuro */
+    --color-warning: #D97706;
+    /* Naranja oscuro */
+    --color-error: #DC2626;
+    /* Rojo fuerte */
+    --color-info: #0284C7;
+    /* Azul cian oscuro */
+    --color-purple: #7C2D12;
+    /* Marrón rojizo */
+
+    --color-neutral-900: #1E293B;
+    --color-neutral-700: #475569;
+    --color-neutral-600: #64748B;
+    --color-neutral-500: #94A3B8;
+    --color-neutral-300: #CBD5E1;
+    --color-neutral-200: #E2E8F0;
+    --color-neutral-100: #F1F5F9;
+
+    --title-dark: #1E293B;
+    /* Azul oscuro - Títulos principales */
+    --subtitle-gray: #64748B;
+    /* Gris medio - Subtítulos */
+    --text-gray: #475569;
+    /* Gris texto */
+    --accent-blue: #1E40AF;
+    /* Azul oscuro fuerte - Acentos principales */
+    --accent-blue-dark: #1E3A8A;
+    /* Azul muy oscuro - Hover y sombras */
+    --accent-blue-light: #3B82F6;
+    /* Azul medio - Degradados */
+    --bg-light: #F8FAFC;
+    /* Fondo claro principal */
+    --bg-white: #FFFFFF;
+    /* Blanco puro */
+    --bg-gray-50: #F9FAFB;
+    --bg-gray-100: #F3F4F6;
+    --bg-gray-200: #E5E7EB;
+
+    /* Colores de Estado */
+    --success-green: #10B981;
+    --success-green-dark: #059669;
+    --success-green-light: #D1FAE5;
+    --error-red: #EF4444;
+    --error-red-dark: #DC2626;
+    --error-red-light: #FEE2E2;
+    --logout-orange: #FF8C00;
+    --warning-yellow: #F59E0B;
+    --warning-yellow-light: #FEF3C7;
+    --purple: #7C3AED;
+    --purple-light: #EDE9FE;
+    --info-blue: #3B82F6;
+
+    /* Efectos Glassmorphism */
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-bg-hover: rgba(255, 255, 255, 1);
+    --card-border: rgba(30, 64, 175, 0.2);
+    --glass-blur: 20px;
+
+    /* Sombras */
+    --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.08);
+    --shadow-md: 0 8px 24px rgba(30, 64, 175, 0.15);
+    --shadow-lg: 0 12px 32px rgba(30, 64, 175, 0.2);
+    --shadow-hover: 0 16px 40px rgba(30, 64, 175, 0.3);
+    --shadow-xl: 0 20px 48px rgba(30, 58, 138, 0.25);
+    --shadow-input: 0 4px 12px rgba(30, 64, 175, 0.1);
+
+    /* Espaciado y Medidas */
+    --radius-card: 32px;
+    --radius-input: 16px;
+    --radius-button: 20px;
+    --radius-small: 12px;
+    --radius-full: 9999px;
+    --transition-speed: 0.4s;
+    --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:root[data-theme='dark'],
+:root.theme-dark {
+    /* Colores Institucionales - TEMA OSCURO */
+    --title-dark: #F8FAFC;
+    --subtitle-gray: #94A3B8;
+    --text-gray: #CBD5E1;
+    --accent-blue: #00B4D8;
+    --accent-blue-dark: #90E0EF;
+    --accent-blue-light: #0077B6;
+    --bg-light: #0F172A;
+    --bg-white: #1E293B;
+    --bg-gray-50: #334155;
+    --bg-gray-100: #475569;
+    --bg-gray-200: #64748B;
+
+    /* Efectos Glassmorphism para tema oscuro */
+    --card-bg: rgba(30, 41, 59, 0.85);
+    --card-bg-hover: rgba(30, 41, 59, 1);
+    --card-border: rgba(0, 180, 216, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --title-dark: #F8FAFC;
+        --subtitle-gray: #94A3B8;
+        --text-gray: #CBD5E1;
+        --accent-blue: #00B4D8;
+        --accent-blue-dark: #90E0EF;
+        --accent-blue-light: #0077B6;
+        --bg-light: #0F172A;
+        --bg-white: #1E293B;
+        --bg-gray-50: #334155;
+        --bg-gray-100: #475569;
+        --bg-gray-200: #64748B;
+        --card-bg: rgba(30, 41, 59, 0.85);
+        --card-bg-hover: rgba(30, 41, 59, 1);
+        --card-border: rgba(0, 180, 216, 0.2);
+    }
+}
+
+:root.contrast-boost {
+    --subtitle-gray: #1E293B;
+    --text-gray: #0F172A;
+    --card-border: rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme='dark'].contrast-boost,
+:root.theme-dark.contrast-boost {
+    --subtitle-gray: #F1F5F9;
+    --text-gray: #F8FAFC;
+    --card-border: rgba(148, 224, 239, 0.4);
+}

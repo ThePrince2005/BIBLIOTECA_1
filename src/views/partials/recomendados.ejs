@@ -1,0 +1,40 @@
+<% if (stats.recomendados && stats.recomendados.length> 0) { %>
+    <div class="recommendations-list">
+        <% stats.recomendados.forEach(item=> { %>
+            <div class="recommendation-item">
+                <div class="recommendation-info">
+                    <h4 class="recommendation-title" title="<%= item.titulo %>">
+                        <%= item.titulo %>
+                    </h4>
+                    <p class="recommendation-meta">
+                        <span class="rec-author">
+                            <%= item.autor %>
+                        </span>
+                        <span class="rec-separator">•</span>
+                        <span class="rec-area">
+                            <%= item.area %>
+                        </span>
+                    </p>
+                </div>
+                <div class="recommendation-actions">
+                    <% if (item.disponibles> 0) { %>
+                        <a href="/prestamos/crear/<%= item.id %>" class="btn-solicitar">
+                            Solicitar <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+                        <% } else { %>
+                            <span class="badge-agotado">
+                                Agotado
+                            </span>
+                            <% } %>
+                </div>
+            </div>
+            <% }) %>
+    </div>
+    <% } else { %>
+        <div class="recommendations-empty">
+            <div class="empty-icon">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+            <p>No hay recomendaciones disponibles por el momento.</p>
+        </div>
+        <% } %>

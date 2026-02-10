@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+    <%- include('../partials/head') %>
+    <title>Usuarios registrados | Biblioteca</title>
+  </head>
+  <body class="dashboard-body">
+    <%- include('../partials/navbar') %>
+
+    <main class="container my-4">
+      <% if (session && session.flash) { %>
+        <div data-flash-message
+             data-flash-type="<%= session.flash.tipo %>"
+             class="d-none">
+          <%= session.flash.mensaje %>
+        </div>
+        <% session.flash = null; %>
+      <% } %>
+
+      <!-- Título principal -->
+      <h1 class="h3 mb-4">Gestión de Usuarios</h1>
+
+      <!-- Gestión de alumnos -->
+      <div class="d-flex justify-content-center mb-3">
+        <a href="/auth/registro" class="btn-export">
+          <i class="fa-solid fa-user-plus"></i> Añadir usuario
+        </a>
+      </div>
+      <div class="table-container-modern mb-4">
+        <div class="table-toolbar">
+          <div class="table-toolbar__left">
+            <h2 class="h5 mb-0">Alumnos registrados</h2>
+            <span class="badge bg-primary-subtle text-primary">
+              Total: <%= alumnos ? alumnos.length : 0 %>
+            </span>
+          </div>
+          <div class="table-toolbar__right">
+            <!-- Campo de búsqueda eliminado -->
+          </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-modern">
+              <thead>
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Grado</th>
+                  <th scope="col">Sección</th>
+                  <th scope="col">Correo</th>
+                  <th scope="col" class="text-end">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tablaAlumnosBody">
+                <% if (!alumnos || !alumnos.length) { %>
+                  <tr>
+                    <td colspan="5" class="text-center py-4 text-muted table-empty">
+                      No hay alumnos registrados.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% alumnos.forEach(a => { %>
+                    <tr>
+                      <td data-label="Nombre">
+                        <div class="fw-semibold"><%= a.nombre %></div>
+                      </td>
+                      <td data-label="Grado">
+                        <span class="badge bg-soft-primary text-primary">
+                          <%= a.grado %>
+                        </span>
+                      </td>
+                      <td data-label="Sección">
+                        <span class="badge bg-soft-secondary text-secondary">
+                          <%= a.seccion %>
+                        </span>
+                      </td>
+                      <td data-label="Correo">
+                        <span class="text-muted small"><%= a.correo %></span>
+                      </td>
+                      <td data-label="Acción" class="text-end">
+                        <div class="table-actions-group">
+                          <a href="/usuario/admin/usuarios/<%= a.id %>/historial"
+                             class="btn btn--ghost btn--sm">
+                            Ver historial
+                          </a>
+
+                          <form action="/usuario/admin/alumnos/<%= a.id %>/eliminar"
+                                method="POST"
+                                class="d-inline"
+                                onsubmit="return confirm('¿Seguro que deseas desactivar a <%= a.nombre %>?');">
+                            <button type="submit"
+                                    class="btn btn--error btn--sm">
+                              Eliminar
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+      </div>
+
+      <!-- Sección personal docente/administrativo -->
+      <div class="table-container-modern">
+        <div class="table-toolbar">
+          <div class="table-toolbar__left">
+            <h2 class="h5 mb-0">Docentes y administrativos</h2>
+            <span class="badge bg-success-subtle text-success">
+              Total: <%= personal ? personal.length : 0 %>
+            </span>
+          </div>
+          <div class="table-toolbar__right">
+            <div class="table-search">
+              <i class="fa-solid fa-search"></i>
+              <input type="text" id="searchPersonal" placeholder="Buscar personal...">
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table-modern">
+              <thead>
+                <tr>
+                  <th scope="col">Nombre</th>
+                  <th scope="col">Rol</th>
+                  <th scope="col">Correo</th>
+                  <th scope="col" class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="tablaPersonalBody">
+                <% if (!personal || !personal.length) { %>
+                  <tr>
+                    <td colspan="4" class="text-center py-4 text-muted table-empty">
+                      No hay docentes ni administrativos registrados.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% personal.forEach(p => { %>
+                    <tr>
+                      <td data-label="Nombre">
+                        <div class="fw-semibold"><%= p.nombre %></div>
+                      </td>
+                      <td data-label="Rol">
+                        <span class="badge bg-soft-info text-info text-uppercase">
+                          <%= p.rol %>
+                        </span>
+                      </td>
+                      <td data-label="Correo">
+                        <span class="text-muted small"><%= p.correo %></span>
+                      </td>
+                      <td data-label="Acciones" class="text-end">
+                        <div class="table-actions-group">
+                          <a href="/usuario/admin/usuarios/<%= p.id %>/historial"
+                             class="btn btn--ghost btn--sm">
+                            Ver historial
+                          </a>
+                          <form action="/usuario/admin/personal/<%= p.id %>/eliminar"
+                                method="POST"
+                                class="d-inline"
+                                onsubmit="return confirm('¿Seguro que deseas desactivar a <%= p.nombre %>?');">
+                            <button type="submit"
+                                    class="btn btn--error btn--sm">
+                              Eliminar
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+      </div>
+    </main>
+
+    <!-- Contenedor para toasts -->
+    <div id="toastStack" class="toast-stack"></div>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+      // Función para mostrar notificaciones toast
+      (function () {
+        const stack = document.getElementById('toastStack');
+        if (!stack) return;
+
+        function showToast(type, message) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'toast-message toast-message--' + type;
+
+          wrapper.innerHTML = `
+            <div class="toast-message__icon">
+              ${type === 'success' ? '✓' : '⚠'}
+            </div>
+            <div class="toast-message__text">${message}</div>
+            <button class="toast-message__close" type="button" aria-label="Cerrar">&times;</button>
+          `;
+
+          stack.appendChild(wrapper);
+
+          requestAnimationFrame(() => {
+            wrapper.classList.add('is-visible');
+          });
+
+          const remove = () => {
+            wrapper.classList.remove('is-visible');
+            setTimeout(() => wrapper.remove(), 220);
+          };
+
+          wrapper.querySelector('.toast-message__close').addEventListener('click', remove);
+          setTimeout(remove, 3500);
+        }
+
+        const flashEl = document.querySelector('[data-flash-message]');
+        if (flashEl) {
+          const type = flashEl.getAttribute('data-flash-type') || 'success';
+          const msg = flashEl.textContent.trim();
+          if (msg) showToast(type, msg);
+          flashEl.remove();
+        }
+
+        window.showToast = showToast;
+      })();
+
+      // Función para buscar en las tablas
+      function setupTableSearch(inputId, tableBodyId) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+
+        input.addEventListener('input', function() {
+          const searchTerm = this.value.toLowerCase();
+          const tableBody = document.getElementById(tableBodyId);
+          if (!tableBody) return;
+
+          const rows = tableBody.getElementsByTagName('tr');
+          
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const text = row.textContent.toLowerCase();
+            
+            if (text.includes(searchTerm)) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          }
+        });
+      }
+
+      // Configurar la búsqueda para ambas tablas
+      document.addEventListener('DOMContentLoaded', function() {
+        setupTableSearch('searchAlumnos', 'tablaAlumnosBody');
+        setupTableSearch('searchPersonal', 'tablaPersonalBody');
+      });
+    </script>
+  </body>
+</html>

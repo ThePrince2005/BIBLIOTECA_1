@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Gestión de Reseñas - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/resenas.css">
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>Panel docente</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Gestión de Reseñas</h1>
+                        <p>Supervisa y modera las opiniones compartidas por los estudiantes sobre el catálogo
+                            bibliográfico.</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Tabla de reseñas -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-comments"></i>
+                                <span>
+                                    <%= resenas.length %> reseñas
+                                </span>
+                            </p>
+                            <h2 class="card__title">Listado de Reseñas</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <!-- Toolbar -->
+                        <div class="table-toolbar">
+                            <div class="table-toolbar__left">
+                                <div class="table-search">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="searchResenas"
+                                        placeholder="Buscar estudiante, libro o comentario...">
+                                </div>
+                            </div>
+                            <div class="table-toolbar__right">
+                                <div class="table-filters">
+                                    <select class="table-filter-select" id="filterCalificacion">
+                                        <option value="">Todas las calificaciones</option>
+                                        <option value="5">⭐ 5 estrellas</option>
+                                        <option value="4">⭐ 4 estrellas</option>
+                                        <option value="3">⭐ 3 estrellas</option>
+                                        <option value="2">⭐ 2 estrellas</option>
+                                        <option value="1">⭐ 1 estrella</option>
+                                    </select>
+                                </div>
+                                <div class="export-dropdown">
+                                    <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/resenas?formato=pdf" class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/resenas?formato=word" class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/resenas?formato=excel" class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla -->
+                        <div class="table-container-modern">
+                            <table class="table-modern" id="tablaResenasAdmin">
+                                <thead>
+                                    <tr>
+                                        <th>Estudiante</th>
+                                        <th>Libro</th>
+                                        <th>Calificación</th>
+                                        <th>Comentario</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% resenas.forEach(resena=> { %>
+                                        <tr data-calificacion="<%= resena.calificacion %>">
+                                            <td data-label="Estudiante">
+                                                <div class="libro-info">
+                                                    <div class="libro-info__title">
+                                                        <%= resena.usuario_nombre %>
+                                                    </div>
+                                                    <% if (resena.grado) { %>
+                                                        <div class="libro-info__author">
+                                                            <%= resena.grado %>° <%= resena.seccion || '' %>
+                                                        </div>
+                                                        <% } %>
+                                                </div>
+                                            </td>
+                                            <td data-label="Libro">
+                                                <div class="libro-info">
+                                                    <div class="libro-info__title">
+                                                        <%= resena.libro_titulo %>
+                                                    </div>
+                                                    <% if (resena.libro_autor) { %>
+                                                        <div class="libro-info__author">
+                                                            <%= resena.libro_autor %>
+                                                        </div>
+                                                        <% } %>
+                                                </div>
+                                            </td>
+                                            <td data-label="Calificación">
+                                                <div class="rating-display">
+                                                    <% for(let i=0; i < resena.calificacion; i++) { %>
+                                                        <i class="fas fa-star"></i>
+                                                        <% } %>
+                                                            <span class="rating-display__value">
+                                                                <%= resena.calificacion %>.0
+                                                            </span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Comentario">
+                                                <p class="comentario-preview" title="<%= resena.comentario %>">
+                                                    <%= resena.comentario %>
+                                                </p>
+                                            </td>
+                                            <td data-label="Fecha">
+                                                <%= new Date(resena.fecha_creacion).toLocaleDateString('es-ES', {
+                                                    year: 'numeric' , month: 'short' , day: 'numeric' }) %>
+                                            </td>
+                                            <td data-label="Acciones">
+                                                <div class="table-actions-cell">
+                                                    <a href="/libros/libro/<%= resena.libro_id %>"
+                                                        class="btn btn--sm btn--ghost" title="Ver libro">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>
+            AOS.init({ duration: 800, once: true });
+
+            // Búsqueda y filtrado
+            const searchResenas = document.getElementById('searchResenas');
+            const filterCalificacion = document.getElementById('filterCalificacion');
+            const tablaResenas = document.getElementById('tablaResenasAdmin');
+
+            if (searchResenas && tablaResenas) {
+                // 'input' cubre tipeo, borrado, pegado. 'keyup' es backup.
+                ['input', 'keyup'].forEach(eventType =>
+                    searchResenas.addEventListener(eventType, filterResenasTable)
+                );
+            }
+
+            if (filterCalificacion && tablaResenas) {
+                // 'change' es el estándar, 'input' ayuda en algunos móviles modernos.
+                ['change', 'input'].forEach(eventType =>
+                    filterCalificacion.addEventListener(eventType, filterResenasTable)
+                );
+            }
+
+            function filterResenasTable() {
+                const searchTerm = searchResenas ? searchResenas.value.toLowerCase() : '';
+                const selectedCalificacion = filterCalificacion ? filterCalificacion.value : '';
+                const rows = tablaResenas.querySelectorAll('tbody tr');
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    const calificacion = row.getAttribute('data-calificacion'); // "3", "4", "5"
+
+                    const matchesSearch = text.includes(searchTerm);
+                    const matchesCalificacion = !selectedCalificacion || calificacion === selectedCalificacion;
+
+                    if (matchesSearch && matchesCalificacion) {
+                        // Resetear para que tome el display del CSS (table-row o block)
+                        // Importante: Remover la propiedad inline por completo
+                        row.style.removeProperty('display');
+                    } else {
+                        // Forzar ocultamiento incluso si el CSS tiene !important
+                        row.style.setProperty('display', 'none', 'important');
+                    }
+                });
+            }
+
+            // Exportar
+            function exportResenas() {
+                const rows = tablaResenas.querySelectorAll('tbody tr');
+                let csvContent = 'Estudiante,Grado,Libro,Autor,Calificación,Comentario,Fecha\n';
+
+                rows.forEach(row => {
+                    // Verificar si está visible (display no es none)
+                    if (row.style.display !== 'none') {
+                        const cols = row.querySelectorAll('td');
+                        const estudiante = cols[0].querySelector('.libro-info__title').textContent.trim();
+                        const grado = cols[0].querySelector('.libro-info__author')?.textContent.trim() || '';
+                        const libro = cols[1].querySelector('.libro-info__title').textContent.trim();
+                        const autor = cols[1].querySelector('.libro-info__author')?.textContent.trim() || '';
+                        const calificacion = cols[2].querySelector('.rating-display__value').textContent.trim();
+                        const comentario = cols[3].textContent.trim();
+                        const fecha = cols[4].textContent.trim();
+
+                        csvContent += `"${estudiante}","${grado}","${libro}","${autor}","${calificacion}","${comentario}","${fecha}"\n`;
+                    }
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'resenas_' + new Date().toISOString().split('T')[0] + '.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+
+            // Eliminar reseña
+            async function eliminarResena(id) {
+                const result = await Swal.fire({
+                    title: '¿Eliminar reseña?',
+                    text: '¿Está seguro de que desea eliminar esta reseña?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#EF4444',
+                    cancelButtonColor: '#64748B',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (!result.isConfirmed) return;
+
+                try {
+                    const response = await fetch(`/resenas/${id}`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Eliminada!',
+                            text: data.message || 'Reseña eliminada exitosamente',
+                            confirmButtonColor: '#00B4D8'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'No se pudo eliminar la reseña',
+                            confirmButtonColor: '#00B4D8'
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo conectar con el servidor',
+                        confirmButtonColor: '#00B4D8'
+                    });
+                }
+            }
+        </script>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

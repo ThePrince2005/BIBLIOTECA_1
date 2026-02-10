@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('partials/head', { title: 'Error - Biblioteca Escolar' }) %>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h1 class="card-title">Error</h1>
+                        <% if (message) { %>
+                            <p class="card-text"><%= message %></p>
+                        <% } %>
+                        <% if (typeof error !== 'undefined' && error && error.status) { %>
+                            <p class="card-text">Estado: <%= error.status %></p>
+                        <% } %>
+                        <a href="/" class="btn btn-primary">Volver al inicio</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

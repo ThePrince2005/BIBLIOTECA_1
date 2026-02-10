@@ -1,0 +1,68 @@
+<% const fecha=resena && resena.fecha_creacion ? new Date(resena.fecha_creacion) : null; const isOwner=usuarioActual &&
+    resena && Number(usuarioActual.id)===Number(resena.usuario_id); const canModerate=usuarioActual &&
+    (usuarioActual.rol==='admin' || usuarioActual.rol==='docente' ); const opts=options || {}; const
+    showActions=isOwner; const rating=resena?.calificacion || 0; const tones={ 1: 'tone-low' , 2: 'tone-low' ,
+    3: 'tone-mid' , 4: 'tone-mid' , 5: 'tone-high' }; %>
+    <article class="resena-card <%= tones[rating] || '' %>" data-aos="fade-up" data-resena-id="<%= resena.id %>"
+        data-libro-id="<%= resena.libro_id || libro?.id || '' %>" data-calificacion="<%= rating %>"
+        data-comment="<%- encodeURIComponent(resena.comentario || '') %>"
+        data-prestamo-id="<%= resena.prestamo_id || '' %>">
+        <div class="resena-card__header">
+            <div class="resena-card__avatar">
+                <% if (resena.foto_url) { %>
+                    <img src="<%= resena.foto_url %>" alt="Avatar de <%= resena.usuario_nombre %>">
+                    <% } else { %>
+                        <span>
+                            <%= (resena.usuario_nombre || '?' ).substring(0, 1).toUpperCase() %>
+                        </span>
+                        <% } %>
+            </div>
+            <div class="resena-card__info">
+                <p class="resena-card__name">
+                    <%= resena.usuario_nombre %>
+                </p>
+                <% if (resena.grado) { %>
+                    <span class="resena-card__badge">Grado <%= resena.grado %>
+                            <%= resena.seccion || '' %></span>
+                    <% } %>
+                        <% if (resena.libro_titulo && opts.showLibro) { %>
+                            <span class="resena-card__badge is-book"><i class="fa-solid fa-book"></i>
+                                <%= resena.libro_titulo %>
+                            </span>
+                            <% } %>
+            </div>
+            <div class="resena-card__rating" aria-label="Calificación <%= rating %> de 5">
+                <% for (let star=1; star <=5; star++) { %>
+                    <i class="fa-solid fa-star <%= star <= rating ? 'is-filled' : '' %>"></i>
+                    <% } %>
+                        <span>
+                            <%= rating %>.0
+                        </span>
+            </div>
+        </div>
+        <p class="resena-card__comment">
+            <%= resena.comentario %>
+        </p>
+        <div class="resena-card__footer">
+            <span class="resena-card__date">
+                <i class="fa-regular fa-calendar"></i>
+                <%= fecha ? fecha.toLocaleDateString('es-PE', { year: 'numeric' , month: 'short' , day: 'numeric' })
+                    : '' %>
+            </span>
+            <div class="resena-card__actions" data-resena-actions>
+                <% if (opts.showLibroLink && resena.libro_id) { %>
+                    <a class="resena-btn ghost" href="/libros/libro/<%= resena.libro_id %>">
+                        <i class="fa-solid fa-up-right-from-square"></i> Ver libro
+                    </a>
+                    <% } %>
+                        <% if (showActions) { %>
+                            <button class="resena-btn ghost" data-resena-edit data-id="<%= resena.id %>">
+                                <i class="fa-regular fa-pen-to-square"></i> Editar
+                            </button>
+                            <button class="resena-btn danger" data-resena-delete data-id="<%= resena.id %>">
+                                <i class="fa-regular fa-trash-can"></i> Eliminar
+                            </button>
+                            <% } %>
+            </div>
+        </div>
+    </article>

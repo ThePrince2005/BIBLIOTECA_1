@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: documento.titulo + ' - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/material.css">
+        <style>
+            .document-viewer {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+                overflow: hidden;
+                margin-bottom: 2rem;
+                transition: background-color 0.3s ease;
+            }
+
+            .document-viewer__header {
+                padding: 1.5rem 2rem;
+                background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+                color: white;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .document-viewer__title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                margin: 0;
+                flex: 1;
+                min-width: 200px;
+            }
+
+            .document-viewer__actions {
+                display: flex;
+                gap: 0.75rem;
+                flex-wrap: wrap;
+            }
+
+            .document-viewer__actions .btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.625rem 1.25rem;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 0.875rem;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                border: none;
+                cursor: pointer;
+            }
+
+            .btn-back {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                backdrop-filter: blur(10px);
+            }
+
+            .btn-back:hover {
+                background: rgba(255, 255, 255, 0.3);
+                color: white;
+            }
+
+            .btn-download {
+                background: white;
+                color: #4e73df;
+            }
+
+            .btn-download:hover {
+                background: #f8f9fc;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .document-viewer__body {
+                padding: 0;
+                background: #525252;
+                min-height: 70vh;
+                position: relative;
+            }
+
+            .document-viewer__iframe {
+                width: 100%;
+                height: 70vh;
+                border: none;
+                display: block;
+            }
+
+            .document-viewer__info {
+                padding: 1.5rem 2rem;
+                background: #f8fafd;
+                border-top: 1px solid #e9ecef;
+            }
+
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .info-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .info-label {
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #6c757d;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .info-value {
+                font-size: 0.95rem;
+                color: #2c3e50;
+                font-weight: 500;
+            }
+
+            .loading-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10;
+                color: white;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 4px solid rgba(255, 255, 255, 0.3);
+                border-top-color: white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .document-viewer__header {
+                    padding: 1.25rem 1.5rem;
+                }
+
+                .document-viewer__title {
+                    font-size: 1.1rem;
+                    width: 100%;
+                }
+
+                .document-viewer__actions {
+                    width: 100%;
+                }
+
+                .document-viewer__actions .btn {
+                    flex: 1;
+                    justify-content: center;
+                }
+
+                .document-viewer__body {
+                    min-height: 60vh;
+                }
+
+                .document-viewer__iframe {
+                    height: 60vh;
+                }
+
+                .info-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Dark Mode Overrides */
+            [data-theme='dark'] .document-viewer {
+                background: #1e293b;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            [data-theme='dark'] .document-viewer__info {
+                background: #0f172a;
+                border-top-color: #334155;
+            }
+
+            [data-theme='dark'] .info-label {
+                color: #94a3b8;
+            }
+
+            [data-theme='dark'] .info-value {
+                color: #f1f5f9;
+            }
+
+            [data-theme='dark'] .btn-download {
+                background: #334155;
+                color: #60a5fa;
+            }
+
+            [data-theme='dark'] .btn-download:hover {
+                background: #475569;
+                color: white;
+            }
+        </style>
+</head>
+
+<body class="dashboard-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="container my-4">
+            <div class="document-viewer">
+                <div class="document-viewer__header">
+                    <h1 class="document-viewer__title">
+                        <i class="fas fa-file-pdf mr-2"></i>
+                        <%= documento.titulo %>
+                    </h1>
+                    <div class="document-viewer__actions">
+                        <a href="/admin/material" class="btn btn-back">
+                            <i class="fas fa-arrow-left"></i>
+                            <span>Volver</span>
+                        </a>
+                        <a href="/admin/documentos/descargar/<%= documento.id_documento %>" class="btn btn-download">
+                            <i class="fas fa-download"></i>
+                            <span>Descargar</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="document-viewer__body">
+                    <div id="loadingOverlay" class="loading-overlay">
+                        <div class="spinner"></div>
+                        <p>Cargando documento...</p>
+                    </div>
+                    <iframe id="documentFrame" class="document-viewer__iframe" src="/<%= rutaArchivo %>"
+                        title="<%= documento.titulo %>" onload="hideLoading()">
+                    </iframe>
+                </div>
+
+                <div class="document-viewer__info">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Descripción</span>
+                            <span class="info-value">
+                                <%= documento.descripcion || 'Sin descripción' %>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tipo de Archivo</span>
+                            <span class="info-value">
+                                <%= documento.tipo_archivo ? documento.tipo_archivo.toUpperCase() : 'PDF' %>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tamaño</span>
+                            <span class="info-value">
+                                <%= documento.tamanio ? (documento.tamanio / (1024 * 1024)).toFixed(2) + ' MB' : 'N/A'
+                                    %>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Fecha de Subida</span>
+                            <span class="info-value">
+                                <%= documento.fecha_subida ? new
+                                    Date(documento.fecha_subida).toLocaleDateString('es-ES', { year: 'numeric' ,
+                                    month: 'long' , day: 'numeric' }) : 'N/A' %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+
+            <script>
+                function hideLoading() {
+                    const overlay = document.getElementById('loadingOverlay');
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                    }
+                }
+
+                // Ocultar loading después de un tiempo máximo (fallback)
+                setTimeout(hideLoading, 5000);
+
+                // Manejar errores de carga del iframe
+                document.getElementById('documentFrame').addEventListener('error', function () {
+                    hideLoading();
+                    const body = document.querySelector('.document-viewer__body');
+                    body.innerHTML = `
+                <div style="padding: 3rem; text-align: center; color: white;">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                    <h3>Error al cargar el documento</h3>
+                    <p>No se pudo cargar el documento. Por favor, intenta descargarlo.</p>
+                    <a href="/admin/documentos/descargar/<%= documento.id_documento %>" 
+                       class="btn btn-download" 
+                       style="margin-top: 1rem; display: inline-block;">
+                        <i class="fas fa-download"></i> Descargar Documento
+                    </a>
+                </div>
+            `;
+                });
+            </script>
+</body>
+
+</html>

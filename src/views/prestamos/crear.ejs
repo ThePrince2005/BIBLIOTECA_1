@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Solicitar Préstamo - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/prestamos.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-book-medical"></i>
+                        <span>Nueva solicitud</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Solicitar Préstamo</h1>
+                        <p>Completa el formulario para solicitar el préstamo de este libro.</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Formulario -->
+            <section class="perfil-grid perfil-grid--two" data-aos="fade-up" data-aos-delay="100">
+                <!-- Información del Libro -->
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-book"></i>
+                                <span>Libro seleccionado</span>
+                            </p>
+                            <h2 class="card__title">Información del Libro</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="libro-highlight-card">
+                            <div class="libro-highlight-card__icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="libro-highlight-card__content">
+                                <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--color-neutral-900);">
+                                    <%= libro.titulo %>
+                                </h3>
+                                <p style="color: var(--color-neutral-600);"><i class="fas fa-pen-nib"
+                                        style="margin-right: 8px;"></i>
+                                    <%= libro.autor %>
+                                </p>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                    <span class="badge badge--secondary"><i class="fas fa-map-marker-alt"></i>
+                                        <%= libro.ubicacion %>
+                                    </span>
+                                    <span class="badge badge--success"><i class="fas fa-check-circle"></i>
+                                        <%= libro.ejemplares_disponibles %> disponibles
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Información del Estudiante -->
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-user"></i>
+                                <span>Solicitante</span>
+                            </p>
+                            <h2 class="card__title">Tus Datos</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="user-highlight-card">
+                            <div class="user-highlight-card__avatar">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--color-neutral-900);">
+                                    <%= usuario.nombre %>
+                                </h3>
+                                <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                                    <span class="badge badge--primary">DNI: <%= usuario.dni %></span>
+                                    <span class="badge badge--secondary">
+                                        <%= usuario.grado %>° "<%= usuario.seccion %>"
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Detalles del Préstamo -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="200">
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-calendar-alt"></i>
+                                <span>Configuración</span>
+                            </p>
+                            <h2 class="card__title">Detalles del Préstamo</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <form id="prestamoForm" class="perfil-form">
+                            <input type="hidden" name="libro_id" value="<%= libro.id %>">
+
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Préstamo *</label>
+                                <select id="tipo_prestamo" name="tipo_prestamo" class="form-select" required>
+                                    <option value="dias">Por Días</option>
+                                    <option value="horas">Por Horas</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="duracion-group">
+                                <label class="form-label" id="duracion-label">Duración en días *</label>
+                                <input type="number" id="duracion" name="duracion" class="form-input" value="3" min="1"
+                                    max="15" required>
+                                <p class="form-helper" id="duracion-helper">Máximo 15 días</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Observaciones</label>
+                                <textarea id="observaciones" name="observaciones" class="form-textarea" rows="4"
+                                    placeholder="Motivo del préstamo u otras observaciones"></textarea>
+                            </div>
+
+                            <div class="terminos-check">
+                                <input type="checkbox" id="terminos" required class="terminos-check__input">
+                                <label for="terminos" class="terminos-check__label">
+                                    <span class="terminos-check__title">Acepto los términos y condiciones</span>
+                                    <span class="terminos-check__text">Me comprometo a devolver el libro en buen estado
+                                        y dentro del plazo establecido.</span>
+                                </label>
+                            </div>
+
+                            <div class="form-actions" style="display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap; margin-top: 2rem;">
+                                <a href="/libros" class="btn-modern btn-modern--secondary">
+                                    <i class="fas fa-times"></i>
+                                    <span>Cancelar</span>
+                                </a>
+                                <button type="submit" class="btn-modern btn-modern--primary">
+                                    <i class="fas fa-check"></i>
+                                    <span>Solicitar Préstamo</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>
+            AOS.init({ duration: 800, once: true });
+
+            // Manejar envío del formulario
+            document.getElementById('prestamoForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (!document.getElementById('terminos').checked) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Términos requeridos',
+                        text: 'Debes aceptar los términos y condiciones',
+                        confirmButtonColor: '#00B4D8'
+                    });
+                    return;
+                }
+
+                const formData = new FormData(e.target);
+                const libroId = parseInt(formData.get('libro_id'));
+                const duracion = parseInt(formData.get('duracion') || 0);
+                const tipoPrestamo = formData.get('tipo_prestamo');
+                const observaciones = formData.get('observaciones');
+
+                const payload = {
+                    libro_id: libroId,
+                    tipo_prestamo: tipoPrestamo,
+                    duracion: duracion, // Send duration
+                    observaciones: observaciones
+                };
+
+                // Mostrar loading
+                Swal.fire({
+                    title: 'Procesando solicitud...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                try {
+                    const response = await fetch('/prestamos', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Préstamo solicitado!',
+                            text: responseData.message,
+                            confirmButtonColor: '#00B4D8'
+                        }).then(() => {
+                            window.location.href = '/prestamos/mis-prestamos';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: responseData.message || 'Error al procesar la solicitud',
+                            confirmButtonColor: '#00B4D8'
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo conectar con el servidor',
+                        confirmButtonColor: '#00B4D8'
+                    });
+                }
+            });
+            // Manejo dinámico del tipo de préstamo
+            const tipoSelect = document.getElementById('tipo_prestamo');
+            const duracionGroup = document.getElementById('duracion-group');
+            const duracionInput = document.getElementById('duracion');
+            const duracionLabel = document.getElementById('duracion-label');
+            const duracionHelper = document.getElementById('duracion-helper');
+
+            tipoSelect.addEventListener('change', (e) => {
+                const tipo = e.target.value;
+
+                if (tipo === 'dias') {
+                    duracionGroup.style.display = 'block';
+                    duracionLabel.textContent = 'Duración en días *';
+                    duracionInput.value = 3;
+                    duracionInput.min = 1;
+                    duracionInput.max = 15;
+                    duracionInput.required = true;
+                    duracionHelper.textContent = 'Máximo 15 días';
+                } else if (tipo === 'horas') {
+                    duracionGroup.style.display = 'block';
+                    duracionLabel.textContent = 'Duración en horas *';
+                    duracionInput.value = 1;
+                    duracionInput.min = 1;
+                    duracionInput.max = 5;
+                    duracionInput.required = true;
+                    duracionHelper.textContent = 'Máximo 5 horas (durante el día)';
+                }
+            });
+        </script>
+</body>
+
+</html>

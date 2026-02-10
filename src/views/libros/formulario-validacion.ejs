@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Validar Lectura - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <style>
+            :root {
+                --input-bg: #f8fafc;
+                --input-border: #e2e8f0;
+                --input-focus: #818cf8;
+                --validation-success: #10b981;
+                --validation-error: #ef4444;
+                --validation-warning: #f59e0b;
+                --text-main: #1e293b;
+                --text-muted: #64748b;
+                --card-bg: white;
+            }
+
+            [data-theme='dark'] {
+                --input-bg: #1e293b;
+                --input-border: #334155;
+                --text-main: #f8fafc;
+                --text-muted: #94a3b8;
+                --card-bg: #1e293b;
+            }
+
+            body {
+                background-color: #f1f5f9;
+                background-image:
+                    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                    radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+                min-height: 100vh;
+            }
+
+            .validation-page {
+                max-width: 900px;
+                margin: 3rem auto;
+                padding: 0 1.5rem;
+                animation: fadeIn 0.6s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Hero Section for Book */
+            .book-hero-card {
+                background: white;
+                border-radius: 20px;
+                padding: 2.5rem;
+                display: grid;
+                grid-template-columns: auto 1fr;
+                gap: 2.5rem;
+                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+                margin-bottom: 2rem;
+                position: relative;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, 0.8);
+            }
+
+            .book-hero-card::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 6px;
+                background: linear-gradient(90deg, #6366f1, #a855f7);
+            }
+
+            .book-cover-wrapper {
+                position: relative;
+                width: 140px;
+                height: 200px;
+                border-radius: 12px;
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+                transition: transform 0.3s ease;
+            }
+
+            .book-cover-wrapper:hover {
+                transform: scale(1.03) rotate(1deg);
+            }
+
+            .book-cover-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 12px;
+            }
+
+            .book-info h1 {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #1e293b;
+                margin-bottom: 0.5rem;
+                letter-spacing: -0.5px;
+                line-height: 1.2;
+            }
+
+            .book-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .meta-tag {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.4rem 0.8rem;
+                background: #f1f5f9;
+                border-radius: 8px;
+                color: #64748b;
+                font-size: 0.85rem;
+                font-weight: 500;
+            }
+
+            .meta-tag i {
+                color: #818cf8;
+            }
+
+            /* Validation Form */
+            .validation-form-card {
+                background: white;
+                border-radius: 20px;
+                padding: 3rem;
+                box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+                position: relative;
+            }
+
+            .form-header {
+                margin-bottom: 2.5rem;
+                border-bottom: 1px solid #e2e8f0;
+                padding-bottom: 1.5rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #1e293b;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .form-header h2 i {
+                color: #8b5cf6;
+            }
+
+            .form-header p {
+                color: #64748b;
+                font-size: 0.95rem;
+            }
+
+            /* Modern Inputs */
+            .modern-form-group {
+                margin-bottom: 2rem;
+                position: relative;
+            }
+
+            .modern-label {
+                display: block;
+                font-weight: 600;
+                color: #334155;
+                margin-bottom: 0.75rem;
+                font-size: 0.95rem;
+                transition: color 0.2s;
+            }
+
+            .modern-label i {
+                color: #94a3b8;
+                margin-right: 0.4rem;
+                width: 16px;
+            }
+
+            .modern-input-wrapper {
+                position: relative;
+            }
+
+            .modern-textarea,
+            .modern-input {
+                width: 100%;
+                padding: 1rem 1.25rem;
+                background: var(--input-bg);
+                border: 2px solid transparent;
+                border-radius: 12px;
+                font-size: 1rem;
+                color: #1e293b;
+                font-family: inherit;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                resize: vertical;
+            }
+
+            .modern-textarea {
+                min-height: 120px;
+            }
+
+            .modern-textarea:hover,
+            .modern-input:hover {
+                background: #fff;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            }
+
+            .modern-textarea:focus,
+            .modern-input:focus {
+                background: #fff;
+                border-color: var(--input-focus);
+                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.15);
+                outline: none;
+            }
+
+            .modern-textarea:focus+.focus-border,
+            .modern-input:focus+.focus-border {
+                width: 100%;
+            }
+
+            .char-counter {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+                margin-top: 0.5rem;
+                font-size: 0.8rem;
+                color: #94a3b8;
+                font-weight: 500;
+            }
+
+            .counter-pill {
+                padding: 0.2rem 0.6rem;
+                border-radius: 20px;
+                background: #f1f5f9;
+                transition: all 0.3s;
+            }
+
+            .counter-pill.valid {
+                background: #dcfce7;
+                color: #15803d;
+            }
+
+            .counter-pill.invalid {
+                background: #fee2e2;
+                color: #b91c1c;
+            }
+
+            /* Action Buttons */
+            .actions-bar {
+                display: flex;
+                justify-content: flex-end;
+                gap: 1rem;
+                margin-top: 3rem;
+                padding-top: 1.5rem;
+                border-top: 1px solid #e2e8f0;
+            }
+
+            .info-card {
+                background: linear-gradient(135deg, #eff6ff, #dbeafe);
+                border-radius: 12px;
+                padding: 1.25rem;
+                display: flex;
+                align-items: flex-start;
+                gap: 1rem;
+                margin-bottom: 2rem;
+                border: 1px solid #bfdbfe;
+            }
+
+            .info-card i {
+                font-size: 1.25rem;
+                color: #2563eb;
+                margin-top: 0.1rem;
+            }
+
+            .info-card p {
+                color: #1e40af;
+                font-size: 0.9rem;
+                line-height: 1.5;
+                margin: 0;
+            }
+
+            @media (max-width: 768px) {
+                .book-hero-card {
+                    grid-template-columns: 1fr;
+                    text-align: center;
+                    padding: 2rem;
+                }
+
+                .book-cover-wrapper {
+                    margin: 0 auto;
+                    width: 120px;
+                    height: 180px;
+                }
+
+                .book-meta {
+                    justify-content: center;
+                }
+            }
+        </style>
+</head>
+
+<body class="dashboard-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="validation-page">
+            <!-- Hero Section -->
+            <article class="book-hero-card" data-aos="fade-up">
+                <div class="book-cover-wrapper">
+                    <img src="<%= libro.portada_url || libro.imagen_portada || '/img/portada-default.jpg' %>"
+                        alt="<%= libro.titulo %>" onerror="this.src='/img/portada-default.jpg'">
+                </div>
+                <div class="book-info">
+                    <h1>
+                        <%= libro.titulo %>
+                    </h1>
+
+                    <div class="book-meta">
+                        <div class="meta-tag">
+                            <i class="fas fa-user-edit"></i>
+                            <%= libro.autor || 'Autor desconocido' %>
+                        </div>
+                        <% if (libro.editorial) { %>
+                            <div class="meta-tag">
+                                <i class="fas fa-building"></i>
+                                <%= libro.editorial %>
+                            </div>
+                            <% } %>
+                                <% if (libro.area || libro.categoria) { %>
+                                    <div class="meta-tag">
+                                        <i class="fas fa-bookmark"></i>
+                                        <%= libro.area || libro.categoria %>
+                                    </div>
+                                    <% } %>
+                                        <% if (libro.tipo==='virtual' ) { %>
+                                            <div class="meta-tag">
+                                                <i class="fas fa-laptop"></i>
+                                                Libro Virtual
+                                            </div>
+                                            <% } else { %>
+                                                <div class="meta-tag">
+                                                    <i class="fas fa-book"></i>
+                                                    Libro Físico
+                                                </div>
+                                                <% } %>
+                    </div>
+
+                    <div class="progress-info" style="margin-top: auto;">
+                        <div
+                            style="display: flex; align-items: center; gap: 0.5rem; color: #64748b; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            <i class="fas fa-check-circle" style="color: #10b981;"></i>
+                            <span>Lectura completada</span>
+                        </div>
+                        <!-- Validado badge if needed -->
+                    </div>
+                </div>
+            </article>
+
+            <!-- Validation Form Section -->
+            <section class="validation-form-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="form-header">
+                    <h2><i class="fas fa-clipboard-check"></i> Cuestionario de Validación</h2>
+                    <p>Completa estas preguntas para confirmar tu lectura. Esto actualizará tu progreso y desbloqueará
+                        logros en tu perfil.</p>
+                </div>
+
+                <div class="info-card">
+                    <i class="fas fa-lightbulb"></i>
+                    <p>
+                        <strong>¡Tu opinión importa!</strong> Escribe respuestas detalladas y sinceras.
+                        Esto te ayudará a recordar mejor lo que leíste y servirá de referencia para otros estudiantes.
+                    </p>
+                </div>
+
+                <form id="formValidacion" method="POST" action="/libros-leidos/validar/<%= tipo %>/<%= id %>">
+                    <!-- Pregunta 1: Opinión -->
+                    <div class="modern-form-group">
+                        <label class="modern-label" for="opinion_libro">
+                            <i class="fas fa-comment-alt"></i> ¿Qué tal te pareció el libro? <span
+                                style="color:red">*</span>
+                        </label>
+                        <div class="modern-input-wrapper">
+                            <textarea id="opinion_libro" name="opinion_libro" class="modern-textarea"
+                                placeholder="Escribe tu opinión personal, qué te gustó más, qué no te gustó, etc..."
+                                required minlength="10" data-min-length="10"><%= libro.opinion_libro || '' %></textarea>
+                        </div>
+                        <div class="char-counter">
+                            <span class="counter-pill" id="opinion-count">0 / 10 mín</span>
+                        </div>
+                    </div>
+
+                    <!-- Pregunta 2: Resumen -->
+                    <div class="modern-form-group">
+                        <label class="modern-label" for="resumen_libro">
+                            <i class="fas fa-book-open"></i> ¿De qué trata el libro? (Resumen) <span
+                                style="color:red">*</span>
+                        </label>
+                        <div class="modern-input-wrapper">
+                            <textarea id="resumen_libro" name="resumen_libro" class="modern-textarea"
+                                placeholder="Describe brevemente la trama principal o el argumento..." required
+                                minlength="20" data-min-length="20"><%= libro.resumen_libro || '' %></textarea>
+                        </div>
+                        <div class="char-counter">
+                            <span class="counter-pill" id="resumen-count">0 / 20 mín</span>
+                        </div>
+                    </div>
+
+                    <!-- Pregunta 3: Personajes -->
+                    <div class="modern-form-group">
+                        <label class="modern-label" for="personajes_principales">
+                            <i class="fas fa-users"></i> Personajes Principales
+                        </label>
+                        <div class="modern-input-wrapper">
+                            <textarea id="personajes_principales" name="personajes_principales" class="modern-textarea"
+                                style="min-height: 80px;"
+                                placeholder="¿Quiénes son los protagonistas?"><%= libro.personajes_principales || '' %></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Pregunta 4: Tema & Lecciones -->
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+                        <div class="modern-form-group">
+                            <label class="modern-label" for="tema_principal">
+                                <i class="fas fa-tag"></i> Tema Principal
+                            </label>
+                            <div class="modern-input-wrapper">
+                                <input type="text" id="tema_principal" name="tema_principal" class="modern-input"
+                                    placeholder="Ej: Amistad, Historia, Ciencia..."
+                                    value="<%= libro.tema_principal || '' %>">
+                            </div>
+                        </div>
+
+                        <div class="modern-form-group">
+                            <label class="modern-label" for="lecciones_aprendidas">
+                                <i class="fas fa-graduation-cap"></i> Lecciones Aprendidas
+                            </label>
+                            <div class="modern-input-wrapper">
+                                <textarea id="lecciones_aprendidas" name="lecciones_aprendidas" class="modern-textarea"
+                                    style="min-height: 80px;"
+                                    placeholder="¿Qué enseñanza te dejó?"><%= libro.lecciones_aprendidas || '' %></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <% if (libro.validado) { %>
+                        <div class="alert alert-success"
+                            style="padding: 1rem; border-radius: 12px; background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; display: flex; gap: 0.5rem; align-items: center; margin-bottom: 1.5rem;">
+                            <i class="fas fa-check-circle" style="font-size: 1.25rem;"></i>
+                            <div>
+                                <strong>¡Libro Validado!</strong> Este cuestionario ya fue completado y aprobado.
+                            </div>
+                        </div>
+                        <% } %>
+
+                            <div class="actions-bar">
+                                <a href="/libros-leidos" class="btn-modern btn-modern--secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                                <button type="submit" class="btn-modern btn-modern--primary" id="btnSubmit"
+                                    <%=libro.validado ? 'disabled' : '' %>>
+                                    <span id="btnText">
+                                        <i class="fas fa-paper-plane"></i> Confirmar y Validar
+                                    </span>
+                                </button>
+                            </div>
+                </form>
+            </section>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            AOS.init({ duration: 800, once: true });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const form = document.getElementById('formValidacion');
+                const submitBtn = document.getElementById('btnSubmit');
+                const btnText = document.getElementById('btnText');
+
+                // Validation Logic
+                const inputs = form.querySelectorAll('textarea[required]');
+
+                function validateField(field) {
+                    const minLength = parseInt(field.dataset.minLength || 0);
+                    const currentLength = field.value.trim().length;
+                    const counterId = field.id === 'opinion_libro' ? 'opinion-count' : 'resumen-count';
+                    const counter = document.getElementById(counterId);
+
+                    if (counter) {
+                        counter.textContent = `${currentLength} / ${minLength} mín`;
+                        if (currentLength >= minLength) {
+                            counter.classList.add('valid');
+                            counter.classList.remove('invalid');
+                            field.style.borderColor = 'var(--validation-success)';
+                        } else {
+                            counter.classList.remove('valid');
+                            counter.classList.add('invalid');
+                            field.style.borderColor = currentLength > 0 ? 'var(--validation-warning)' : '';
+                        }
+                    }
+
+                    return currentLength >= minLength;
+                }
+
+                function checkFormValidity() {
+                    let isValid = true;
+                    inputs.forEach(input => {
+                        if (!validateField(input)) isValid = false;
+                    });
+                    submitBtn.disabled = !isValid;
+                    if (!isValid) submitBtn.style.opacity = '0.6';
+                    else submitBtn.style.opacity = '1';
+                }
+
+                // Bind events
+                inputs.forEach(input => {
+                    input.addEventListener('input', () => {
+                        validateField(input);
+                        checkFormValidity();
+                    });
+                    // Initial check
+                    validateField(input);
+                });
+
+                checkFormValidity();
+
+            // Disable if validated
+            <% if (libro.validado) { %>
+                    form.querySelectorAll('input, textarea, button').forEach(el => el.disabled = true);
+            <% } %>
+
+                    // Submit Handler
+                    form.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+
+                        if (submitBtn.disabled) return;
+
+                        // Animation
+                        submitBtn.disabled = true;
+                        const originalHtml = btnText.innerHTML;
+                        btnText.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Guardando...';
+
+                        try {
+                            const formData = new FormData(form);
+                            const response = await fetch(form.action, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'Accept': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                },
+                                body: new URLSearchParams(formData)
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok) {
+                                await Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Excelente trabajo!',
+                                    text: 'Has validado este libro correctamente. Se ha añadido a tu récord.',
+                                    confirmButtonColor: '#6366f1'
+                                });
+                                window.location.href = '/libros-leidos';
+                            } else {
+                                throw new Error(data.message || 'Error al guardar');
+                            }
+                        } catch (error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Ups...',
+                                text: error.message || 'Ocurrió un error al procesar la solicitud.',
+                                confirmButtonColor: '#ef4444'
+                            });
+                            btnText.innerHTML = originalHtml;
+                            submitBtn.disabled = false;
+                        }
+                    });
+            });
+        </script>
+</body>
+
+</html>

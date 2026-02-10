@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Editar Perfil' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Header -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-user-edit"></i>
+                        <span>Editar información</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Editar mi perfil</h1>
+                        <p>Actualiza tus datos y mantén tu cuenta sincronizada con la institución.</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Formulario de Edición -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Información personal</span>
+                            </p>
+                            <h2 class="card__title">Actualizar datos</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <form id="formEditarPerfil" class="perfil-form">
+                            <div class="form-group">
+                                <label class="form-label">Nombre completo</label>
+                                <input type="text" name="nombre" value="<%= usuario.nombre %>" class="form-input"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Correo electrónico</label>
+                                <input type="email" value="<%= usuario.correo %>" class="form-input" readonly disabled>
+                                <p class="form-helper">El correo electrónico no puede ser modificado</p>
+                            </div>
+
+                            <% if (usuario.rol==='estudiante' ) { %>
+                                <div class="form-grid-two">
+                                    <div class="form-group">
+                                        <label class="form-label">Grado</label>
+                                        <input type="number" name="grado" value="<%= usuario.grado %>"
+                                            class="form-input" min="1" max="5">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Sección</label>
+                                        <input type="text" name="seccion" value="<%= usuario.seccion %>"
+                                            class="form-input" maxlength="1">
+                                    </div>
+                                </div>
+                                <% } else { %>
+                                    <div class="form-group">
+                                        <label class="form-label">Área de especialidad</label>
+                                        <input type="text" name="area_docente" value="<%= usuario.area_docente %>"
+                                            class="form-input">
+                                    </div>
+                                    <% } %>
+
+                                        <div class="form-actions">
+                                            <a href="/perfil" class="btn btn--secondary">
+                                                <i class="fas fa-times"></i>
+                                                Cancelar
+                                            </a>
+                                            <button type="submit" class="btn btn--primary">
+                                                <i class="fas fa-save"></i>
+                                                Guardar cambios
+                                            </button>
+                                        </div>
+                        </form>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>
+            AOS.init({ duration: 800, once: true });
+
+            document.getElementById('formEditarPerfil').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch('/perfil', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Perfil actualizado!',
+                            text: result.message,
+                            confirmButtonColor: '#00B4D8'
+                        }).then(() => {
+                            window.location.href = '/perfil';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: result.message || 'No se pudo actualizar el perfil.',
+                            confirmButtonColor: '#00B4D8'
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        text: 'No se pudo conectar con el servidor.',
+                        confirmButtonColor: '#00B4D8'
+                    });
+                }
+            });
+        </script>
+</body>
+
+</html>

@@ -1,0 +1,668 @@
+/* ========================================================================
+   BIBLIOTECA ESCOLAR - RESEÑAS (DISEÑO MODERNO)
+   Archivo: resenas.css
+   Propósito: Estilos específicos para vistas de reseñas
+   ======================================================================== */
+
+/* ================================================================
+   RATING DISPLAY
+   ================================================================ */
+
+.rating-display {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 1rem;
+    color: #F59E0B;
+    font-weight: var(--font-weight-semibold);
+}
+
+.rating-display i {
+    color: #F59E0B;
+}
+
+.rating-display__value {
+    margin-left: 0.25rem;
+    color: var(--color-neutral-900);
+}
+
+/* ================================================================
+   COMENTARIO PREVIEW
+   ================================================================ */
+
+.comentario-preview {
+    max-width: 300px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    color: var(--color-neutral-600);
+    font-size: var(--font-size-sm);
+}
+
+/* ================================================================
+   BTN DELETE
+   ================================================================ */
+
+.btn-delete {
+    color: var(--color-error) !important;
+}
+
+.btn-delete:hover {
+    background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* ================================================================
+   MODAL DE RESEÑAS
+   ================================================================ */
+
+/* Modal oculto por defecto */
+.resena-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+/* Mostrar modal cuando tiene clase is-open */
+.resena-modal.is-open {
+    display: flex !important;
+}
+
+/* Backdrop */
+.resena-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Dialog */
+.resena-modal__dialog {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid rgba(148, 224, 239, 0.25);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease-out;
+}
+
+/* Header */
+.resena-modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(148, 224, 239, 0.25);
+}
+
+.resena-modal__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+.resena-modal__subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0.5rem 0 0 0;
+}
+
+.resena-modal__close {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    border: none;
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.resena-modal__close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+}
+
+/* Body */
+.resena-modal__body {
+    padding: 2rem;
+}
+
+.resena-modal__label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.resena-modal__label:first-child {
+    margin-top: 0;
+}
+
+/* Rating */
+.resena-rating {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.resena-rating button {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+}
+
+.resena-rating button:hover,
+.resena-rating button.is-active {
+    color: #F59E0B;
+    transform: scale(1.1);
+}
+
+/* Textarea */
+.resena-modal__body textarea {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(148, 224, 239, 0.3);
+    background: rgba(255, 255, 255, 0.95);
+    color: #1e293b;
+    font-size: 0.95rem;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+    transition: all 0.3s ease;
+}
+
+.resena-modal__body textarea:focus {
+    outline: none;
+    border-color: #00B4D8;
+    box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.1);
+}
+
+/* Footer */
+.resena-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid rgba(148, 224, 239, 0.25);
+}
+
+.resena-modal__footer button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.resena-modal__footer button.ghost {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    color: #64748b;
+}
+
+.resena-modal__footer button.ghost:hover {
+    background: rgba(148, 224, 239, 0.1);
+    border-color: #00B4D8;
+    color: #00B4D8;
+}
+
+.resena-modal__footer button[type="submit"] {
+    background: linear-gradient(135deg, #00B4D8, #0096C7);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 180, 216, 0.25);
+}
+
+.resena-modal__footer button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 180, 216, 0.35);
+}
+
+/* Animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================================================
+   TEMA OSCURO
+   ================================================================ */
+
+[data-theme="dark"] .rating-display__value {
+    color: var(--color-neutral-50);
+}
+
+[data-theme="dark"] .comentario-preview {
+    color: var(--color-neutral-400);
+}
+
+[data-theme="dark"] .resena-modal__dialog {
+    background: rgba(30, 41, 59, 0.95);
+}
+
+[data-theme="dark"] .resena-modal__title {
+    color: var(--color-neutral-50);
+}
+
+[data-theme="dark"] .resena-modal__subtitle {
+    color: var(--color-neutral-400);
+}
+
+[data-theme="dark"] .resena-modal__label {
+    color: var(--color-neutral-200);
+}
+
+[data-theme="dark"] .resena-modal__body textarea {
+    background: rgba(51, 65, 85, 0.5);
+    color: var(--color-neutral-50);
+    border-color: rgba(148, 224, 239, 0.2);
+}
+/* ================================================================
+   TARJETAS DE RESE�AS
+   ================================================================ */
+
+.resena-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.resena-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(148, 224, 239, 0.25);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.resena-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 180, 216, 0.3);
+}
+
+/* Header */
+.resena-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.resena-card__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00B4D8, #0096C7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.resena-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.resena-card__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.resena-card__name {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.resena-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(148, 224, 239, 0.15);
+    color: #0096C7;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.resena-card__badge.is-book {
+    background: rgba(124, 58, 237, 0.1);
+    color: #7C3AED;
+}
+
+/* Rating */
+.resena-card__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.resena-card__rating i {
+    color: #cbd5e1;
+    font-size: 1rem;
+}
+
+.resena-card__rating i.is-filled {
+    color: #F59E0B;
+}
+
+.resena-card__rating span {
+    margin-left: 0.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+/* Comment */
+.resena-card__comment {
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+}
+
+/* Footer */
+.resena-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(148, 224, 239, 0.2);
+}
+
+.resena-card__date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.resena-card__date i {
+    color: #cbd5e1;
+}
+
+.resena-card__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Botones de acci�n */
+.resena-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid;
+    text-decoration: none;
+}
+
+.resena-btn.ghost {
+    background: transparent;
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
+.resena-btn.ghost:hover {
+    background: rgba(0, 180, 216, 0.1);
+    border-color: #00B4D8;
+    color: #00B4D8;
+    transform: translateY(-1px);
+}
+
+.resena-btn.danger {
+    background: transparent;
+    border-color: #fecaca;
+    color: #EF4444;
+}
+
+.resena-btn.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #EF4444;
+    transform: translateY(-1px);
+}
+
+.resena-btn i {
+    font-size: 0.9rem;
+}
+
+/* ================================================================
+   TARJETAS DE RESE�AS
+   ================================================================ */
+
+.resena-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.resena-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(148, 224, 239, 0.25);
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.resena-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 180, 216, 0.3);
+}
+
+/* Header */
+.resena-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.resena-card__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #00B4D8, #0096C7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.resena-card__avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.resena-card__info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.resena-card__name {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.resena-card__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 8px;
+    background: rgba(148, 224, 239, 0.15);
+    color: #0096C7;
+    font-size: 0.8rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.resena-card__badge.is-book {
+    background: rgba(124, 58, 237, 0.1);
+    color: #7C3AED;
+}
+
+/* Rating */
+.resena-card__rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.resena-card__rating i {
+    color: #cbd5e1;
+    font-size: 1rem;
+}
+
+.resena-card__rating i.is-filled {
+    color: #F59E0B;
+}
+
+.resena-card__rating span {
+    margin-left: 0.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 0.95rem;
+}
+
+/* Comment */
+.resena-card__comment {
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+}
+
+/* Footer */
+.resena-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(148, 224, 239, 0.2);
+}
+
+.resena-card__date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.resena-card__date i {
+    color: #cbd5e1;
+}
+
+.resena-card__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Botones de acci�n */
+.resena-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid;
+    text-decoration: none;
+}
+
+.resena-btn.ghost {
+    background: transparent;
+    border-color: #cbd5e1;
+    color: #64748b;
+}
+
+.resena-btn.ghost:hover {
+    background: rgba(0, 180, 216, 0.1);
+    border-color: #00B4D8;
+    color: #00B4D8;
+    transform: translateY(-1px);
+}
+
+.resena-btn.danger {
+    background: transparent;
+    border-color: #fecaca;
+    color: #EF4444;
+}
+
+.resena-btn.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #EF4444;
+    transform: translateY(-1px);
+}
+
+.resena-btn i {
+    font-size: 0.9rem;
+}

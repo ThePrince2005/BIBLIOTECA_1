@@ -1,0 +1,418 @@
+@import url('variables.css');
+
+/* ========================================================================
+   GLOBAL RESET & TYPOGRAPHY
+   ======================================================================== */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+@media (max-width: 640px) {
+    html {
+        font-size: 15px;
+    }
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-family);
+    color: var(--text-gray);
+    background: var(--bg-light);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+img,
+picture,
+video,
+canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+:is(button, [type="button"], [type="submit"]) {
+    cursor: pointer;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Hide native password reveal button in Edge/Internet Explorer */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+/* ========================================================================
+   LAYOUT UTILITIES - MEJORADO PARA ULTRA-WIDE
+   ======================================================================== */
+
+:root {
+    --container-max: 1280px;
+    /* Base container width optimized for standard laptops */
+    --container-padding: clamp(1rem, 3vw, 2rem);
+    --grid-gap: clamp(1rem, 2vw, 2rem);
+}
+
+/* Ajustes para Laptops (Compact Desktop) */
+@media (min-width: 1024px) and (max-width: 1440px) {
+    :root {
+        --container-max: 95%;
+        /* Use percentage on laptops to maximize space */
+        --container-padding: 1.5rem;
+    }
+}
+
+/* Ajustes para pantallas grandes (Full HD +) */
+@media (min-width: 1441px) {
+    :root {
+        --container-max: 1400px;
+    }
+}
+
+@media (min-width: 1920px) {
+    :root {
+        --container-max: 1600px;
+    }
+}
+
+@media (min-width: 2560px) {
+    :root {
+        --container-max: 2000px;
+    }
+
+    html {
+        font-size: 18px;
+    }
+}
+
+.container {
+    width: min(95%, var(--container-max));
+    margin-inline: auto;
+    padding-inline: var(--container-padding);
+}
+
+/* Contenedor fluido para dashboards */
+.dashboard-wrapper {
+    width: min(98%, 1800px);
+    /* Slightly wider on default */
+    margin: 0 auto;
+    padding: clamp(1rem, 3vw, 2.5rem);
+    /* Reduced top/bottom padding slightly */
+}
+
+@media (min-width: 1440px) {
+    .dashboard-wrapper {
+        width: 95%;
+        padding: 3rem;
+    }
+}
+
+@media (min-width: 2560px) {
+    .dashboard-wrapper {
+        width: 85%;
+        max-width: 2200px;
+    }
+}
+
+
+.section {
+    padding-block: clamp(2rem, 4vw, 4rem);
+}
+
+.stack-md {
+    display: flex;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .stack-md {
+        flex-direction: column;
+    }
+}
+
+.stack-sm {
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 640px) {
+    .stack-sm {
+        flex-direction: column;
+    }
+}
+
+.responsive-grid {
+    display: grid;
+    gap: clamp(1rem, 2vw, 1.75rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+}
+
+.card {
+    background: var(--bg-white);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-sm);
+    padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--card-border);
+}
+
+.button-group {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+    .button-group {
+        flex-direction: column;
+    }
+
+    .button-group>* {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.form-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.form-grid .form-control,
+.form-grid select,
+.form-grid input,
+.form-grid textarea {
+    width: 100%;
+}
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-small);
+    border: 1px solid var(--card-border);
+}
+
+.table-wrapper table {
+    width: 100%;
+    min-width: 640px;
+    border-collapse: collapse;
+}
+
+.table-wrapper th,
+.table-wrapper td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+}
+
+.table-wrapper th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--subtitle-gray);
+    background: var(--bg-gray-50);
+}
+
+.table-wrapper tr:nth-child(even) {
+    background: var(--bg-gray-50);
+}
+
+.badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.media-card {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(80px, 120px) 1fr;
+    align-items: center;
+}
+
+@media (max-width: 640px) {
+    .media-card {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mobile-only {
+    display: none !important;
+}
+
+.desktop-only {
+    display: inherit;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: block !important;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+.text-balance {
+    text-wrap: balance;
+}
+
+/* Custom class for table actions to ensure horizontal layout */
+.table-actions-group {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem; /* Or use a specific gap value like 0.75rem or 1rem */
+}
+
+/* ========================================================================
+   RESPONSIVE TYPOGRAPHY
+   ======================================================================== */
+
+h1,
+.text-3xl {
+    font-size: clamp(2rem, 3vw, 2.75rem);
+}
+
+h2,
+.text-2xl {
+    font-size: clamp(1.5rem, 2.5vw, 2rem);
+}
+
+h3,
+.text-xl {
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+}
+
+p,
+.text-base {
+    font-size: 1rem;
+}
+
+small,
+.text-sm {
+    font-size: 0.875rem;
+}
+
+/* ========================================================================
+   UTILITIES FOR DASHBOARDS & PANELS
+   ======================================================================== */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-card);
+    background: var(--bg-white);
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+}
+
+.stat-card__content {
+    flex: 1;
+}
+
+.chip-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip-list span {
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-full);
+    background: var(--bg-gray-100);
+    font-size: 0.85rem;
+}
+
+.toast-container {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    z-index: 1100;
+}
+
+@media (max-width: 640px) {
+    .toast-container {
+        left: 1rem;
+        right: 1rem;
+    }
+}
+
+/* ========================================================================
+   ACCESSIBILITY & MOTION
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .table-wrapper table {
+        min-width: 520px;
+    }
+}
+
+.nav-open {
+    overflow: hidden;
+}

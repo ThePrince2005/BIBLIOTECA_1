@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Seleccionar Perfil - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/auth-shared.css">
+        <!-- FontAwesome for Icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            /* Force single screen view on desktop */
+            .auth-body {
+                height: 100vh;
+                overflow: hidden;
+                padding: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .auth-wrapper {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .auth-card-wide {
+                max-width: 950px;
+                width: 90%;
+                padding: 3rem 3rem 2rem;
+                /* Increased top padding to 3rem to prevent logo clipping */
+                max-height: 95vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .auth-header {
+                margin-bottom: 2rem;
+                text-align: center;
+                /* Ensure centering */
+            }
+
+            .auth-logo {
+                height: 65px;
+                /* Slightly smaller to fit better */
+                margin: 0 auto 1rem auto;
+                /* Center horizontally */
+                display: block;
+                object-fit: contain;
+            }
+
+            /* Override/Custom size for the institution text */
+            .auth-institution {
+                font-size: 1rem !important;
+                /* Reduced size as requested */
+                margin-bottom: 0.25rem;
+                padding: 0 1rem;
+            }
+
+            .auth-title {
+                font-size: 1.8rem;
+                /* Adjusted for balance */
+            }
+
+            .role-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+                margin: 1rem 0 2rem 0;
+                perspective: 1000px;
+            }
+
+            /* Card Design - Blue Background Default */
+            .profile-card {
+                position: relative;
+                background: linear-gradient(135deg, rgba(224, 242, 254, 0.9), rgba(186, 230, 253, 0.8));
+                border-radius: 20px;
+                padding: 1.5rem 1rem;
+                text-align: center;
+                text-decoration: none;
+                color: var(--title-dark);
+                border: 2px solid rgba(0, 180, 216, 0.3);
+                box-shadow: 0 4px 15px rgba(0, 119, 182, 0.1);
+                transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                cursor: pointer;
+            }
+
+            /* Hover Effect: Turn White & Scale */
+            .profile-card:hover {
+                background: #ffffff;
+                border-color: var(--accent-blue);
+                transform: translateY(-8px) scale(1.03);
+                box-shadow: 0 15px 35px rgba(0, 119, 182, 0.2);
+            }
+
+            /* Click Effect */
+            .profile-card:active {
+                transform: scale(0.95);
+                background: #f0f9ff;
+                box-shadow: 0 5px 15px rgba(0, 119, 182, 0.15);
+                transition: transform 0.1s;
+            }
+
+            /* Icon Wrapper */
+            .icon-container {
+                width: 80px;
+                height: 80px;
+                background: #ffffff;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1rem;
+                position: relative;
+                z-index: 1;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 10px rgba(0, 180, 216, 0.15);
+            }
+
+            .profile-card:hover .icon-container {
+                background: linear-gradient(135deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
+                transform: scale(1.1) rotate(5deg);
+            }
+
+            .profile-card i {
+                font-size: 2.5rem;
+                color: var(--accent-blue);
+                transition: color 0.3s ease;
+            }
+
+            .profile-card:hover i {
+                color: white;
+            }
+
+            /* Text Styling */
+            .profile-title {
+                font-size: 1.35rem;
+                font-weight: 700;
+                margin-bottom: 0.4rem;
+                z-index: 1;
+            }
+
+            .profile-desc {
+                font-size: 0.9rem;
+                color: var(--text-gray);
+                line-height: 1.4;
+                z-index: 1;
+                opacity: 0.9;
+            }
+
+            /* Support Section */
+            .support-section {
+                margin-top: 1rem;
+                padding-top: 1rem;
+                display: flex;
+                justify-content: center;
+                gap: 1.5rem;
+                flex-wrap: wrap;
+            }
+
+            .support-item {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                color: var(--subtitle-gray);
+                font-size: 0.9rem;
+                background: rgba(255, 255, 255, 0.6);
+                padding: 0.6rem 1.25rem;
+                border-radius: 50px;
+                transition: all 0.3s ease;
+            }
+
+            .support-item:hover {
+                background: white;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                transform: translateY(-2px);
+                color: var(--accent-blue-dark);
+            }
+
+            .support-item i {
+                font-size: 1.1rem;
+                color: var(--accent-blue);
+            }
+
+            /* Mobile Responsive */
+            @media (max-width: 900px) {
+                .auth-body {
+                    height: auto;
+                    min-height: 100vh;
+                    overflow-y: auto;
+                    padding: 1rem;
+                    display: block;
+                    /* Disable flex centering on mobile to allow scrolling */
+                }
+
+                .auth-wrapper {
+                    display: block;
+                }
+
+                .auth-card-wide {
+                    padding: 2rem 1.5rem;
+                    max-height: none;
+                    width: 100%;
+                    margin: 0 auto;
+                }
+
+                .role-grid {
+                    grid-template-columns: 1fr;
+                    gap: 1rem;
+                    margin: 2rem 0;
+                }
+
+                .profile-card {
+                    flex-direction: row;
+                    padding: 1.25rem;
+                    gap: 1rem;
+                    text-align: left;
+                    align-items: center;
+                }
+
+                .icon-container {
+                    width: 60px;
+                    height: 60px;
+                    margin-bottom: 0;
+                }
+
+                .profile-card i {
+                    font-size: 1.8rem;
+                }
+
+                .auth-title {
+                    font-size: 1.75rem;
+                }
+            }
+
+            /* =========================
+               DARK MODE SUPPORT 
+               ========================= */
+
+            /* Background & Text */
+            body.theme-dark .auth-institution {
+                color: #38bdf8;
+                /* Lighter cyan */
+            }
+
+            body.theme-dark .auth-title {
+                color: #f1f5f9;
+                /* White-ish */
+            }
+
+            body.theme-dark .auth-subtitle {
+                color: #94a3b8;
+                /* Gray-400 */
+            }
+
+            /* Cards in Dark Mode */
+            body.theme-dark .profile-card {
+                background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+                border-color: rgba(56, 189, 248, 0.2);
+                color: #e2e8f0;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            body.theme-dark .profile-card:hover {
+                background: rgba(30, 41, 59, 1);
+                border-color: #38bdf8;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            }
+
+            body.theme-dark .profile-card:active {
+                background: #0f172a;
+            }
+
+            body.theme-dark .profile-title {
+                color: #f8fafc;
+            }
+
+            body.theme-dark .profile-desc {
+                color: #cbd5e1;
+                opacity: 0.8;
+            }
+
+            /* Icons in Dark Mode */
+            body.theme-dark .icon-container {
+                background: rgba(15, 23, 42, 0.6);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            }
+
+            body.theme-dark .profile-card i {
+                color: #38bdf8;
+            }
+
+            body.theme-dark .profile-card:hover .icon-container {
+                background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            }
+
+            body.theme-dark .profile-card:hover i {
+                color: #ffffff;
+            }
+
+            /* Support Section in Dark Mode */
+            body.theme-dark .support-item {
+                background: rgba(30, 41, 59, 0.6);
+                color: #94a3b8;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            body.theme-dark .support-item:hover {
+                background: #1e293b;
+                color: #38bdf8;
+                border-color: rgba(56, 189, 248, 0.3);
+            }
+
+            body.theme-dark .support-item i {
+                color: #38bdf8;
+            }
+
+            /* Footer text */
+            body.theme-dark .text-center p {
+                color: #64748b !important;
+            }
+        </style>
+
+</head>
+
+<body class="auth-body">
+    <div class="auth-wrapper auth-wrapper--wide"
+        style="max-width: none; width: auto; display: flex; justify-content: center;">
+
+        <div class="auth-card auth-card-wide">
+
+            <!-- Header -->
+            <div class="auth-header">
+                <img src="/img/logo.png" alt="Logo Colegio Daniel Hernández" class="auth-logo">
+                <h2 class="auth-institution">Institución Educativa “Daniel Hernández”</h2>
+                <h1 class="auth-title">Bienvenido a la Biblioteca</h1>
+                <p class="auth-subtitle">Por favor, selecciona tu perfil para ingresar al sistema</p>
+            </div>
+
+            <!-- Grid de Roles -->
+            <div class="role-grid">
+                <!-- Estudiante -->
+                <a href="/auth/login?role=estudiante" class="profile-card">
+                    <div class="icon-container">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <div class="profile-content">
+                        <h3 class="profile-title">Estudiante</h3>
+                        <p class="profile-desc">Lee libros físicos y virtuales, realiza préstamos y consulta tu
+                            historial.</p>
+                    </div>
+                </a>
+
+                <!-- Docente -->
+                <a href="/auth/login?role=docente" class="profile-card">
+                    <div class="icon-container">
+                        <i class="fa-solid fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="profile-content">
+                        <h3 class="profile-title">Docente</h3>
+                        <p class="profile-desc">Lee libros, sube material educativo y gestiona el progreso de
+                            estudiantes.</p>
+                    </div>
+                </a>
+
+                <!-- Administrador -->
+                <a href="/auth/login?role=admin" class="profile-card">
+                    <div class="icon-container">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <div class="profile-content">
+                        <h3 class="profile-title">Administrativo</h3>
+                        <p class="profile-desc">Gestión completa de usuarios, libros y configuraciones.</p>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Footer / Soporte -->
+            <div class="support-section">
+                <div class="support-item">
+                    <i class="fa-solid fa-headset"></i>
+                    <span>Soporte Técnico</span>
+                </div>
+                <div class="support-item">
+                    <i class="fa-solid fa-envelope"></i>
+                    <span>biblioteca@danielhernandez.edu.pe</span>
+                </div>
+                <!-- <div class="support-item">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <span>+51 999 999 999</span>
+                </div> -->
+            </div>
+
+            <div class="text-center mt-4">
+                <p style="font-size: 0.85rem; color: var(--text-gray); opacity: 0.7;">
+                    &copy; <%= new Date().getFullYear() %> Sistema Bibliotecario. Todos los derechos reservados.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

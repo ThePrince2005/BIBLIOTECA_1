@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Editar Libro - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/libros.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-book-open"></i>
+                        <span>Gestión de Libros</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Editar Libro</h1>
+                        <p>Actualiza la información del libro "<%= libro.titulo %>"</p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right">
+                    <a href="/libros" class="btn btn--ghost">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver
+                    </a>
+                </div>
+            </header>
+
+            <!-- Formulario -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-edit"></i>
+                                <span>Formulario de Edición</span>
+                            </p>
+                            <h2 class="card__title">Información del Libro</h2>
+                        </div>
+                    </div>
+
+                    <div class="card__body">
+                        <form id="formEditarLibro">
+                            <div class="form-grid-two">
+                                <!-- Título -->
+                                <div class="form-group form-group--full">
+                                    <label class="form-label">Título *</label>
+                                    <input type="text" name="titulo" value="<%= libro.titulo %>" required
+                                        placeholder="Ej: Don Quijote de la Mancha" class="form-input">
+                                </div>
+
+                                <!-- Autor -->
+                                <div class="form-group">
+                                    <label class="form-label">Autor *</label>
+                                    <input type="text" name="autor" value="<%= libro.autor %>" required
+                                        placeholder="Ej: Miguel de Cervantes" class="form-input">
+                                </div>
+
+                                <!-- Editorial -->
+                                <div class="form-group">
+                                    <label class="form-label">Editorial *</label>
+                                    <input type="text" name="editorial" value="<%= libro.editorial %>" required
+                                        placeholder="Ej: Santillana" class="form-input">
+                                </div>
+
+                                <!-- ISBN -->
+                                <div class="form-group">
+                                    <label class="form-label">ISBN</label>
+                                    <input type="text" name="isbn" value="<%= libro.isbn %>"
+                                        pattern="^(?:\d{10}|\d{13})$" placeholder="10 o 13 dígitos" class="form-input">
+                                </div>
+
+                                <!-- Área -->
+                                <div class="form-group">
+                                    <label class="form-label">Área *</label>
+                                    <select name="area" required class="form-select">
+                                        <% areas.forEach(area=> { %>
+                                            <option value="<%= area %>" <%=libro.area===area ? 'selected' : '' %>><%=
+                                                    area %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                </div>
+
+                                <!-- Grado recomendado -->
+                                <div class="form-group">
+                                    <label class="form-label">Grado recomendado</label>
+                                    <select name="grado_recomendado" class="form-select">
+                                        <option value="">Seleccione un grado</option>
+                                        <% for(let i=1; i<=5; i++) { %>
+                                            <option value="<%= i %>" <%=libro.grado_recomendado===i ? 'selected' : '' %>
+                                                ><%= i %>° grado</option>
+                                            <% } %>
+                                    </select>
+                                </div>
+
+                                <!-- Año de publicación -->
+                                <div class="form-group">
+                                    <label class="form-label">Año de publicación</label>
+                                    <input type="number" name="anio_publicacion" value="<%= libro.anio_publicacion %>"
+                                        min="1800" max="<%= new Date().getFullYear() %>" placeholder="Ej: 2023"
+                                        class="form-input">
+                                </div>
+
+                                <!-- Número de ejemplares -->
+                                <div class="form-group">
+                                    <label class="form-label">Número de ejemplares *</label>
+                                    <input type="number" name="ejemplares_totales"
+                                        value="<%= libro.ejemplares_totales %>" required min="1" class="form-input">
+                                </div>
+
+                                <!-- Ubicación -->
+                                <div class="form-group">
+                                    <label class="form-label">Ubicación *</label>
+                                    <input type="text" name="ubicacion" value="<%= libro.ubicacion %>" required
+                                        placeholder="Ej: Estante A, Nivel 2" class="form-input">
+                                </div>
+
+                                <!-- Palabras clave -->
+                                <div class="form-group">
+                                    <label class="form-label">Palabras clave</label>
+                                    <input type="text" name="palabras_clave" value="<%= libro.palabras_clave %>"
+                                        placeholder="Separadas por comas" class="form-input">
+                                </div>
+
+                                <!-- Descripción -->
+                                <div class="form-group form-group--full">
+                                    <label class="form-label">Descripción</label>
+                                    <textarea name="descripcion" rows="3" placeholder="Breve descripción del libro..."
+                                        class="form-textarea"><%= libro.descripcion %></textarea>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <a href="/libros" class="btn btn--secondary">
+                                    <i class="fas fa-times"></i>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn btn--primary">
+                                    <i class="fas fa-save"></i>
+                                    Guardar Cambios
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            AOS.init({ duration: 800, once: true });
+
+            document.getElementById('formEditarLibro').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const form = e.target;
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+
+                // Convertir a números los campos que lo requieran
+                ['anio_publicacion', 'grado_recomendado', 'ejemplares_totales'].forEach(field => {
+                    if (data[field]) data[field] = parseInt(data[field]);
+                });
+
+                try {
+                    const response = await fetch(`/libros/<%= libro.id %>`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Actualizado!',
+                            text: result.message || 'Libro actualizado correctamente',
+                            confirmButtonColor: '#00B4D8'
+                        }).then(() => window.location.href = '/libros');
+                    } else {
+                        const errorMessage = result.errors ? result.errors.map(err => err.msg).join(', ') : result.message;
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMessage,
+                            confirmButtonColor: '#00B4D8'
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        confirmButtonColor: '#00B4D8'
+                    });
+                }
+            });
+        </script>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

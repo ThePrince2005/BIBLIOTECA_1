@@ -1,0 +1,721 @@
+/* ========================================================================
+   BIBLIOTECA ESCOLAR DANIEL HERNÁNDEZ
+   Archivo: /public/css/auth-shared.css
+   Propósito: Estilos compartidos para todas las vistas de autenticación
+   ======================================================================== */
+
+@import url('variables.css');
+
+/* ========================================================================
+   ESTILOS BASE
+   ======================================================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* ========================================================================
+   FONDO PRINCIPAL CON ANIMACIÓN (Estilo Configuración)
+   ======================================================================== */
+
+.auth-body {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    background: var(--bg-light);
+    overflow-y: auto;
+    transition: background 0.4s ease;
+}
+
+/* Fondos animados con orbs (similar a configuración) */
+.auth-body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: radial-gradient(circle at 20% 20%, rgba(0, 180, 216, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 0%, rgba(12, 74, 110, 0.25), transparent 42%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(148, 224, 239, 0.15));
+    opacity: 0.8;
+    transition: opacity 0.4s ease;
+}
+
+.auth-body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(120deg, rgba(148, 224, 239, 0.12), transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(0, 119, 182, 0.25), transparent 45%);
+    opacity: 0.6;
+    transition: opacity 0.4s ease;
+}
+
+/* Soporte para tema oscuro */
+.auth-body.theme-dark {
+    background: #0f172a;
+}
+
+.auth-body.theme-dark::before {
+    opacity: 0.35;
+}
+
+.auth-body.theme-dark::after {
+    opacity: 0.2;
+}
+
+/* ========================================================================
+   CONTENEDORES Y TARJETAS
+   ======================================================================== */
+
+.auth-wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+}
+
+.auth-wrapper--wide {
+    max-width: 600px;
+}
+
+/* Tarjeta principal con glassmorphism mejorado */
+.auth-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 32px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.15),
+        0 8px 24px rgba(0, 119, 182, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    padding: clamp(2rem, 4vw, 3rem);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: cardEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes cardEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18),
+        0 12px 32px rgba(0, 119, 182, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Borde superior decorativo con animación */
+.auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(90deg,
+            var(--accent-blue-dark) 0%,
+            var(--accent-blue) 25%,
+            var(--accent-blue-light) 50%,
+            var(--accent-blue) 75%,
+            var(--accent-blue-dark) 100%);
+    background-size: 200% 100%;
+    border-radius: 32px 32px 0 0;
+    z-index: 1;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* ========================================================================
+   HEADER Y LOGO
+   ======================================================================== */
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-logo {
+    display: block;
+    margin: 0 auto 1.5rem;
+    height: 96px;
+    width: auto;
+    filter: drop-shadow(0 10px 20px rgba(0, 119, 182, 0.25));
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.auth-logo:hover {
+    transform: scale(1.08) rotate(2deg);
+    filter: drop-shadow(0 15px 30px rgba(0, 180, 216, 0.4));
+    animation: none;
+}
+
+.auth-title {
+    font-size: clamp(1.75rem, 4vw, 2.25rem);
+    font-weight: 600;
+    color: var(--title-dark);
+    margin: 0 0 0.5rem 0;
+    letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+    font-size: 1rem;
+    color: var(--subtitle-gray);
+    margin: 0;
+    font-weight: 400;
+}
+
+/* Badge decorativo */
+.auth-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 9999px;
+    background: rgba(0, 180, 216, 0.12);
+    color: #015871;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* ========================================================================
+   FORMULARIOS
+   ======================================================================== */
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-gray);
+    transition: color 0.3s ease;
+}
+
+.form-group:focus-within .form-label {
+    color: var(--accent-blue-dark);
+}
+
+/* Inputs */
+.form-input {
+    appearance: none;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid rgba(0, 180, 216, 0.2);
+    border-radius: 16px;
+    background: var(--bg-white);
+    color: var(--title-dark);
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 180, 216, 0.05);
+    outline: none;
+}
+
+.form-input::placeholder {
+    color: var(--subtitle-gray);
+    opacity: 0.6;
+}
+
+.form-input:hover {
+    border-color: rgba(0, 180, 216, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 180, 216, 0.08);
+}
+
+.form-input:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.2),
+        0 8px 24px rgba(0, 180, 216, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform: translateY(-3px);
+}
+
+/* Select */
+.form-select {
+    appearance: none;
+    width: 100%;
+    padding: 0.875rem 2.5rem 0.875rem 1rem;
+    border: 2px solid rgba(0, 180, 216, 0.2);
+    border-radius: 16px;
+    background: var(--bg-white);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300B4D8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    color: var(--title-dark);
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 180, 216, 0.05);
+    outline: none;
+}
+
+.form-select:hover {
+    border-color: rgba(0, 180, 216, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 180, 216, 0.08);
+}
+
+.form-select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15), 0 8px 20px rgba(0, 180, 216, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Input con icono (password toggle) */
+.form-input-wrapper {
+    position: relative;
+}
+
+.form-input-wrapper .form-input {
+    padding-right: 3rem;
+}
+
+.form-input-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--subtitle-gray);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.form-input-icon:hover {
+    color: var(--accent-blue-dark);
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* ========================================================================
+   BOTONES
+   ======================================================================== */
+
+.btn {
+    position: relative;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 20px;
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+    color: white;
+    box-shadow: 0 12px 30px rgba(0, 132, 199, 0.25);
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(0, 132, 199, 0.4),
+        0 8px 20px rgba(0, 180, 216, 0.25);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-block {
+    width: 100%;
+}
+
+/* ========================================================================
+   ENLACES
+   ======================================================================== */
+
+.auth-link {
+    color: var(--accent-blue-dark);
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    position: relative;
+    display: inline-block;
+    transition: color 0.3s ease;
+}
+
+.auth-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s ease;
+}
+
+.auth-link:hover {
+    color: var(--accent-blue);
+}
+
+.auth-link:hover::after {
+    width: 100%;
+}
+
+.auth-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+/* ========================================================================
+   TOAST NOTIFICATIONS
+   ======================================================================== */
+
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    min-width: 300px;
+    max-width: 400px;
+    background: var(--bg-white);
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    box-shadow: 0 12px 32px rgba(0, 119, 182, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: slideInRight 0.4s ease;
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(400px);
+}
+
+.toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.toast-success {
+    border-left: 5px solid var(--success-green);
+}
+
+.toast-error {
+    border-left: 5px solid var(--error-red);
+}
+
+.toast-message {
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--title-dark);
+}
+
+/* ========================================================================
+   UTILIDADES
+   ======================================================================== */
+
+.text-center {
+    text-align: center;
+}
+
+.mt-1 {
+    margin-top: 0.5rem;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mt-3 {
+    margin-top: 1.5rem;
+}
+
+.mt-4 {
+    margin-top: 2rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.mb-3 {
+    margin-bottom: 1.5rem;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ========================================================================
+   RESPONSIVE
+   ======================================================================== */
+
+@media (max-width: 768px) {
+    .auth-body {
+        padding: 1rem;
+    }
+
+    .auth-card {
+        padding: 2rem 1.5rem;
+    }
+
+    .auth-logo {
+        height: 80px;
+    }
+
+    .auth-title {
+        font-size: 1.5rem;
+    }
+
+    .toast {
+        min-width: 280px;
+        max-width: calc(100vw - 2rem);
+        right: 1rem;
+        bottom: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .auth-logo {
+        height: 72px;
+    }
+
+    .form-input,
+    .form-select {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        padding: 0.75rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    .auth-links {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+}
+
+/* ========================================================================
+   ACCESIBILIDAD
+   ======================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Mejora de contraste */
+.contrast-boost .form-label,
+.contrast-boost .auth-subtitle {
+    color: var(--title-dark);
+}
+
+/* ========================================================================
+   ESTILOS UNIFICADOS (Boton y Header Institucional)
+   ======================================================================== */
+
+.auth-institution {
+    font-size: 1.1rem;
+    color: var(--accent-blue-dark);
+    font-weight: 800;
+    margin: 0 0 0.5rem 0;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.auth-institution.large {
+    font-size: 1.25rem;
+}
+
+.btn-unified {
+    position: relative;
+    background: linear-gradient(90deg, #00B4D8 0%, #0077B6 100%);
+    /* Gradiente Cyan-Azul similar a la imagen */
+    color: white;
+    padding: 0.9rem 2.5rem;
+    border-radius: 50px;
+    /* Pill shape */
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 20px -5px rgba(0, 180, 216, 0.4);
+    /* Sombra suave cyan */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-transform: none;
+    /* La imagen tiene Texto Normal/Capitalizado, no todo mayusculas */
+    letter-spacing: 0.02em;
+    overflow: hidden;
+    width: 100%;
+    /* Por defecto full width en auth cards */
+}
+
+/* Brillo superior "glass" sutil */
+.btn-unified::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent);
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.btn-unified:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px -5px rgba(0, 180, 216, 0.6);
+    background: linear-gradient(90deg, #00C4EB 0%, #0088CC 100%);
+    /* Un poco más brillante */
+}
+
+.btn-unified:active {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px -5px rgba(0, 180, 216, 0.5);
+}
+
+.btn-unified span {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-unified i {
+    position: relative;
+    z-index: 1;
+    font-size: 1rem;
+}
+
+/* Ajuste para que no sea todo mayúsculas si el usuario quiere "Solicitar préstamo" style */
+/* Pero en login usualmente es "INGRESAR". Vamos a dejarlo normal y usar clases utilitarias si se quiere mayusculas */

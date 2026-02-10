@@ -1,0 +1,357 @@
+/* ========================================================================
+   BIBLIOTECA ESCOLAR - PRÉSTAMOS (DISEÑO MODERNO)
+   Archivo: prestamos.css
+   Propósito: Estilos específicos para vistas de préstamos
+   ======================================================================== */
+
+/* ================================================================
+   LIBRO INFO
+   ================================================================ */
+
+.libro-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+}
+
+.libro-info__title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-900);
+    font-size: var(--font-size-base);
+}
+
+.libro-info__author {
+    font-size: var(--font-size-sm);
+    color: var(--color-neutral-500);
+}
+
+/* ================================================================
+   PRESTAMO ACTIONS
+   ================================================================ */
+
+.prestamo-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    flex-wrap: wrap;
+}
+
+/* ================================================================
+   CARD VARIANTS PARA PRÉSTAMOS
+   ================================================================ */
+
+.prestamo-card-danger {
+    border-color: rgba(239, 68, 68, 0.25);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 226, 226, 0.3));
+}
+
+.prestamo-eyebrow-danger {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #DC2626 !important;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.prestamo-card-warning {
+    border-color: rgba(245, 158, 11, 0.25);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 243, 199, 0.3));
+}
+
+.prestamo-eyebrow-warning {
+    background: rgba(245, 158, 11, 0.12) !important;
+    color: #B45309 !important;
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 768px) {
+    .prestamo-actions {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: var(--spacing-2);
+        margin-top: 0.5rem;
+    }
+
+    .prestamo-actions .btn {
+        width: auto;
+    }
+
+    .prestamo-actions .badge {
+        width: auto;
+    }
+}
+
+/* ================================================================
+   TEMA OSCURO
+   ================================================================ */
+
+[data-theme="dark"] .libro-info__title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .libro-info__author {
+    color: var(--color-neutral-400);
+}
+
+[data-theme="dark"] .prestamo-card-danger {
+    border-color: rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(127, 29, 29, 0.15));
+}
+
+[data-theme="dark"] .prestamo-card-warning {
+    border-color: rgba(245, 158, 11, 0.3);
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(120, 53, 15, 0.15));
+}
+
+[data-theme="dark"] .prestamo-eyebrow-danger {
+    background: rgba(239, 68, 68, 0.2) !important;
+    /* ========================================================================
+   BIBLIOTECA ESCOLAR - PRÉSTAMOS (DISEÑO MODERNO)
+   Archivo: prestamos.css
+   Propósito: Estilos específicos para vistas de préstamos
+   ======================================================================== */
+
+    /* ================================================================
+   LIBRO INFO
+   ================================================================ */
+
+    .libro-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-1);
+    }
+
+    .libro-info__title {
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-neutral-900);
+        font-size: var(--font-size-base);
+    }
+
+    .libro-info__author {
+        font-size: var(--font-size-sm);
+        color: var(--color-neutral-500);
+    }
+
+    /* ================================================================
+   PRESTAMO ACTIONS
+   ================================================================ */
+
+    .prestamo-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-2);
+        flex-wrap: wrap;
+    }
+
+    /* ================================================================
+   CARD VARIANTS PARA PRÉSTAMOS
+   ================================================================ */
+
+    .prestamo-card-danger {
+        border-color: rgba(239, 68, 68, 0.25);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 226, 226, 0.3));
+    }
+
+    .prestamo-eyebrow-danger {
+        background: rgba(239, 68, 68, 0.12) !important;
+        color: #DC2626 !important;
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .prestamo-card-warning {
+        border-color: rgba(245, 158, 11, 0.25);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(254, 243, 199, 0.3));
+    }
+
+    .prestamo-eyebrow-warning {
+        background: rgba(245, 158, 11, 0.12) !important;
+        color: #B45309 !important;
+        border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    /* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+    @media (max-width: 768px) {
+        .prestamo-actions {
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            gap: var(--spacing-3);
+        }
+
+        .prestamo-actions .btn {
+            width: 100%;
+        }
+
+        .prestamo-actions .badge {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* ================================================================
+   TEMA OSCURO
+   ================================================================ */
+
+    [data-theme="dark"] .libro-info__title {
+        color: var(--color-neutral-50);
+    }
+
+    [data-theme="dark"] .libro-info__author {
+        color: var(--color-neutral-400);
+    }
+
+    [data-theme="dark"] .prestamo-card-danger {
+        border-color: rgba(239, 68, 68, 0.3);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(127, 29, 29, 0.15));
+    }
+
+    [data-theme="dark"] .prestamo-card-warning {
+        border-color: rgba(245, 158, 11, 0.3);
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(120, 53, 15, 0.15));
+    }
+
+    [data-theme="dark"] .prestamo-eyebrow-danger {
+        background: rgba(239, 68, 68, 0.2) !important;
+        color: #FCA5A5 !important;
+    }
+
+    [data-theme="dark"] .prestamo-eyebrow-warning {
+        background: rgba(245, 158, 11, 0.2) !important;
+        color: #FCD34D !important;
+    }
+
+    /* ================================================================
+   LIBRO DETALLE
+   ================================================================ */
+
+    .libro-detalle {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-5);
+    }
+
+    .libro-detalle__item {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-2);
+    }
+
+    .libro-detalle__item label {
+        font-size: var(--font-size-xs);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-neutral-500);
+        font-weight: var(--font-weight-semibold);
+    }
+
+    .libro-detalle__value {
+        margin: 0;
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-neutral-900);
+    }
+
+    /* ================================================================
+   TERMINOS CHECK
+   ================================================================ */
+
+    .terminos-check {
+        display: flex;
+        gap: var(--spacing-3);
+        padding: var(--spacing-4);
+        border-radius: var(--radius-xl);
+        background: rgba(0, 180, 216, 0.05);
+        border: var(--border-width) solid var(--glass-border);
+    }
+
+    .terminos-check__input {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: var(--radius-sm);
+        border: var(--border-width-2) solid var(--color-primary);
+        cursor: pointer;
+        flex-shrink: 0;
+        margin-top: 0.125rem;
+    }
+
+    .terminos-check__input:checked {
+        background-color: var(--color-primary);
+    }
+
+    .terminos-check__label {
+        display: flex;
+        flex-direction: column;
+        gap: var(--spacing-1);
+        cursor: pointer;
+    }
+
+    .terminos-check__title {
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-neutral-900);
+        font-size: var(--font-size-base);
+    }
+
+    .terminos-check__text {
+        font-size: var(--font-size-sm);
+        color: var(--color-neutral-600);
+        line-height: var(--line-height-relaxed);
+    }
+
+    /* ================================================================
+   TEMA OSCURO - LIBRO DETALLE
+   ================================================================ */
+
+    [data-theme="dark"] .libro-detalle__value {
+        color: var(--color-neutral-50);
+    }
+
+    [data-theme="dark"] .terminos-check {
+        background: rgba(148, 224, 239, 0.08);
+    }
+
+    [data-theme="dark"] .terminos-check__title {
+        color: var(--color-neutral-50);
+    }
+
+    [data-theme="dark"] .terminos-check__text {
+        color: var(--color-neutral-400);
+    }
+
+    /* Animación para el botón de Aprobar (Like) */
+    @keyframes pulse-blue {
+        0% {
+            box-shadow: 0 0 0 0 rgba(0, 180, 216, 0.4);
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+
+        70% {
+            box-shadow: 0 0 0 6px rgba(0, 180, 216, 0);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .btn-animado {
+        animation: pulse-blue 2s infinite;
+        transition: all 0.3s ease;
+    }
+
+    .btn-animado:hover {
+        animation: none;
+        transform: scale(1.1);
+        background-color: var(--color-primary);
+        color: white !important;
+    }

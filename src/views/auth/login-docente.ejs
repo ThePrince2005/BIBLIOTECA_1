@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Acceso Docentes - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/auth-shared.css">
+</head>
+
+<body class="auth-body">
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <!-- Header -->
+            <div class="auth-header">
+                <img src="/img/logo.png" alt="Logo Colegio Daniel Hernández" class="auth-logo">
+                <h2 class="auth-institution">INSTITUCIÓN EDUCATIVA “DANIEL HERNÁNDEZ”</h2>
+                <h1 class="auth-title">Acceso Docentes</h1>
+                <p class="auth-subtitle">Panel de gestión para educadores</p>
+            </div>
+
+            <!-- Formulario -->
+            <form class="auth-form" id="loginForm" method="POST">
+                <input type="hidden" name="role" value="docente">
+
+                <div class="form-group">
+                    <label for="correo" class="form-label">Correo electrónico</label>
+                    <input id="correo" name="correo" type="email" class="form-input" placeholder="tu.correo@ejemplo.com"
+                        required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena" class="form-label">Contraseña</label>
+                    <div class="form-input-wrapper">
+                        <input id="contrasena" name="contrasena" type="password" class="form-input"
+                            placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" id="togglePassword" class="form-input-icon">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-unified">
+                    <span>Ingresar</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Enlaces -->
+            <div class="auth-links" style="justify-content: center;">
+                <a href="/auth/login" class="auth-link">Volver al inicio</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/auth-shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar toggle de contraseña
+            initPasswordToggle('contrasena', 'togglePassword');
+
+            // Mostrar mensaje de éxito si viene del registro
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('registered') === 'true') {
+                showToast('¡Registro exitoso! Ahora puedes iniciar sesión.', 'success');
+            }
+
+            // Manejar envío del formulario
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = {
+                    correo: document.getElementById('correo').value,
+                    contrasena: document.getElementById('contrasena').value,
+                    role: 'docente'
+                };
+
+                // Validar email
+                if (!validateEmail(formData.correo)) {
+                    showToast('Por favor, ingrese un correo electrónico válido', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await handleFetchError(response);
+
+                    // Redireccionar según el rol del usuario
+                    window.location.href = data.redirect || '/dashboard/docente';
+                } catch (error) {
+                    showToast(error.message || 'Error al iniciar sesión', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

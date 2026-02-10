@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <%- include('../partials/head', { title: 'Gestión de Usuarios | Biblioteca' }) %>
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/sistema-moderno.css">
+    <link rel="stylesheet" href="/css/componentes-mejorados.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+      /* Ajustes específicos para esta vista */
+      .badge-grade {
+        background: rgba(99, 102, 241, 0.1);
+        color: #6366f1;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      .badge-section {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+      }
+
+      .user-avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+    </style>
+</head>
+
+<body class="perfil-body">
+  <%- include('../partials/navbar') %>
+
+    <div class="perfil-wrapper">
+
+      <!-- Hero Section -->
+      <header class="perfil-hero" data-aos="fade-down">
+        <div class="perfil-hero__left">
+          <div class="perfil-hero__badge">
+            <i class="fas fa-users-cog"></i>
+            <span>Administración</span>
+          </div>
+          <div class="perfil-hero__title">
+            <h1>Gestión de Usuarios</h1>
+            <p>Administra el acceso de alumnos, docentes y personal administrativo.</p>
+          </div>
+        </div>
+        <div class="perfil-hero__right">
+          <a href="/auth/registro" class="btn-modern btn-modern--primary">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Nuevo Usuario</span>
+          </a>
+        </div>
+      </header>
+
+      <% if (session && session.flash && session.flash.mensaje) { %>
+        <div data-flash-message data-flash-type="<%= session.flash.tipo %>" class="d-none"
+          style="display: none !important;">
+          <%= session.flash.mensaje %>
+        </div>
+        <% session.flash=null; %>
+          <% } %>
+
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+
+              <!-- TARJETA DE ALUMNOS -->
+              <article class="card-modern" style="grid-column: 1 / -1;">
+                <div class="card-modern__header">
+                  <div class="card-modern__title">
+                    <i class="fas fa-user-graduate"></i>
+                    Alumnos Registrados
+                    <span class="badge-modern badge-modern--primary" style="font-size: 0.9rem;">
+                      <%= alumnos ? alumnos.length : 0 %>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Filtros para Alumnos (Estilo Unificado) -->
+                <div class="filters-modern">
+                  <div class="filters-modern__grid" style="align-items: end;">
+                    <!-- Búsqueda -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label"
+                        style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">Buscar</label>
+                      <div class="input-wrapper-modern">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchAlumnos" class="input-modern" placeholder="Nombre o correo...">
+                      </div>
+                    </div>
+
+                    <!-- Filtro Grado -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label"
+                        style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">Grado</label>
+                      <select id="filterGrado" class="input-modern" style="padding-left: 1rem;">
+                        <option value="">Todos los Grados</option>
+                        <% const grados=[...new Set(alumnos.map(a=> a.grado))].sort((a,b) => a - b);
+                          grados.forEach(g => {
+                          %>
+                          <option value="<%= g %>">
+                            <%= g %>° Grado
+                          </option>
+                          <% }) %>
+                      </select>
+                    </div>
+
+                    <!-- Filtro Sección -->
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label"
+                        style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">Sección</label>
+                      <select id="filterSeccion" class="input-modern" style="padding-left: 1rem;">
+                        <option value="">Todas</option>
+                        <% const secciones=[...new Set(alumnos.map(a=> a.seccion))].sort();
+                          secciones.forEach(s => {
+                          %>
+                          <option value="<%= s %>">Sección <%= s %>
+                          </option>
+                          <% }) %>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-container-modern">
+                  <table class="table-modern-enhanced" id="tableAlumnos">
+                    <thead>
+                      <tr>
+                        <th>Estudiante</th>
+                        <th>Grado</th>
+                        <th>Sección</th>
+                        <th>Contacto</th>
+                        <th class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaAlumnosBody">
+                      <% if (!alumnos || !alumnos.length) { %>
+                        <tr>
+                          <td colspan="5" class="text-center py-4 text-muted">No hay alumnos registrados.</td>
+                        </tr>
+                        <% } else { %>
+                          <% alumnos.forEach(a=> { %>
+                            <tr class="alumno-row" data-grado="<%= a.grado %>" data-seccion="<%= a.seccion %>">
+                              <td data-label="Estudiante">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                  <div class="user-avatar-placeholder">
+                                    <%= a.nombre.charAt(0).toUpperCase() %>
+                                  </div>
+                                  <div style="display: flex; flex-direction: column;">
+                                    <span style="font-weight: 600; color: var(--dash-text);">
+                                      <%= a.nombre %>
+                                    </span>
+                                    <span style="font-size: 0.85rem; color: var(--dash-muted);">ID: <%= a.id %></span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td data-label="Grado">
+                                <span class="badge-modern badge-grade">
+                                  <i class="fas fa-graduation-cap" style="font-size: 0.8rem;"></i>
+                                  <%= a.grado %>°
+                                </span>
+                              </td>
+                              <td data-label="Sección">
+                                <span class="badge-modern badge-section">
+                                  <%= a.seccion %>
+                                </span>
+                              </td>
+                              <td data-label="Contacto">
+                                <div
+                                  style="display: flex; align-items: center; gap: 0.5rem; color: var(--dash-subtext);">
+                                  <i class="fas fa-envelope"></i>
+                                  <%= a.correo %>
+                                </div>
+                              </td>
+                              <td data-label="Acciones" class="text-end">
+                                <div class="table-actions-cell"
+                                  style="justify-content: flex-end; display: flex; gap: 0.5rem; align-items: center;">
+                                  <a href="/usuario/admin/usuarios/<%= a.id %>/historial"
+                                    class="btn-modern btn-modern--secondary"
+                                    style="padding: 0.35rem 0.65rem; font-size: 0.75rem;" title="Ver Historial">
+                                    <i class="fas fa-history"></i> Historial
+                                  </a>
+                                  <form action="/usuario/admin/alumnos/<%= a.id %>/eliminar" method="POST"
+                                    class="d-inline">
+                                    <button type="button" class="btn-modern btn-eliminar js-btn-eliminar"
+                                      data-nombre="<%= a.nombre %>" data-tipo="alumno"
+                                      style="padding: 0.35rem 0.65rem; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2);"
+                                      title="Dar de baja">
+                                      <i class="fas fa-user-times"></i>
+                                    </button>
+                                  </form>
+                                </div>
+                              </td>
+                            </tr>
+                            <% }) %>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+              <!-- TARJETA DE PERSONAL -->
+              <article class="card-modern" style="grid-column: 1 / -1;">
+                <div class="card-modern__header">
+                  <div class="card-modern__title">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    Docentes y Administrativos
+                    <span class="badge-modern badge-modern--success" style="font-size: 0.9rem;">
+                      <%= personal ? personal.length : 0 %>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Filtros para Personal (Estilo Unificado) -->
+                <div class="filters-modern">
+                  <div class="filters-modern__grid" style="align-items: end;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label class="form-label"
+                        style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">Buscar</label>
+                      <div class="input-wrapper-modern">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchPersonal" class="input-modern" placeholder="Buscar personal...">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="table-container-modern">
+                  <table class="table-modern-enhanced">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>Rol</th>
+                        <th>Contacto</th>
+                        <th class="text-end">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tablaPersonalBody">
+                      <% if (!personal || !personal.length) { %>
+                        <tr>
+                          <td colspan="4" class="text-center py-4 text-muted">No hay personal registrado.</td>
+                        </tr>
+                        <% } else { %>
+                          <% personal.forEach(p=> { %>
+                            <tr>
+                              <td data-label="Nombre">
+                                <div style="display: flex; align-items: center; gap: 1rem;">
+                                  <div class="user-avatar-placeholder"
+                                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                    <%= p.nombre.charAt(0).toUpperCase() %>
+                                  </div>
+                                  <span style="font-weight: 600; color: var(--dash-text);">
+                                    <%= p.nombre %>
+                                  </span>
+                                </div>
+                              </td>
+                              <td data-label="Rol">
+                                <span class="badge-modern badge-modern--warning" style="text-transform: uppercase;">
+                                  <%= p.rol %>
+                                </span>
+                              </td>
+                              <td data-label="Contacto">
+                                <div
+                                  style="display: flex; align-items: center; gap: 0.5rem; color: var(--dash-subtext);">
+                                  <i class="fas fa-envelope"></i>
+                                  <%= p.correo %>
+                                </div>
+                              </td>
+                              <td data-label="Acciones" class="text-end">
+                                <div class="table-actions-cell"
+                                  style="justify-content: flex-end; display: flex; gap: 0.5rem; align-items: center;">
+                                  <a href="/usuario/admin/usuarios/<%= p.id %>/historial"
+                                    class="btn-modern btn-modern--secondary"
+                                    style="padding: 0.35rem 0.65rem; font-size: 0.75rem;" title="Ver Historial">
+                                    <i class="fas fa-history"></i> Historial
+                                  </a>
+                                  <form action="/usuario/admin/personal/<%= p.id %>/eliminar" method="POST"
+                                    class="d-inline">
+                                    <button type="button" class="btn-modern btn-eliminar js-btn-eliminar"
+                                      data-nombre="<%= p.nombre %>" data-tipo="usuario"
+                                      style="padding: 0.35rem 0.65rem; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2);"
+                                      title="Dar de baja">
+                                      <i class="fas fa-user-times"></i>
+                                    </button>
+                                  </form>
+                                </div>
+                              </td>
+                            </tr>
+                            <% }) %>
+                              <% } %>
+                    </tbody>
+                  </table>
+                </div>
+              </article>
+
+            </section>
+    </div>
+
+    <!-- Contenedor para toasts -->
+    <div id="toastStack" class="toast-stack"></div>
+
+    <%- include('../partials/footer') %>
+      <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+        AOS.init({ duration: 800, once: true });
+
+        // Confirmación de Eliminación con SweetAlert2 (Using Fetch/AJAX)
+        document.addEventListener('click', function (e) {
+          const btn = e.target.closest('.js-btn-eliminar');
+          if (!btn) return;
+
+          e.preventDefault();
+          const form = btn.closest('form');
+          const nombre = btn.dataset.nombre;
+          const tipo = btn.dataset.tipo; // 'alumno' or 'usuario'
+
+          Swal.fire({
+            title: '¿Estás seguro?',
+            text: `Se dará de baja al ${tipo} "${nombre}".`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            background: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1e293b' : '#fff',
+            color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#000'
+          }).then(async (result) => {
+            if (result.isConfirmed) {
+              try {
+                // Realizar la eliminación vía Fetch (AJAX)
+                const response = await fetch(form.action, { method: 'POST' });
+
+                if (response.ok) {
+                  // Mostrar éxito INMEDIATAMENTE
+                  await Swal.fire({
+                    icon: 'success',
+                    title: 'Excelente',
+                    text: `${tipo.charAt(0).toUpperCase() + tipo.slice(1)} eliminado correctamente.`,
+                    showConfirmButton: false,
+                    timer: 1000, // Tiempo breve para visualizar
+                    timerProgressBar: false
+                  });
+                  // Recargar la página después de la alerta
+                  window.location.reload();
+                } else {
+                  throw new Error('Error en la respuesta del servidor');
+                }
+              } catch (error) {
+                console.error(error);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'No se pudo eliminar el usuario.',
+                  confirmButtonColor: '#EF4444'
+                });
+              }
+            }
+          });
+        });
+
+        // SHOW TOAST LOGIC (Legacy support + integration)
+        (function () {
+          const stack = document.getElementById('toastStack');
+          if (!stack) return;
+
+          function showToast(type, message) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'toast-message toast-message--' + type;
+            wrapper.innerHTML = `
+                    <div class="toast-message__icon">${type === 'success' ? '✓' : '⚠'}</div>
+                    <div class="toast-message__text">${message}</div>
+                    <button class="toast-message__close">&times;</button>
+                `;
+            stack.appendChild(wrapper);
+            requestAnimationFrame(() => wrapper.classList.add('is-visible'));
+
+            const remove = () => {
+              wrapper.classList.remove('is-visible');
+              setTimeout(() => wrapper.remove(), 220);
+            };
+
+            wrapper.querySelector('.toast-message__close').addEventListener('click', remove);
+            setTimeout(remove, 3500);
+          }
+
+          const flashEl = document.querySelector('[data-flash-message]');
+          if (flashEl) {
+            const message = flashEl.textContent.trim();
+            const type = flashEl.getAttribute('data-flash-type') || 'success';
+
+            if (message) {
+              if (type === 'success') {
+                // Use SweetAlert for success messages (Requested Center Modal)
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Excelente',
+                  text: message,
+                  showConfirmButton: false,
+                  timer: 700,
+                  timerProgressBar: false // Removed progress bar for cleaner, faster look
+                });
+              } else {
+                // Fallback to toast for errors/warnings
+                showToast(type, message);
+              }
+            }
+            flashEl.remove();
+          }
+        })();
+
+        // LOGICA DE FILTRADO AVANZADO PARA ALUMNOS
+        document.addEventListener('DOMContentLoaded', function () {
+          const searchInput = document.getElementById('searchAlumnos');
+          const gradeSelect = document.getElementById('filterGrado');
+          const sectionSelect = document.getElementById('filterSeccion');
+          const btnReset = document.getElementById('btnResetAlumnos');
+          const tableBody = document.getElementById('tablaAlumnosBody');
+          const rows = tableBody ? Array.from(tableBody.getElementsByClassName('alumno-row')) : [];
+
+          function filterTable() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const gradeFilter = gradeSelect.value;
+            const sectionFilter = sectionSelect.value;
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+              const text = row.textContent.toLowerCase();
+              const rowGrade = row.getAttribute('data-grado');
+              const rowSection = row.getAttribute('data-seccion');
+
+              const matchesSearch = searchTerm === '' || text.includes(searchTerm);
+              const matchesGrade = gradeFilter === '' || rowGrade === gradeFilter;
+              const matchesSection = sectionFilter === '' || rowSection === sectionFilter;
+
+              if (matchesSearch && matchesGrade && matchesSection) {
+                row.style.display = '';
+                visibleCount++;
+              } else {
+                row.style.display = 'none';
+              }
+            });
+
+            // Opcional: Mostrar mensaje si no hay resultados
+          }
+
+          if (searchInput) searchInput.addEventListener('input', filterTable);
+          if (gradeSelect) gradeSelect.addEventListener('change', filterTable);
+          if (sectionSelect) sectionSelect.addEventListener('change', filterTable);
+
+          if (btnReset) {
+            btnReset.addEventListener('click', function () {
+              searchInput.value = '';
+              gradeSelect.value = '';
+              sectionSelect.value = '';
+              filterTable();
+            });
+          }
+
+          // Búsqueda simple para Personal (mantener funcionalidad anterior)
+          const searchPersonal = document.getElementById('searchPersonal');
+          const tablePersonal = document.getElementById('tablaPersonalBody');
+          if (searchPersonal && tablePersonal) {
+            searchPersonal.addEventListener('input', function () {
+              const term = this.value.toLowerCase().trim();
+              const pRows = tablePersonal.getElementsByTagName('tr');
+              for (let r of pRows) {
+                r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none';
+              }
+            });
+          }
+        });
+      </script>
+</body>
+
+</html>

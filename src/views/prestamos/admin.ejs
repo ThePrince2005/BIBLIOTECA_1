@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Gestión de Préstamos | Biblioteca' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+        <style>
+            /* Ajustes específicos para esta vista */
+            .prestamo-row {
+                transition: background-color 0.2s;
+            }
+
+            .prestamo-row:hover {
+                background-color: var(--bg-gray-50);
+            }
+
+            .user-avatar-placeholder {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 1.1rem;
+            }
+
+            .filters-modern {
+                background: var(--bg-gray-50);
+                border: 1px solid var(--card-border);
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+                border-radius: 12px;
+            }
+        </style>
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <div class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-hand-holding-heart"></i>
+                        <span>Administración</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Gestión de Préstamos</h1>
+                        <p>Administra el flujo de libros, controla devoluciones y monitorea el estado del inventario.
+                        </p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right">
+                    <!-- Exportar Dropdown Moderno -->
+
+                </div>
+            </header>
+
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                <article class="card-modern" style="grid-column: 1 / -1;">
+                    <div class="card-modern__header">
+                        <div class="card-modern__title">
+                            <i class="fas fa-list-check"></i>
+                            Listado de Préstamos
+                            <span class="badge-modern badge-modern--primary" style="font-size: 0.9rem;">
+                                <%= prestamos.length %>
+                            </span>
+                        </div>
+
+                        <!-- Tabs Simplificados -->
+                        <div class="button-group" style="display: flex; gap: 0.5rem;">
+                            <button type="button" class="btn-modern btn-modern--primary" data-prestamo-tab="todos"
+                                style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                <i class="fas fa-layer-group"></i> Todos
+                            </button>
+                            <button type="button" class="btn-modern btn-modern--secondary"
+                                data-prestamo-tab="estudiantes" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                <i class="fas fa-user-graduate"></i> Estudiantes
+                                <span class="badge-modern badge-modern--neutral"
+                                    style="margin-left: 0.5rem; font-size: 0.75rem;">
+                                    <%= prestamosEstudiantes.length %>
+                                </span>
+                            </button>
+                            <button type="button" class="btn-modern btn-modern--secondary" data-prestamo-tab="docentes"
+                                style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+                                <i class="fas fa-chalkboard-teacher"></i> Docentes
+                                <span class="badge-modern badge-modern--neutral"
+                                    style="margin-left: 0.5rem; font-size: 0.75rem;">
+                                    <%= prestamosDocentes.length %>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Modernos -->
+                    <div class="filters-modern">
+                        <div class="filters-modern__grid" style="align-items: end;">
+                            <!-- Búsqueda -->
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label"
+                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">Buscar</label>
+                                <div class="input-wrapper-modern">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="searchPrestamos" class="input-modern"
+                                        placeholder="Estudiante, docente o libro...">
+                                </div>
+                            </div>
+
+                            <!-- Filtro Periodo -->
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label"
+                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">Periodo</label>
+                                <select id="filterPeriodo" class="input-modern">
+                                    <option value="">Todo el tiempo</option>
+                                    <option value="anio_actual" <%=(typeof filtros !=='undefined' &&
+                                        filtros.periodo==='anio_actual' ) ? 'selected' : '' %>>Este Año</option>
+                                    <option value="mes_actual" <%=(typeof filtros !=='undefined' &&
+                                        filtros.periodo==='mes_actual' ) ? 'selected' : '' %>>Este Mes</option>
+                                    <option value="trimestre" <%=(typeof filtros !=='undefined' &&
+                                        filtros.periodo==='trimestre' ) ? 'selected' : '' %>>Último Trimestre</option>
+                                    <option value="bimestre" <%=(typeof filtros !=='undefined' &&
+                                        filtros.periodo==='bimestre' ) ? 'selected' : '' %>>Último Bimestre</option>
+                                    <option value="hoy" <%=(typeof filtros !=='undefined' && filtros.periodo==='hoy' )
+                                        ? 'selected' : '' %>>Hoy</option>
+                                </select>
+                            </div>
+
+                            <!-- Filtro Estado -->
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label"
+                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">Estado</label>
+                                <select id="filterEstado" class="input-modern">
+                                    <option value="">Todos los estados</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="activo">Activo</option>
+                                    <option value="vencido">Vencido</option>
+                                    <option value="devuelto">Devuelto</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenedores de Tablas -->
+                    <div class="table-container-modern prestamo-tab-content" data-prestamo-content="todos">
+                        <table class="table-modern-enhanced" id="tablaPrestamosAdmin">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Libro</th>
+                                    <th>Tipo</th>
+                                    <th>Fechas</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (prestamos.length===0) { %>
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">No se encontraron préstamos.
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <% prestamos.forEach(prestamo=> {
+                                            let estadoBadge = '', estadoLabel = '', estadoIcon = '';
+                                            if (prestamo.estado === 'pendiente') { estadoBadge =
+                                            'badge-modern--warning'; estadoLabel = 'Pendiente'; estadoIcon = 'fa-clock';
+                                            }
+                                            else if (prestamo.estado === 'activo') { estadoBadge =
+                                            'badge-modern--success'; estadoLabel = 'Activo'; estadoIcon =
+                                            'fa-check-circle'; }
+                                            else if (prestamo.estado === 'vencido') { estadoBadge =
+                                            'badge-modern--danger'; estadoLabel = 'Vencido'; estadoIcon =
+                                            'fa-exclamation-circle'; }
+                                            else { estadoBadge = 'badge-modern--neutral'; estadoLabel = 'Devuelto';
+                                            estadoIcon = 'fa-history'; }
+                                            %>
+                                            <tr class="prestamo-row" data-estado="<%= prestamo.estado %>"
+                                                data-usuario="<%= prestamo.usuario.nombre.toLowerCase() %>"
+                                                data-libro="<%= prestamo.libro.titulo.toLowerCase() %>">
+                                                <td data-label="Usuario">
+                                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                                        <div class="user-avatar-placeholder">
+                                                            <%= prestamo.usuario.nombre.charAt(0).toUpperCase() %>
+                                                        </div>
+                                                        <div style="display: flex; flex-direction: column;">
+                                                            <span style="font-weight: 600; color: var(--dash-text);">
+                                                                <%= prestamo.usuario.nombre %>
+                                                            </span>
+                                                            <span
+                                                                style="font-size: 0.85rem; color: var(--dash-muted);">DNI:
+                                                                <%= prestamo.usuario.dni %>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Rol">
+                                                    <span class="badge-modern badge-modern--info"
+                                                        style="text-transform: uppercase; font-size: 0.75rem;">
+                                                        <%= (prestamo.usuario.rol || 'N/A' ) %>
+                                                    </span>
+                                                </td>
+                                                <td data-label="Libro">
+                                                    <div style="display: flex; flex-direction: column;">
+                                                        <span style="font-weight: 500; color: var(--dash-text);">
+                                                            <%= prestamo.libro.titulo %>
+                                                        </span>
+                                                        <span style="font-size: 0.85rem; color: var(--dash-muted);">
+                                                            <%= prestamo.libro.autor %>
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Tipo">
+                                                    <span class="badge-modern badge-modern--secondary"
+                                                        style="text-transform: capitalize;">
+                                                        <%= prestamo.tipo || 'días' %>
+                                                    </span>
+                                                </td>
+                                                <td data-label="Fechas">
+                                                    <div
+                                                        style="display: flex; flex-direction: column; font-size: 0.85rem;">
+                                                        <span style="color: var(--dash-text);"><i
+                                                                class="fas fa-arrow-right"
+                                                                style="color: var(--primary-color); width: 15px;"></i>
+                                                            <%= new
+                                                                Date(prestamo.fecha_prestamo).toLocaleDateString('es-PE')
+                                                                %>
+                                                        </span>
+                                                        <% if (prestamo.fecha_devolucion_real) { %>
+                                                            <span style="color: var(--success-color);"><i
+                                                                    class="fas fa-arrow-left" style="width: 15px;"></i>
+                                                                <%= new
+                                                                    Date(prestamo.fecha_devolucion_real).toLocaleDateString('es-PE')
+                                                                    %>
+                                                            </span>
+                                                            <% } else { %>
+                                                                <span style="color: var(--dash-muted);"><i
+                                                                        class="fas fa-arrow-left"
+                                                                        style="width: 15px;"></i>
+                                                                    <%= new
+                                                                        Date(prestamo.fecha_devolucion_esperada).toLocaleDateString('es-PE')
+                                                                        %>
+                                                                </span>
+                                                                <% } %>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Estado">
+                                                    <span class="badge-modern <%= estadoBadge %>">
+                                                        <i class="fas <%= estadoIcon %>" style="margin-right: 4px;"></i>
+                                                        <%= estadoLabel %>
+                                                    </span>
+                                                </td>
+                                                <td data-label="Acciones" class="text-end">
+                                                    <div class="table-actions-cell" style="justify-content: flex-end;">
+                                                        <% if (usuario.rol==='admin' ) { %>
+                                                            <% if (prestamo.estado==='pendiente' ) { %>
+                                                                <button data-prestamo-id="<%= prestamo.id %>"
+                                                                    class="btn-modern btn-modern--secondary aprobar-btn"
+                                                                    title="Aprobar préstamo">
+                                                                    <i class="fas fa-thumbs-up"></i>
+                                                                </button>
+                                                                <% } else if (prestamo.estado==='activo' ||
+                                                                    prestamo.estado==='vencido' ) { %>
+                                                                    <button data-prestamo-id="<%= prestamo.id %>"
+                                                                        class="btn-modern btn-modern--primary devolver-btn"
+                                                                        title="Registrar Devolución">
+                                                                        <i class="fas fa-check"></i>
+                                                                    </button>
+                                                                    <% } else { %>
+                                                                        <span class="badge-modern badge-modern--neutral"
+                                                                            style="font-size: 0.75rem;"><i
+                                                                                class="fas fa-archive"></i></span>
+                                                                        <% } %>
+                                                                            <% } else { %>
+                                                                                <span
+                                                                                    class="badge-modern badge-modern--neutral"><i
+                                                                                        class="fas fa-eye"></i></span>
+                                                                                <% } %>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tabla Estudiantes (Hidden by default) -->
+                    <div class="table-container-modern prestamo-tab-content" data-prestamo-content="estudiantes"
+                        style="display:none;">
+                        <!-- Copia simplificada de la estructura para estudiantes -->
+                        <table class="table-modern-enhanced">
+                            <thead>
+                                <tr>
+                                    <th>Estudiante</th>
+                                    <th>Libro</th>
+                                    <th>Fechas</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% prestamosEstudiantes.forEach(prestamo=> {
+                                    let estadoBadge = '', estadoLabel = '';
+                                    if (prestamo.estado === 'pendiente') { estadoBadge = 'badge-modern--warning';
+                                    estadoLabel = 'Pendiente'; }
+                                    else if (prestamo.estado === 'activo') { estadoBadge = 'badge-modern--success';
+                                    estadoLabel = 'Activo'; }
+                                    else if (prestamo.estado === 'vencido') { estadoBadge = 'badge-modern--danger';
+                                    estadoLabel = 'Vencido'; }
+                                    else { estadoBadge = 'badge-modern--neutral'; estadoLabel = 'Devuelto'; }
+                                    %>
+                                    <tr class="prestamo-row" data-estado="<%= prestamo.estado %>"
+                                        data-usuario="<%= prestamo.usuario.nombre.toLowerCase() %>">
+                                        <td data-label="Estudiante">
+                                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                                <div class="user-avatar-placeholder">
+                                                    <%= prestamo.usuario.nombre.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <div style="display: flex; flex-direction: column;">
+                                                    <span style="font-weight: 600; color: var(--dash-text);">
+                                                        <%= prestamo.usuario.nombre %>
+                                                    </span>
+                                                    <span style="font-size: 0.85rem; color: var(--dash-muted);">DNI: <%=
+                                                            prestamo.usuario.dni %></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Libro">
+                                            <div style="display: flex; flex-direction: column;">
+                                                <span style="font-weight: 500; color: var(--dash-text);">
+                                                    <%= prestamo.libro.titulo %>
+                                                </span>
+                                                <span style="font-size: 0.85rem; color: var(--dash-muted);">
+                                                    <%= prestamo.libro.autor %>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Fechas">
+                                            <div style="display: flex; flex-direction: column; font-size: 0.85rem;">
+                                                <span style="color: var(--dash-text);"><i class="fas fa-arrow-right"
+                                                        style="color: var(--primary-color);"></i>
+                                                    <%= new Date(prestamo.fecha_prestamo).toLocaleDateString('es-PE') %>
+                                                </span>
+                                                <span style="color: var(--dash-muted);"><i
+                                                        class="fas fa-arrow-left"></i>
+                                                    <%= new
+                                                        Date(prestamo.fecha_devolucion_esperada).toLocaleDateString('es-PE')
+                                                        %>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Estado">
+                                            <span class="badge-modern <%= estadoBadge %>">
+                                                <%= estadoLabel %>
+                                            </span>
+                                        </td>
+                                        <td data-label="Acciones" class="text-end">
+                                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                                <% if (usuario.rol==='admin' && (prestamo.estado==='activo' ||
+                                                    prestamo.estado==='vencido' )) { %>
+                                                    <button data-prestamo-id="<%= prestamo.id %>"
+                                                        class="btn-modern btn-modern--primary devolver-btn"
+                                                        title="Registrar Devolución"><i
+                                                            class="fas fa-check"></i></button>
+                                                    <% } else if (usuario.rol==='admin' && prestamo.estado==='pendiente'
+                                                        ) { %>
+                                                        <button data-prestamo-id="<%= prestamo.id %>"
+                                                            class="btn-modern btn-modern--secondary aprobar-btn"
+                                                            title="Aprobar"><i class="fas fa-thumbs-up"></i></button>
+                                                        <% } %>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Tabla Docentes (Hidden by default) -->
+                    <div class="table-container-modern prestamo-tab-content" data-prestamo-content="docentes"
+                        style="display:none;">
+                        <table class="table-modern-enhanced">
+                            <thead>
+                                <tr>
+                                    <th>Docente</th>
+                                    <th>Libro</th>
+                                    <th>Fechas</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% prestamosDocentes.forEach(prestamo=> {
+                                    let estadoBadge = '', estadoLabel = '';
+                                    if (prestamo.estado === 'pendiente') { estadoBadge = 'badge-modern--warning';
+                                    estadoLabel = 'Pendiente'; }
+                                    else if (prestamo.estado === 'activo') { estadoBadge = 'badge-modern--success';
+                                    estadoLabel = 'Activo'; }
+                                    else if (prestamo.estado === 'vencido') { estadoBadge = 'badge-modern--danger';
+                                    estadoLabel = 'Vencido'; }
+                                    else { estadoBadge = 'badge-modern--neutral'; estadoLabel = 'Devuelto'; }
+                                    %>
+                                    <tr class="prestamo-row" data-estado="<%= prestamo.estado %>"
+                                        data-usuario="<%= prestamo.usuario.nombre.toLowerCase() %>">
+                                        <td data-label="Docente">
+                                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                                <div class="user-avatar-placeholder"
+                                                    style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                                    <%= prestamo.usuario.nombre.charAt(0).toUpperCase() %>
+                                                </div>
+                                                <div style="display: flex; flex-direction: column;">
+                                                    <span style="font-weight: 600; color: var(--dash-text);">
+                                                        <%= prestamo.usuario.nombre %>
+                                                    </span>
+                                                    <span style="font-size: 0.85rem; color: var(--dash-muted);">DNI: <%=
+                                                            prestamo.usuario.dni %></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td data-label="Libro">
+                                            <div style="display: flex; flex-direction: column;">
+                                                <span style="font-weight: 500; color: var(--dash-text);">
+                                                    <%= prestamo.libro.titulo %>
+                                                </span>
+                                                <span style="font-size: 0.85rem; color: var(--dash-muted);">
+                                                    <%= prestamo.libro.autor %>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Fechas">
+                                            <div style="display: flex; flex-direction: column; font-size: 0.85rem;">
+                                                <span style="color: var(--dash-text);"><i class="fas fa-arrow-right"
+                                                        style="color: var(--primary-color);"></i>
+                                                    <%= new Date(prestamo.fecha_prestamo).toLocaleDateString('es-PE') %>
+                                                </span>
+                                                <span style="color: var(--dash-muted);"><i
+                                                        class="fas fa-arrow-left"></i>
+                                                    <%= new
+                                                        Date(prestamo.fecha_devolucion_esperada).toLocaleDateString('es-PE')
+                                                        %>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td data-label="Estado">
+                                            <span class="badge-modern <%= estadoBadge %>">
+                                                <%= estadoLabel %>
+                                            </span>
+                                        </td>
+                                        <td data-label="Acciones" class="text-end">
+                                            <div class="table-actions-cell" style="justify-content: flex-end;">
+                                                <% if (usuario.rol==='admin' && (prestamo.estado==='activo' ||
+                                                    prestamo.estado==='vencido' )) { %>
+                                                    <button data-prestamo-id="<%= prestamo.id %>"
+                                                        class="btn-modern btn-modern--primary devolver-btn"
+                                                        title="Registrar Devolución"><i
+                                                            class="fas fa-check"></i></button>
+                                                    <% } else if (usuario.rol==='admin' && prestamo.estado==='pendiente'
+                                                        ) { %>
+                                                        <button data-prestamo-id="<%= prestamo.id %>"
+                                                            class="btn-modern btn-modern--secondary aprobar-btn"
+                                                            title="Aprobar"><i class="fas fa-thumbs-up"></i></button>
+                                                        <% } %>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </article>
+            </section>
+        </div>
+
+        <!-- Contenedor para toasts -->
+        <div id="toastStack" class="toast-stack"></div>
+
+        <%- include('../partials/footer') %>
+            <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+            <script>
+                AOS.init({ duration: 800, once: true });
+
+                // Dropdown Export Logic
+                document.addEventListener('DOMContentLoaded', function () {
+                    var dropdown = document.querySelector('.dropdown');
+                    var btn = document.getElementById('dropdownMenuButton');
+                    var content = document.querySelector('.dropdown-content');
+
+                    if (btn && content) {
+                        btn.addEventListener('click', function (e) {
+                            e.stopPropagation();
+                            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+                        });
+
+                        window.addEventListener('click', function () {
+                            content.style.display = 'none';
+                        });
+                    }
+
+                    // Tabs Logic
+                    const tabButtons = document.querySelectorAll('[data-prestamo-tab]');
+                    const tabContents = document.querySelectorAll('.prestamo-tab-content');
+
+                    tabButtons.forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const target = btn.getAttribute('data-prestamo-tab');
+
+                            // Style update
+                            tabButtons.forEach(b => {
+                                b.classList.remove('btn-modern--primary');
+                                b.classList.add('btn-modern--secondary');
+                            });
+                            btn.classList.remove('btn-modern--secondary');
+                            btn.classList.add('btn-modern--primary');
+
+                            // Content toggle
+                            tabContents.forEach(content => {
+                                content.style.display = content.getAttribute('data-prestamo-content') === target ? '' : 'none';
+                            });
+                        });
+                    });
+
+                    // Filter Logic (Client Side for Todos Table mainly)
+                    const searchInput = document.getElementById('searchPrestamos');
+                    const filterEstado = document.getElementById('filterEstado');
+
+                    function filterTable() {
+                        const term = searchInput ? searchInput.value.toLowerCase().trim() : '';
+                        const estado = filterEstado ? filterEstado.value : '';
+
+                        // Filter all visible rows
+                        const contentActive = document.querySelector('.prestamo-tab-content:not([style*="display: none"])');
+                        if (!contentActive) return;
+
+                        const rows = contentActive.querySelectorAll('.prestamo-row');
+                        rows.forEach(row => {
+                            const rowDataUser = row.getAttribute('data-usuario') || '';
+                            const rowDataBook = row.getAttribute('data-libro') || ''; // Only in Todos table usually
+                            const rowEstado = row.getAttribute('data-estado');
+
+                            const matchSearch = term === '' || rowDataUser.includes(term) || rowDataBook.includes(term);
+                            const matchEstado = estado === '' || rowEstado === estado;
+
+                            row.style.display = (matchSearch && matchEstado) ? '' : 'none';
+                        });
+                    }
+
+                    if (searchInput) searchInput.addEventListener('input', filterTable);
+                    if (filterEstado) filterEstado.addEventListener('change', filterTable);
+
+                    // Server Side Period Filter
+                    const filterPeriodo = document.getElementById('filterPeriodo');
+                    if (filterPeriodo) {
+                        filterPeriodo.addEventListener('change', function () {
+                            const url = new URL(window.location.href);
+                            if (this.value) url.searchParams.set('periodo', this.value);
+                            else url.searchParams.delete('periodo');
+                            window.location.href = url.toString();
+                        });
+                    }
+                });
+
+                // ACTIONS LOGIC (SweetAlert)
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Devolver
+                    document.querySelectorAll('.devolver-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            const id = btn.getAttribute('data-prestamo-id');
+                            if (!id) return;
+
+                            const result = await Swal.fire({
+                                title: '¿Confirmar devolución?',
+                                text: 'El libro será registrado como devuelto.',
+                                icon: 'question',
+                                showCancelButton: true,
+                                confirmButtonColor: '#4f46e5',
+                                cancelButtonColor: '#9ca3af',
+                                confirmButtonText: 'Sí, confirmar',
+                                cancelButtonText: 'Cancelar'
+                            });
+
+                            if (result.isConfirmed) {
+                                try {
+                                    const resp = await fetch(`/prestamos/${id}/devolucion`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({})
+                                    });
+                                    if (resp.ok) {
+                                        Swal.fire({ icon: 'success', title: 'Excelente', text: 'Devolución registrada correctamente.', timer: 1500, showConfirmButton: false }).then(() => location.reload());
+                                    } else {
+                                        throw new Error('Error en la petición');
+                                    }
+                                } catch (err) {
+                                    Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo registrar la devolución' });
+                                }
+                            }
+                        });
+                    });
+
+                    // Aprobar
+                    document.querySelectorAll('.aprobar-btn').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            e.preventDefault();
+                            const id = btn.getAttribute('data-prestamo-id');
+                            if (!id) return;
+
+                            // Simple loading state
+                            const originalHTML = btn.innerHTML;
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                            btn.disabled = true;
+
+                            try {
+                                const resp = await fetch(`/prestamos/${id}/aprobar`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({})
+                                });
+                                if (resp.ok) {
+                                    Swal.fire({ icon: 'success', title: 'Aprobado', text: 'Préstamo iniciado.', timer: 1500, showConfirmButton: false }).then(() => location.reload());
+                                } else {
+                                    throw new Error('Error al aprobar');
+                                }
+                            } catch (err) {
+                                btn.innerHTML = originalHTML;
+                                btn.disabled = false;
+                                Swal.fire('Error', 'No se pudo aprobar el préstamo', 'error');
+                            }
+                        });
+                    });
+                });
+            </script>
+</body>
+
+</html>

@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Panel Administrativo - Biblioteca Escolar' }) %>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="/css/dashboard.css?v=3">
+        <link rel="stylesheet" href="/css/components/export-dropdown.css">
+</head>
+
+<body class="dashboard-body">
+
+    <script type="application/json"
+        id="labelsLibrosPopulares"><%- JSON.stringify((stats.librosMasPrestados && stats.librosMasPrestados.labels) || []) %></script>
+    <script type="application/json"
+        id="dataLibrosPopulares"><%- JSON.stringify((stats.librosMasPrestados && stats.librosMasPrestados.data) || []) %></script>
+
+    <!-- Nuevos KPIs Data -->
+    <script type="application/json"
+        id="labelsLibrosPorAnio"><%- JSON.stringify((stats.librosPorAnio && stats.librosPorAnio.labels) || []) %></script>
+    <script type="application/json"
+        id="dataLibrosPorAnio"><%- JSON.stringify((stats.librosPorAnio && stats.librosPorAnio.data) || []) %></script>
+    <script type="application/json"
+        id="labelsComparativa"><%- JSON.stringify((stats.comparativaGrados && stats.comparativaGrados.labels) || []) %></script>
+    <script type="application/json"
+        id="dataComparativa"><%- JSON.stringify((stats.comparativaGrados && stats.comparativaGrados.data) || []) %></script>
+    <script type="application/json"
+        id="labelsRanking"><%- JSON.stringify((stats.rankingGrados && stats.rankingGrados.labels) || []) %></script>
+    <script type="application/json"
+        id="dataRanking"><%- JSON.stringify((stats.rankingGrados && stats.rankingGrados.data) || []) %></script>
+    <script type="application/json"
+        id="labelsLibrosPorMes"><%- JSON.stringify((stats.prestamosPorMes && stats.prestamosPorMes.labels) || []) %></script>
+    <script type="application/json"
+        id="dataLibrosPorMes"><%- JSON.stringify((stats.prestamosPorMes && stats.prestamosPorMes.data) || []) %></script>
+
+    <%- include('../partials/navbar') %>
+
+        <main class="dashboard-wrapper">
+            <section class="dashboard-hero">
+                <span class="glow-orb glow-orb--right"></span>
+                <span class="glow-orb glow-orb--bottom"></span>
+
+                <div class="dashboard-hero__content">
+                    <span class="dashboard-hero__badge">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Panel administrativo
+                    </span>
+                    <div class="dashboard-hero__title">
+                        <h1>Panel administrativo de la biblioteca</h1>
+                    </div>
+                </div>
+
+                <!-- Sección de estado resumido eliminada según requerimiento -->
+            </section>
+
+            <section class="stats-grid">
+                <article class="stat-card" data-color="blue">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Préstamos activos</h3>
+                        <div class="stat-card__value">
+                            <%= stats.prestamosActivos %>
+                        </div>
+                        <p class="stat-card__meta">Operaciones que siguen en curso.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="cyan">
+                    <div class="stat-card__icon"
+                        style="background: linear-gradient(135deg, #0ea5e9, #38bdf8); box-shadow: 0 18px 30px rgba(14, 165, 233, 0.3);">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Préstamos pendientes</h3>
+                        <div class="stat-card__value">
+                            <%= stats.prestamosPendientes || 0 %>
+                        </div>
+                        <p class="stat-card__meta">Solicitudes por aprobar.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="amber">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-hourglass-half"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Préstamos vencidos</h3>
+                        <div class="stat-card__value">
+                            <%= stats.prestamosVencidos %>
+                        </div>
+                        <p class="stat-card__meta">Casos que requieren seguimiento.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="purple">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-layer-group"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Total de préstamos</h3>
+                        <div class="stat-card__value">
+                            <%= stats.totalPrestamos %>
+                        </div>
+                        <p class="stat-card__meta">Flujo acumulado del periodo.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="green">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-book-reader"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Total Lecturas</h3>
+                        <div class="stat-card__value">
+                            <%= (stats.totalFisicosLeidos || 0) + (stats.totalVirtualesLeidos || 0) %>
+                        </div>
+                        <p class="stat-card__meta">
+                            <span title="Libros físicos leídos"><i class="fas fa-book"></i>
+                                <%= stats.totalFisicosLeidos || 0 %>
+                            </span> |
+                            <span title="Libros virtuales leídos"><i class="fas fa-tablet-screen-button"></i>
+                                <%= stats.totalVirtualesLeidos || 0 %>
+                            </span>
+                        </p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Sección movida al final del documento -->
+
+            <section class="dashboard-panels">
+                <!-- KPI 1: Libros por Año -->
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Libros prestados por semana</h3>
+                            <p>Préstamos por día de la semana (<%= stats.rangoSemana || '' %>).</p>
+                        </div>
+                        <div class="export-dropdown">
+                            <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="export-dropdown__menu">
+                                <a href="/reportes/libros-por-semana?formato=pdf" class="export-dropdown__item">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                                <a href="/reportes/libros-por-semana?formato=word" class="export-dropdown__item">
+                                    <i class="fas fa-file-word"></i> Word
+                                </a>
+                                <a href="/reportes/libros-por-semana?formato=excel" class="export-dropdown__item">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chartLibrosPorAnio"></canvas>
+                    </div>
+                </article>
+
+                <!-- KPI 2: Libros leídos por mes -->
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Actividad lectora mensual</h3>
+                            <p>Total de libros leídos por mes.</p>
+                        </div>
+                        <div class="export-dropdown">
+                            <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="export-dropdown__menu">
+                                <a href="/reportes/actividad-mensual?formato=pdf" class="export-dropdown__item">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                                <a href="/reportes/actividad-mensual?formato=word" class="export-dropdown__item">
+                                    <i class="fas fa-file-word"></i> Word
+                                </a>
+                                <a href="/reportes/actividad-mensual?formato=excel" class="export-dropdown__item">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chartLibrosPorMes"></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <section class="dashboard-panels">
+                <!-- Libros que más leen por grado -->
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Libros que más leen por grado</h3>
+                            <p>Grados con mayor actividad lectora.</p>
+                        </div>
+                        <div class="export-dropdown">
+                            <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="export-dropdown__menu">
+                                <a href="/reportes/lectura-por-grado?formato=pdf" class="export-dropdown__item">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                                <a href="/reportes/lectura-por-grado?formato=word" class="export-dropdown__item">
+                                    <i class="fas fa-file-word"></i> Word
+                                </a>
+                                <a href="/reportes/lectura-por-grado?formato=excel" class="export-dropdown__item">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="chartRanking"></canvas>
+                    </div>
+                </article>
+
+                <article class="dash-panel">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Libros más leídos</h3>
+                            <p>Top títulos con mayor demanda.</p>
+                        </div>
+                        <div class="export-dropdown">
+                            <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                <i class="fas fa-download"></i>
+                                Exportar
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="export-dropdown__menu">
+                                <a href="/reportes/libros-populares?formato=pdf" class="export-dropdown__item">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                                <a href="/reportes/libros-populares?formato=word" class="export-dropdown__item">
+                                    <i class="fas fa-file-word"></i> Word
+                                </a>
+                                <a href="/reportes/libros-populares?formato=excel" class="export-dropdown__item">
+                                    <i class="fas fa-file-excel"></i> Excel
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="librosPopulares"></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <section class="dashboard-panels">
+                <article class="dash-panel dash-panel--full">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Préstamos por grado (Detalle)</h3>
+                            <p>Distribución entre activos y vencidos.</p>
+                        </div>
+                    </div>
+                    <div class="table-container-modern">
+                        <!-- Barra de Herramientas (Nuevo) -->
+                        <div class="table-toolbar">
+                            <div class="table-toolbar__left">
+                                <!-- Texto "Filtrar reporte" eliminado -->
+                            </div>
+                            <div class="table-toolbar__right">
+                                <div class="table-filters">
+                                    <select class="table-filter-select" id="filterPeriodoPrestamos">
+                                        <option value="anio_actual" selected>Este Año</option>
+                                        <option value="anio_anterior">Año Pasado</option>
+                                        <option value="mes_actual">Este Mes</option>
+                                        <option value="trimestre">Último Trimestre</option>
+                                        <option value="bimestre">Último Bimestre</option>
+                                        <option value="historico">Todo el tiempo</option>
+                                    </select>
+                                </div>
+                                <div class="export-dropdown">
+                                    <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/prestamos-grado?formato=pdf&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportPdfPrestamos">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/prestamos-grado?formato=word&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportWordPrestamos">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/prestamos-grado?formato=excel&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportExcelPrestamos">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table-modern-enhanced" id="tablePrestamosGrado">
+                            <thead>
+                                <tr>
+                                    <th>Grado</th>
+                                    <th style="text-align: center;">Activos</th>
+                                    <th style="text-align: center;">Vencidos</th>
+                                    <th style="text-align: center;">Devueltos</th>
+                                    <th style="text-align: center;">Total Histórico</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (stats.prestamosPorGrado && stats.prestamosPorGrado.length) { %>
+                                    <% stats.prestamosPorGrado.forEach(row=> { %>
+                                        <tr>
+                                            <td data-label="Grado">
+                                                <span class="badge-modern badge-modern--secondary">
+                                                    <%= row.grado %>° Grado
+                                                </span>
+                                            </td>
+                                            <td data-label="Activos" style="text-align: center;">
+                                                <span class="chip"
+                                                    style="background: rgba(14, 165, 233, 0.1); color: #0284c7;">
+                                                    <%= row.activos %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Vencidos" style="text-align: center;">
+                                                <span class="chip"
+                                                    style="background: rgba(239, 68, 68, 0.1); color: #dc2626;">
+                                                    <%= row.vencidos %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Devueltos" style="text-align: center;">
+                                                <span class="chip"
+                                                    style="background: rgba(16, 185, 129, 0.1); color: #059669;">
+                                                    <%= row.devueltos %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Total Histórico" style="text-align: center;">
+                                                <strong>
+                                                    <%= row.total_historico %>
+                                                </strong>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="5" style="text-align: center; padding: 2rem;">
+                                                        <i class="fas fa-folder-open"
+                                                            style="font-size: 2rem; opacity: 0.3; margin-bottom: 0.5rem;"></i>
+                                                        <p>No hay datos disponibles para este periodo</p>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+
+            <section class="dashboard-panels">
+                <!-- Top Lectores Estudiantes -->
+                <article class="dash-panel dash-panel--full">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Top lectores - Estudiantes</h3>
+                            <p>Ranking de estudiantes con mayor actividad lectora.</p>
+                        </div>
+                    </div>
+                    <div class="table-container-modern">
+                        <!-- Barra de Herramientas (Siempre visible) -->
+                        <div class="table-toolbar">
+                            <div class="table-toolbar__left">
+                                <div class="table-search">
+                                    <input type="text" id="searchTopLectores" placeholder="Buscar estudiante...">
+                                </div>
+                            </div>
+                            <div class="table-toolbar__right">
+                                <div class="table-filters">
+                                    <select class="table-filter-select" id="filterPeriodo">
+                                        <option value="anio_actual" selected>Este Año</option>
+                                        <option value="anio_anterior">Año Pasado</option>
+                                        <option value="mes_actual">Este Mes</option>
+                                        <option value="trimestre">Último Trimestre</option>
+                                        <option value="bimestre">Último Bimestre</option>
+                                        <option value="historico">Todo el tiempo</option>
+                                    </select>
+                                    <select class="table-filter-select" id="filterGrado">
+                                        <option value="">Todos los grados</option>
+                                        <option value="1">1er Grado</option>
+                                        <option value="2">2do Grado</option>
+                                        <option value="3">3er Grado</option>
+                                        <option value="4">4to Grado</option>
+                                        <option value="5">5to Grado</option>
+                                    </select>
+                                </div>
+                                <div class="export-dropdown">
+                                    <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/top-lectores?formato=pdf&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportPdfTop">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/top-lectores?formato=word&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportWordTop">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/top-lectores?formato=excel&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportExcelTop">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table-modern-enhanced" id="tableTopLectores">
+                            <thead>
+                                <tr>
+                                    <th>Posición</th>
+                                    <th>Estudiante</th>
+                                    <th style="text-align: center;">Grado</th>
+                                    <th style="text-align: center;">Libros leídos</th>
+                                    <th style="text-align: center;">Áreas exploradas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (stats.topLectores && stats.topLectores.length) { %>
+                                    <% stats.topLectores.forEach((lector, index)=> { %>
+                                        <tr data-grado="<%= lector.grado %>">
+                                            <td data-label="Posición">
+                                                <div
+                                                    style="font-weight: 700; color: var(--primary-color); background: rgba(59, 130, 246, 0.1); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                                    #<%= index + 1 %>
+                                                </div>
+                                            </td>
+                                            <td data-label="Estudiante">
+                                                <div class="table-user-info">
+                                                    <div class="user-avatar-placeholder"
+                                                        style="width: 32px; height: 32px; font-size: 0.8rem;">
+                                                        <i class="fas fa-user-graduate"></i>
+                                                    </div>
+                                                    <span class="table-user-name" style="font-weight: 600;">
+                                                        <%= lector.nombre %>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Grado" style="text-align: center;">
+                                                <span class="badge-modern badge-modern--secondary">
+                                                    <%= lector.grado %>° Grado
+                                                </span>
+                                            </td>
+                                            <td data-label="Libros leídos" style="text-align: center;">
+                                                <strong style="font-size: 1rem; color: var(--dash-text);">
+                                                    <%= lector.totalLibros %>
+                                                </strong>
+                                            </td>
+                                            <td data-label="Áreas exploradas" style="text-align: center;">
+                                                <span style="color: var(--dash-muted); font-size: 0.9rem;">
+                                                    <%= lector.areasLeidas %> áreas
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="5"
+                                                        style="text-align: center; padding: 2rem; color: var(--dash-muted);">
+                                                        <div
+                                                            style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem;">
+                                                            <i class="fas fa-search"
+                                                                style="font-size: 1.5rem; opacity: 0.5;"></i>
+                                                            <p>No hay datos suficientes para mostrar el ranking en este
+                                                                periodo.</p>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <!-- Top Lectores Docentes -->
+                <article class="dash-panel dash-panel--full">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Top lectores - Docentes</h3>
+                            <p>Ranking de docentes con mayor actividad lectora.</p>
+                        </div>
+                    </div>
+                    <!-- Tabla Moderna con Scroll Interno -->
+                    <div class="table-container-modern">
+                        <!-- Barra de Herramientas -->
+                        <div class="table-toolbar">
+                            <div class="table-toolbar__left">
+                                <div class="table-search">
+                                    <input type="text" id="searchTopDocentes" placeholder="Buscar docente...">
+                                </div>
+                            </div>
+                            <div class="table-toolbar__right">
+                                <div class="table-filters">
+                                    <select class="table-filter-select" id="filterPeriodoDocentes">
+                                        <option value="anio_actual" selected>Este Año</option>
+                                        <option value="anio_anterior">Año Pasado</option>
+                                        <option value="mes_actual">Este Mes</option>
+                                        <option value="trimestre">Último Trimestre</option>
+                                        <option value="bimestre">Último Bimestre</option>
+                                        <option value="historico">Todo el tiempo</option>
+                                    </select>
+                                </div>
+                                <div class="export-dropdown">
+                                    <button class="btn btn--sm btn--ghost export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/top-lectores?formato=pdf&tipo=docente&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportPdfTopDoc">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/top-lectores?formato=word&tipo=docente&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportWordTopDoc">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/top-lectores?formato=excel&tipo=docente&periodo=anio_actual"
+                                            class="export-dropdown__item" id="exportExcelTopDoc">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table-modern-enhanced" id="tableTopDocentes">
+                            <thead>
+                                <tr>
+                                    <th>Posición</th>
+                                    <th>Docente</th>
+                                    <th style="text-align: center;">Área</th>
+                                    <th style="text-align: center;">Libros leídos</th>
+                                    <th style="text-align: center;">Áreas exploradas</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="5" style="text-align:center; padding: 2rem;">
+                                        <p>Cargando datos de docentes...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="dash-panel dash-panel--full">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Alertas recientes</h3>
+                            <p>Eventos críticos o recordatorios importantes.</p>
+                        </div>
+                    </div>
+                    <% if (stats.alertas && stats.alertas.length) { %>
+                        <div class="alert-grid">
+                            <% stats.alertas.forEach(alerta=> { %>
+                                <div class="alert-card">
+
+                                    <!-- Icono según tipo -->
+                                    <div
+                                        class="alert-icon <%= alerta.tipo === 'VENCIMIENTO' ? 'alert-icon--warning' : 'alert-icon--info' %>">
+                                        <i
+                                            class="fas <%= alerta.tipo === 'VENCIMIENTO' ? 'fa-exclamation-triangle' : (alerta.tipo === 'PENDIENTE' ? 'fa-clock' : 'fa-bookmark') %>"></i>
+                                    </div>
+
+                                    <!-- Contenido -->
+                                    <div class="alert-content">
+                                        <h4>
+                                            <%= alerta.titulo %>
+                                        </h4>
+                                        <p>
+                                            <%= alerta.mensaje %>
+                                        </p>
+                                    </div>
+
+                                    <!-- Acción -->
+                                    <% if ((alerta.tipo==='VENCIMIENTO' || alerta.tipo==='PENDIENTE' ) &&
+                                        alerta.prestamo_id && !isNaN(alerta.prestamo_id)) { %>
+                                        <a href="/prestamos/<%= parseInt(alerta.prestamo_id) %>/detalle"
+                                            class="btn-check-detail" target="_self">
+                                            Ver detalle
+                                        </a>
+                                        <% } else { %>
+                                            <a href="/prestamos/admin" class="btn-check-detail" target="_self">
+                                                Ver detalle
+                                            </a>
+                                            <% } %>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% } else { %>
+                            <div class="table-empty">
+                                <i class="fas fa-check-circle"></i>
+                                No hay alertas recientes.
+                            </div>
+                            <% } %>
+                </article>
+            </section>
+
+            <!-- Reportes Disponibles -->
+            <section class="dashboard-panels">
+                <article class="dash-panel dash-panel--full">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Reportes Disponibles</h3>
+                            <p>Genera y exporta reportes detallados del sistema.</p>
+                        </div>
+                    </div>
+                    <div class="reports-grid">
+                        <!-- 1. Préstamos Generales -->
+                        <div class="report-card">
+                            <div class="report-card__icon"
+                                style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">
+                                <i class="fa-solid fa-clipboard-list"></i>
+                            </div>
+                            <div class="report-card__content">
+                                <h4>Préstamos Generales</h4>
+                                <p>Historial completo de movimientos</p>
+                            </div>
+                            <div class="report-card__action">
+                                <div class="export-dropdown">
+                                    <button class="btn-export-centered export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/prestamos?formato=pdf" class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/prestamos?formato=word" class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/prestamos?formato=excel" class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Listado de Estudiantes -->
+                        <div class="report-card">
+                            <div class="report-card__icon"
+                                style="background: linear-gradient(135deg, #10b981, #34d399);">
+                                <i class="fa-solid fa-user-graduate"></i>
+                            </div>
+                            <div class="report-card__content">
+                                <h4>Listado de Estudiantes</h4>
+                                <p>Registro de alumnos inscritos</p>
+                            </div>
+                            <div class="report-card__action">
+                                <div class="export-dropdown">
+                                    <button class="btn-export-centered export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/estudiantes?formato=pdf" class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/estudiantes?formato=word" class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/estudiantes?formato=excel" class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Catálogo de Libros -->
+                        <div class="report-card">
+                            <div class="report-card__icon"
+                                style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+                                <i class="fa-solid fa-book"></i>
+                            </div>
+                            <div class="report-card__content">
+                                <h4>Catálogo de Libros</h4>
+                                <p>Inventario bibliográfico total</p>
+                            </div>
+                            <div class="report-card__action">
+                                <div class="export-dropdown">
+                                    <button class="btn-export-centered export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/libros?formato=pdf" class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/libros?formato=word" class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/libros?formato=excel" class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Reseñas y Opiniones -->
+                        <div class="report-card">
+                            <div class="report-card__icon"
+                                style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">
+                                <i class="fa-solid fa-comments"></i>
+                            </div>
+                            <div class="report-card__content">
+                                <h4>Reseñas y Opiniones</h4>
+                                <p>Comentarios de los lectores</p>
+                            </div>
+                            <div class="report-card__action">
+                                <div class="export-dropdown">
+                                    <button class="btn-export-centered export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/resenas?formato=pdf" class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/resenas?formato=word" class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/resenas?formato=excel" class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Ranking de Lectores -->
+                        <div class="report-card">
+                            <div class="report-card__icon"
+                                style="background: linear-gradient(135deg, #ef4444, #f87171);">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <div class="report-card__content">
+                                <h4>Ranking de Lectores</h4>
+                                <p>Estudiantes más destacados</p>
+                            </div>
+                            <div class="report-card__action">
+                                <div class="export-dropdown">
+                                    <button class="btn-export-centered export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/top-lectores?formato=pdf&periodo=anio_actual"
+                                            class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/top-lectores?formato=word&periodo=anio_actual"
+                                            class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/top-lectores?formato=excel&periodo=anio_actual"
+                                            class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 6. Libros Populares -->
+                        <div class="report-card">
+                            <div class="report-card__icon"
+                                style="background: linear-gradient(135deg, #06b6d4, #22d3ee);">
+                                <i class="fa-solid fa-star"></i>
+                            </div>
+                            <div class="report-card__content">
+                                <h4>Libros Populares</h4>
+                                <p>Títulos más solicitados</p>
+                            </div>
+                            <div class="report-card__action">
+                                <div class="export-dropdown">
+                                    <button class="btn-export-centered export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/libros-populares?formato=pdf" class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/libros-populares?formato=word" class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/libros-populares?formato=excel"
+                                            class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 7. Préstamos por Grado -->
+                        <div class="report-card">
+                            <div class="report-card__icon"
+                                style="background: linear-gradient(135deg, #6366f1, #818cf8);">
+                                <i class="fa-solid fa-chart-bar"></i>
+                            </div>
+                            <div class="report-card__content">
+                                <h4>Préstamos por Grado</h4>
+                                <p>Estadísticas por nivel</p>
+                            </div>
+                            <div class="report-card__action">
+                                <div class="export-dropdown">
+                                    <button class="btn-export-centered export-dropdown__trigger">
+                                        <i class="fas fa-download"></i>
+                                        Exportar
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="export-dropdown__menu">
+                                        <a href="/reportes/prestamos-grado?formato=pdf" class="export-dropdown__item">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                        <a href="/reportes/prestamos-grado?formato=word" class="export-dropdown__item">
+                                            <i class="fas fa-file-word"></i> Word
+                                        </a>
+                                        <a href="/reportes/prestamos-grado?formato=excel" class="export-dropdown__item">
+                                            <i class="fas fa-file-excel"></i> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+
+
+            <!-- Script de Funcionalidad Top Lectores -->
+            <script>
+                // ================================================================
+                // FUNCIONALIDAD DE TABLA TOP LECTORES (SERVER SIDE)
+                // ================================================================
+
+                // Declarar variables primero
+                const searchInput = document.getElementById('searchTopLectores');
+                const searchInputDocentes = document.getElementById('searchTopDocentes');
+                const filterGrado = document.getElementById('filterGrado');
+                const filterPeriodo = document.getElementById('filterPeriodo');
+                const filterPeriodoDocentes = document.getElementById('filterPeriodoDocentes');
+                const tableBody = document.querySelector('#tableTopLectores tbody');
+                const tableBodyDocentes = document.querySelector('#tableTopDocentes tbody');
+
+                // Export Links
+                const exportPdfLink = document.getElementById('exportPdfTop');
+                const exportWordLink = document.getElementById('exportWordTop');
+                const exportExcelLink = document.getElementById('exportExcelTop');
+                const exportPdfLinkDoc = document.getElementById('exportPdfTopDoc');
+                const exportWordLinkDoc = document.getElementById('exportWordTopDoc');
+                const exportExcelLinkDoc = document.getElementById('exportExcelTopDoc');
+
+                function updateExportLinks() {
+                    const periodo = filterPeriodo ? filterPeriodo.value : 'anio_actual';
+                    const grado = filterGrado ? filterGrado.value : '';
+                    const busqueda = searchInput ? searchInput.value : '';
+
+                    const queryParams = new URLSearchParams({ periodo, grado, busqueda, tipo: 'estudiante' });
+
+                    if (exportPdfLink) exportPdfLink.href = `/reportes/top-lectores?formato=pdf&${queryParams.toString()}`;
+                    if (exportWordLink) exportWordLink.href = `/reportes/top-lectores?formato=word&${queryParams.toString()}`;
+                    if (exportExcelLink) exportExcelLink.href =
+                        `/reportes/top-lectores?formato=excel&${queryParams.toString()}`;
+                }
+
+                function updateExportLinksDocentes() {
+                    const periodo = filterPeriodoDocentes ? filterPeriodoDocentes.value : 'anio_actual';
+                    const queryParams = new URLSearchParams({ periodo, tipo: 'docente' });
+
+                    if (exportPdfLinkDoc) exportPdfLinkDoc.href =
+                        `/reportes/top-lectores?formato=pdf&${queryParams.toString()}`;
+                    if (exportWordLinkDoc) exportWordLinkDoc.href =
+                        `/reportes/top-lectores?formato=word&${queryParams.toString()}`;
+                    if (exportExcelLinkDoc) exportExcelLinkDoc.href =
+                        `/reportes/top-lectores?formato=excel&${queryParams.toString()}`;
+                }
+
+                async function fetchTopLectores() {
+                    try {
+                        const periodo = filterPeriodo ? filterPeriodo.value : 'anio_actual';
+                        const grado = filterGrado ? filterGrado.value : '';
+                        const busqueda = searchInput ? searchInput.value : '';
+
+                        const response = await
+                            fetch(`/dashboard/api/top-lectores?limit=10&periodo=${periodo}&grado=${grado}&busqueda=${busqueda}&tipo=estudiante`);
+                        const result = await response.json();
+
+                        if (result.success) {
+                            renderTable(result.data);
+                            updateExportLinks();
+                        } else {
+                            console.error('Error fetching data:', result.message);
+                        }
+                    } catch (error) {
+                        console.error('Error de red:', error);
+                    }
+                }
+
+                async function fetchTopDocentes() {
+                    try {
+                        const periodo = filterPeriodoDocentes ? filterPeriodoDocentes.value : 'anio_actual';
+                        const busqueda = searchInputDocentes ? searchInputDocentes.value : '';
+
+                        const response = await
+                            fetch(`/dashboard/api/top-lectores?limit=10&periodo=${periodo}&busqueda=${busqueda}&tipo=docente`);
+                        const result = await response.json();
+
+                        if (result.success) {
+                            renderTableDocentes(result.data);
+                            updateExportLinksDocentes();
+                        } else {
+                            console.error('Error fetching data:', result.message);
+                            if (tableBodyDocentes) {
+                                tableBodyDocentes.innerHTML = `<tr>
+                                    <td colspan="5" style="text-align:center; padding: 2rem;">Error al cargar los datos: ${result.message || 'Error desconocido'}</td>
+                                </tr>`;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error de red:', error);
+                        if (tableBodyDocentes) {
+                            tableBodyDocentes.innerHTML = `<tr>
+                                <td colspan="5" style="text-align:center; padding: 2rem;">Error de conexión: ${error.message}</td>
+                            </tr>`;
+                        }
+                    }
+                }
+
+                function renderTable(data) {
+                    if (!tableBody) return;
+                    tableBody.innerHTML = '';
+
+                    if (data.length === 0) {
+                        tableBody.innerHTML = `<tr>
+                            <td colspan="5" style="text-align:center; padding: 2rem; color: var(--dash-muted);">No se encontraron resultados</td>
+                        </tr>`;
+                        return;
+                    }
+
+                    data.forEach((lector, index) => {
+                        const row = `
+            <tr>
+                <td data-label="Posición">
+                    <div
+                        style="font-weight: 700; color: var(--primary-color); background: rgba(59, 130, 246, 0.1); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        #${index + 1}
+                    </div>
+                </td>
+                <td data-label="Estudiante">
+                    <div class="table-user-info">
+                        <div class="user-avatar-placeholder" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <span class="table-user-name" style="font-weight: 600;">${lector.nombre}</span>
+                    </div>
+                </td>
+                <td data-label="Grado" style="text-align: center;">
+                    <span class="badge-modern badge-modern--secondary">
+                        ${lector.grado}° Grado
+                    </span>
+                </td>
+                <td data-label="Libros leídos" style="text-align: center;">
+                    <strong style="font-size: 1rem; color: var(--dash-text);">
+                        ${lector.totalLibros}
+                    </strong>
+                </td>
+                <td data-label="Áreas exploradas" style="text-align: center;">
+                    <span style="color: var(--dash-muted); font-size: 0.9rem;">
+                        ${lector.areasLeidas || 0} áreas
+                    </span>
+                </td>
+            </tr>
+            `;
+                        tableBody.innerHTML += row;
+                    });
+                }
+
+                function renderTableDocentes(data) {
+                    if (!tableBodyDocentes) return;
+                    tableBodyDocentes.innerHTML = '';
+
+                    if (data.length === 0) {
+                        tableBodyDocentes.innerHTML = `<tr>
+                            <td colspan="5" style="text-align:center; padding: 2rem; color: var(--dash-muted);">No se encontraron docentes con préstamos registrados</td>
+                        </tr>`;
+                        return;
+                    }
+
+                    data.forEach((docente, index) => {
+                        // Para docentes, usar area_docente si existe, sino usar el campo grado (que contiene el área)
+                        const area = (docente.area_docente || docente.grado || 'Sin área').toString();
+                        const row = `
+            <tr>
+                <td data-label="Posición">
+                    <div
+                        style="font-weight: 700; color: var(--primary-color); background: rgba(59, 130, 246, 0.1); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                        #${index + 1}
+                    </div>
+                </td>
+                <td data-label="Docente">
+                    <div class="table-user-info">
+                        <div class="user-avatar-placeholder" style="width: 32px; height: 32px; font-size: 0.8rem;">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <span class="table-user-name" style="font-weight: 600;">${docente.nombre}</span>
+                    </div>
+                </td>
+                <td data-label="Área" style="text-align: center;">
+                    <span class="badge-modern badge-modern--secondary">
+                        ${area}
+                    </span>
+                </td>
+                <td data-label="Libros leídos" style="text-align: center;">
+                    <strong style="font-size: 1rem; color: var(--dash-text);">
+                        ${docente.totalLibros}
+                    </strong>
+                </td>
+                <td data-label="Áreas exploradas" style="text-align: center;">
+                    <span style="color: var(--dash-muted); font-size: 0.9rem;">
+                        ${docente.areasLeidas || 0} áreas
+                    </span>
+                </td>
+            </tr>
+            `;
+                        tableBodyDocentes.innerHTML += row;
+                    });
+                }
+
+                // Event Listeners para estudiantes
+                if (filterPeriodo) filterPeriodo.addEventListener('change', fetchTopLectores);
+                if (filterGrado) filterGrado.addEventListener('change', fetchTopLectores);
+
+                // Event Listeners para docentes
+                if (filterPeriodoDocentes) filterPeriodoDocentes.addEventListener('change', () => {
+                    fetchTopDocentes();
+                    updateExportLinksDocentes();
+                });
+
+                // Debounce para búsqueda de estudiantes
+                let timeoutId;
+                if (searchInput) {
+                    searchInput.addEventListener('input', () => {
+                        clearTimeout(timeoutId);
+                        timeoutId = setTimeout(fetchTopLectores, 500);
+                    });
+                }
+
+                // Debounce para búsqueda de docentes
+                let timeoutIdDocentes;
+                if (searchInputDocentes) {
+                    searchInputDocentes.addEventListener('input', () => {
+                        clearTimeout(timeoutIdDocentes);
+                        timeoutIdDocentes = setTimeout(fetchTopDocentes, 500);
+                    });
+                }
+
+                // Cargar datos iniciales
+                updateExportLinks();
+                updateExportLinksDocentes();
+                // Cargar top docentes y estudiantes automáticamente al cargar la página para sincronizar filtros
+                fetchTopDocentes();
+                fetchTopLectores();
+            </script>
+
+            <!-- Dashboard Shared JS -->
+            <script src="/js/dashboard-shared.js"></script>
+
+            <script src="/js/export-dropdown.js"></script>
+
+            <script>
+                // Wait for DOM to be fully loaded
+                document.addEventListener('DOMContentLoaded', function () {
+                    // Get data from server
+                    const getData = (id) => {
+                        const element = document.getElementById(id);
+                        return element ? JSON.parse(element.textContent) : [];
+                    };
+
+                    const labelsLibrosPorAnio = getData('labelsLibrosPorAnio');
+                    const dataLibrosPorAnio = getData('dataLibrosPorAnio');
+                    const labelsLibrosPorMes = getData('labelsLibrosPorMes');
+                    const dataLibrosPorMes = getData('dataLibrosPorMes');
+                    const labelsRanking = getData('labelsRanking');
+                    const dataRanking = getData('dataRanking');
+                    const labelsLibrosPopulares = getData('labelsLibrosPopulares');
+                    const dataLibrosPopulares = getData('dataLibrosPopulares');
+                    const dataLibrosPorSemana = getData('dataLibrosPorSemana');
+
+                    // Chart colors
+                    const colors = {
+                        primary: '#0ea5e9',
+                        success: '#10b981',
+                        danger: '#ef4444',
+                        warning: '#f59e0b',
+                        info: '#3b82f6',
+                        purple: '#8b5cf6',
+                        pink: '#ec4899',
+                        indigo: '#6366f1',
+                        teal: '#14b8a6',
+                        orange: '#f97316',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    };
+
+                    // 1. Libros prestados por semana (Libros por semana)
+                    const ctxLibrosPorAnio = document.getElementById('chartLibrosPorAnio')?.getContext('2d');
+                    if (ctxLibrosPorAnio) {
+                        // Definir los días de la semana laboral (ahora dinámico)
+                        const labelsSemana = getData('labelsLibrosPorSemana');
+                        const diasSemana = labelsSemana.length > 0 ? labelsSemana : ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+
+                        // Asegurarse de que los datos coincidan con los días de la semana
+                        let datosSemana = [];
+                        if (dataLibrosPorSemana && dataLibrosPorSemana.length > 0) {
+                            // Usar datos reales procesados en controller
+                            datosSemana = dataLibrosPorSemana.slice(0, 5);
+                            while (datosSemana.length < 5) {
+                                datosSemana.push(0);
+                            }
+                        } else {
+                            // Si no hay datos, mostrar ceros (NO dummy data)
+                            datosSemana = [0, 0, 0, 0, 0];
+                        }
+
+                        new Chart(ctxLibrosPorAnio, {
+                            type: 'bar',
+                            data: {
+                                labels: diasSemana,
+                                datasets: [{
+                                    label: 'Préstamos',
+                                    data: datosSemana,
+                                    backgroundColor: [
+                                        colors.primary,
+                                        colors.success,
+                                        colors.warning,
+                                        colors.danger,
+                                        colors.purple
+                                    ],
+                                    borderWidth: 0,
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `${context.parsed.y} préstamos`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            precision: 0
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // 2. Actividad lectora mensual (Libros por Mes)
+                    const ctxLibrosPorMes = document.getElementById('chartLibrosPorMes')?.getContext('2d');
+                    if (ctxLibrosPorMes) {
+                        // Definir los meses del año
+                        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+
+                        // Asegurarse de que los datos coincidan con los meses del año
+                        let datosMensuales = [];
+                        if (dataLibrosPorMes && dataLibrosPorMes.length > 0) {
+                            // Los datos ya vienen mapeados a 12 meses desde el controller
+                            datosMensuales = dataLibrosPorMes;
+                        } else {
+                            // Ceros por defecto
+                            datosMensuales = new Array(12).fill(0);
+                        }
+
+                        new Chart(ctxLibrosPorMes, {
+                            type: 'line',
+                            data: {
+                                labels: meses,
+                                datasets: [{
+                                    label: 'Libros leídos',
+                                    data: datosMensuales,
+                                    borderColor: colors.primary,
+                                    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                                    tension: 0.4,
+                                    fill: true,
+                                    borderWidth: 3,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: colors.primary,
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: true,
+                                        position: 'top'
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `${context.parsed.y} libros`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            precision: 0
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Cantidad de libros'
+                                        }
+                                    },
+                                    x: {
+                                        title: {
+                                            display: true,
+                                            text: 'Meses del año'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // 3. Libros que más leen por grado (Ranking)
+                    const ctxRanking = document.getElementById('chartRanking')?.getContext('2d');
+                    if (ctxRanking) {
+                        new Chart(ctxRanking, {
+                            type: 'doughnut',
+                            data: {
+                                labels: labelsRanking.length ? labelsRanking : ['Sin datos'],
+                                datasets: [{
+                                    data: dataRanking.length ? dataRanking : [0],
+                                    backgroundColor: [
+                                        colors.primary,
+                                        colors.success,
+                                        colors.warning,
+                                        colors.danger,
+                                        colors.purple,
+                                        colors.teal
+                                    ],
+                                    borderWidth: 0,
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutout: '70%',
+                                // ...
+                            }
+                        });
+                    }
+
+                    // 4. Libros más leídos (Libros Populares)
+                    const ctxLibrosPopulares = document.getElementById('librosPopulares')?.getContext('2d');
+                    if (ctxLibrosPopulares) {
+                        // Limit to top 5 for better visualization
+                        const topN = 5;
+                        const limitedLabels = labelsLibrosPopulares.slice(0, topN);
+                        const limitedData = dataLibrosPopulares.slice(0, topN);
+
+                        new Chart(ctxLibrosPopulares, {
+                            type: 'bar',
+                            data: {
+                                labels: limitedLabels.length ? limitedLabels : ['Sin datos'],
+                                datasets: [{
+                                    label: 'Veces prestado',
+                                    data: limitedData.length ? limitedData : [0],
+                                    backgroundColor: [
+                                        colors.primary,
+                                        colors.success,
+                                        colors.warning,
+                                        colors.danger,
+                                        colors.purple,
+                                        colors.teal
+                                    ],
+                                    borderWidth: 0,
+                                    borderRadius: 4
+                                }]
+                            },
+                            options: {
+                                indexAxis: 'y',
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            label: function (context) {
+                                                return `${context.parsed.x} préstamos`;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: {
+                                    x: {
+                                        beginAtZero: true,
+                                        ticks: {
+                                            precision: 0
+                                        },
+                                        title: {
+                                            display: true,
+                                            text: 'Número de préstamos'
+                                        }
+                                    },
+                                    y: {
+                                        ticks: {
+                                            autoSkip: false
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+                // --- NUEVO: Lógica para Préstamos por Grado ---
+                const filterPeriodoPrestamos = document.getElementById('filterPeriodoPrestamos');
+                const tablePrestamosGrado = document.getElementById('tablePrestamosGrado')?.querySelector('tbody');
+                const exportPdfPrestamos = document.getElementById('exportPdfPrestamos');
+                const exportWordPrestamos = document.getElementById('exportWordPrestamos');
+                const exportExcelPrestamos = document.getElementById('exportExcelPrestamos');
+
+                function updateExportLinksPrestamos() {
+                    const periodo = filterPeriodoPrestamos ? filterPeriodoPrestamos.value : 'anio_actual';
+                    const queryParams = new URLSearchParams({ periodo });
+
+                    if (exportPdfPrestamos) exportPdfPrestamos.href = `/reportes/prestamos-grado?formato=pdf&${queryParams.toString()}`;
+                    if (exportWordPrestamos) exportWordPrestamos.href = `/reportes/prestamos-grado?formato=word&${queryParams.toString()}`;
+                    if (exportExcelPrestamos) exportExcelPrestamos.href = `/reportes/prestamos-grado?formato=excel&${queryParams.toString()}`;
+                }
+
+                async function fetchPrestamosGrado() {
+                    if (!filterPeriodoPrestamos) return;
+                    const periodo = filterPeriodoPrestamos.value;
+
+                    try {
+                        if (tablePrestamosGrado) tablePrestamosGrado.style.opacity = '0.5';
+
+                        const response = await fetch(`/dashboard/api/prestamos-grado?periodo=${periodo}`);
+                        const result = await response.json();
+
+                        if (result.success && tablePrestamosGrado) {
+                            tablePrestamosGrado.innerHTML = '';
+
+                            if (result.data && result.data.length > 0) {
+                                result.data.forEach(row => {
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `
+                                            <td data-label="Grado">
+                                                <span class="badge-modern badge-modern--secondary">
+                                                    ${row.grado}° Grado
+                                                </span>
+                                            </td>
+                                            <td data-label="Activos" style="text-align: center;">
+                                                <span class="chip" style="background: rgba(14, 165, 233, 0.1); color: #0284c7;">
+                                                    ${row.activos}
+                                                </span>
+                                            </td>
+                                            <td data-label="Vencidos" style="text-align: center;">
+                                                <span class="chip" style="background: rgba(239, 68, 68, 0.1); color: #dc2626;">
+                                                    ${row.vencidos}
+                                                </span>
+                                            </td>
+                                            <td data-label="Devueltos" style="text-align: center;">
+                                                <span class="chip" style="background: rgba(16, 185, 129, 0.1); color: #059669;">
+                                                    ${row.devueltos}
+                                                </span>
+                                            </td>
+                                            <td data-label="Total Histórico" style="text-align: center;">
+                                                <strong>${row.total_historico}</strong>
+                                            </td>`;
+                                    tablePrestamosGrado.appendChild(tr);
+                                });
+                            } else {
+                                tablePrestamosGrado.innerHTML = `
+                                        <tr>
+                                            <td colspan="5" style="text-align: center; padding: 2rem;">
+                                                <i class="fas fa-folder-open" style="font-size: 2rem; opacity: 0.3; margin-bottom: 0.5rem;"></i>
+                                                <p>No hay datos disponibles para este periodo</p>
+                                            </td>
+                                        </tr>`;
+                            }
+                            updateExportLinksPrestamos();
+                        }
+                    } catch (error) {
+                        console.error('Error fetching prestamos grado:', error);
+                    } finally {
+                        if (tablePrestamosGrado) tablePrestamosGrado.style.opacity = '1';
+                    }
+                }
+
+                if (filterPeriodoPrestamos) {
+                    filterPeriodoPrestamos.addEventListener('change', fetchPrestamosGrado);
+                    updateExportLinksPrestamos();
+                }
+            </script>
+            <div id="dataLibrosPorSemana" style="display: none;">
+                <%- JSON.stringify(stats.dataLibrosPorSemana) %>
+            </div>
+            <div id="labelsLibrosPorSemana" style="display: none;">
+                <%- JSON.stringify(stats.labelsLibrosPorSemana || []) %>
+            </div>
+            <div id="labelsLibrosPorAnio" style="display: none;">
+                <%- JSON.stringify(stats.librosPorAnio.labels || []) %>
+            </div>
+            <div id="dataLibrosPorAnio" style="display: none;">
+                <%- JSON.stringify(stats.librosPorAnio.data || []) %>
+            </div>
+            <div id="dataLibrosPorMes" style="display: none;">
+                <%- JSON.stringify(stats.prestamosPorMes.data || []) %>
+            </div>
+            <div id="labelsRanking" style="display: none;">
+                <%- JSON.stringify(stats.rankingGrados.labels || []) %>
+            </div>
+            <div id="dataRanking" style="display: none;">
+                <%- JSON.stringify(stats.rankingGrados.data || []) %>
+            </div>
+            <div id="labelsLibrosPopulares" style="display: none;">
+                <%- JSON.stringify(stats.librosMasPrestados.labels || []) %>
+            </div>
+            <div id="dataLibrosPopulares" style="display: none;">
+                <%- JSON.stringify(stats.librosMasPrestados.data || []) %>
+            </div>
+</body>
+
+</html>

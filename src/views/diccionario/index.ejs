@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Diccionario - Biblioteca Escolar' }) %>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-gray-50">
+    <%- include('../partials/navbar') %>
+
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">Diccionario Escolar</h1>
+                    <p class="text-gray-600 mt-1">Consulta términos y definiciones</p>
+                </div>
+                <% if (usuario && usuario.rol==='admin' ) { %>
+                    <button onclick="abrirModalCrear()"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                        <i class="fas fa-plus"></i> Nuevo Término
+                    </button>
+                    <% } %>
+            </div>
+
+            <!-- Buscador -->
+            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-8">
+                <form action="/diccionario" method="GET" class="flex gap-4">
+                    <div class="flex-1 relative">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        <input type="text" name="busqueda" value="<%= busqueda %>"
+                            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Buscar término...">
+                    </div>
+                    <button type="submit"
+                        class="bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+                        Buscar
+                    </button>
+                </form>
+            </div>
+
+            <!-- Lista de Términos -->
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <% if (terminos.length===0) { %>
+                    <div class="col-span-full text-center py-12 bg-white rounded-lg border border-gray-100">
+                        <i class="fas fa-book-open text-4xl text-gray-300 mb-4"></i>
+                        <p class="text-gray-500">No se encontraron términos.</p>
+                    </div>
+                    <% } else { %>
+                        <% terminos.forEach(termino=> { %>
+                            <div
+                                class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow group relative">
+                                <h3 class="text-xl font-bold text-gray-900 mb-2">
+                                    <%= termino.termino %>
+                                </h3>
+                                <p class="text-gray-600 mb-4">
+                                    <%= termino.definicion %>
+                                </p>
+                                <% if (termino.ejemplo) { %>
+                                    <div
+                                        class="bg-gray-50 p-3 rounded text-sm text-gray-500 italic border-l-4 border-indigo-200">
+                                        "<%= termino.ejemplo %>"
+                                    </div>
+                                    <% } %>
+
+                                        <% if (usuario && usuario.rol==='admin' ) { %>
+                                            <div
+                                                class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                                                <button onclick="editarTermino('<%= JSON.stringify(termino) %>')"
+                                                    class="text-blue-600 hover:text-blue-800">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button onclick="eliminarTermino(<%= termino.id %>)"
+                                                    class="text-red-600 hover:text-red-800">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <% } %>
+                            </div>
+                            <% }) %>
+                                <% } %>
+            </div>
+
+            <!-- Paginación -->
+            <% if (paginacion.totalPaginas> 1) { %>
+                <div class="mt-8 flex justify-center gap-2">
+                    <% for(let i=1; i <=paginacion.totalPaginas; i++) { %>
+                        <a href="/diccionario?pagina=<%= i %>&busqueda=<%= busqueda %>"
+                            class="px-4 py-2 rounded-lg <%= paginacion.paginaActual === i ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50' %>">
+                            <%= i %>
+                        </a>
+                        <% } %>
+                </div>
+                <% } %>
+        </div>
+
+        <!-- Modal Crear/Editar -->
+        <div id="modalTermino" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg w-full max-w-md p-6 mx-4">
+                <h2 id="modalTitle" class="text-2xl font-bold mb-4">Nuevo Término</h2>
+                <form id="formTermino">
+                    <input type="hidden" id="terminoId">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Término</label>
+                        <input type="text" id="inputTermino" name="termino" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Definición</label>
+                        <textarea id="inputDefinicion" name="definicion" rows="3" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Ejemplo (Opcional)</label>
+                        <textarea id="inputEjemplo" name="ejemplo" rows="2"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+                    <div class="flex justify-end gap-3">
+                        <button type="button" onclick="cerrarModal()"
+                            class="px-4 py-2 text-gray-600 hover:text-gray-800">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const modal = document.getElementById('modalTermino');
+            const form = document.getElementById('formTermino');
+            let isEditing = false;
+
+            function abrirModalCrear() {
+                isEditing = false;
+                document.getElementById('modalTitle').textContent = 'Nuevo Término';
+                document.getElementById('terminoId').value = '';
+                form.reset();
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function editarTermino(terminoStr) {
+                const termino = JSON.parse(terminoStr);
+                isEditing = true;
+                document.getElementById('modalTitle').textContent = 'Editar Término';
+                document.getElementById('terminoId').value = termino.id;
+                document.getElementById('inputTermino').value = termino.termino;
+                document.getElementById('inputDefinicion').value = termino.definicion;
+                document.getElementById('inputEjemplo').value = termino.ejemplo || '';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+
+            function cerrarModal() {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const id = document.getElementById('terminoId').value;
+                const data = {
+                    termino: document.getElementById('inputTermino').value,
+                    definicion: document.getElementById('inputDefinicion').value,
+                    ejemplo: document.getElementById('inputEjemplo').value
+                };
+
+                const url = isEditing ? `/diccionario/${id}` : '/diccionario';
+                const method = isEditing ? 'PUT' : 'POST';
+
+                try {
+                    const res = await fetch(url, {
+                        method: method,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: isEditing ? '¡Término actualizado!' : '¡Término creado!',
+                            text: 'El término se ha guardado correctamente',
+                            confirmButtonColor: '#00B4D8'
+                        }).then(() => window.location.reload());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al guardar el término',
+                            confirmButtonColor: '#00B4D8'
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        confirmButtonColor: '#00B4D8'
+                    });
+                }
+            });
+
+            async function eliminarTermino(id) {
+                const result = await Swal.fire({
+                    title: '¿Eliminar término?',
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#EF4444',
+                    cancelButtonColor: '#64748B',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (!result.isConfirmed) return;
+
+                try {
+                    const res = await fetch(`/diccionario/${id}`, { method: 'DELETE' });
+                    if (res.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Eliminado!',
+                            text: 'El término se ha eliminado correctamente',
+                            confirmButtonColor: '#00B4D8'
+                        }).then(() => window.location.reload());
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Error al eliminar el término',
+                            confirmButtonColor: '#00B4D8'
+                        });
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de conexión',
+                        confirmButtonColor: '#00B4D8'
+                    });
+                }
+            }
+        </script>
+</body>
+
+</html>

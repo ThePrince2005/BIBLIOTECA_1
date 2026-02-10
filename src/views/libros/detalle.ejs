@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: libro.titulo + ' - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/libros.css">
+        <link rel="stylesheet" href="/css/resenas.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Custom Styles for Details -->
+            <style>
+                .btn-gradient-marketing {
+                    background: linear-gradient(135deg, #5b46e8 0%, #9e46e8 100%);
+                    color: white;
+                    padding: 0.875rem 2rem;
+                    border-radius: 12px;
+                    font-weight: 600;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    box-shadow: 0 4px 15px rgba(91, 70, 232, 0.4);
+                    transition: all 0.3s ease;
+                    border: none;
+                    text-decoration: none;
+                    font-size: 1rem;
+                    letter-spacing: 0.3px;
+                }
+
+                .btn-gradient-marketing:hover {
+                    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4), 0 4px 6px -2px rgba(99, 102, 241, 0.2);
+                    transform: translateY(-2px);
+                    color: white;
+                }
+
+                .detail-modern-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                    gap: 1.5rem;
+                    margin-bottom: 2rem;
+                }
+
+                .detail-modern-item {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 1rem;
+                    padding: 1.25rem;
+                    background: #f8fafc;
+                    border-radius: 12px;
+                    border: 1px solid #e2e8f0;
+                    transition: all 0.2s;
+                }
+
+                .detail-modern-item:hover {
+                    border-color: #cbd5e1;
+                    background: #f1f5f9;
+                }
+
+                .detail-icon-box {
+                    width: 48px;
+                    height: 48px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 12px;
+                    font-size: 1.25rem;
+                    flex-shrink: 0;
+                }
+
+                .detail-content {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .detail-label {
+                    font-size: 0.8rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    color: #64748b;
+                    font-weight: 600;
+                    margin-bottom: 0.25rem;
+                }
+
+                .detail-value {
+                    color: #1e293b;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    line-height: 1.4;
+                }
+            </style>
+
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-book-open"></i>
+                        <span>Detalle del Libro</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1 style="font-size: 2.5rem; letter-spacing: -0.02em;">
+                            <%= libro.titulo %>
+                        </h1>
+                        <p style="font-size: 1.2rem; color: var(--dash-muted);">
+                            por <strong style="color: var(--dash-text);">
+                                <%= libro.autor %>
+                            </strong>
+                        </p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+                    <% if (usuario && (usuario.rol==='estudiante' || usuario.rol==='docente' ) &&
+                        libro.ejemplares_disponibles> 0) { %>
+                        <a href="/prestamos/crear/<%= libro.id %>" class="btn-gradient-marketing">
+                            <i class="fas fa-plus"></i>
+                            <span>Solicitar préstamo</span>
+                        </a>
+                        <% } %>
+                </div>
+            </header>
+
+            <!-- Main Content Grid -->
+            <div class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                <!-- Información Principal -->
+                <article class="card-modern">
+                    <div class="card-modern__header">
+                        <div class="card-modern__title">
+                            <i class="fas fa-info-circle"></i>
+                            Información del Libro
+                        </div>
+                    </div>
+                    <div class="card-modern__body" style="padding: 2rem;">
+
+                        <div class="detail-modern-grid">
+                            <!-- ISBN -->
+                            <div class="detail-modern-item">
+                                <div class="detail-icon-box"
+                                    style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                                    <i class="fas fa-barcode"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">ISBN</span>
+                                    <span class="detail-value">
+                                        <%= libro.isbn || 'No disponible' %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Editorial -->
+                            <div class="detail-modern-item">
+                                <div class="detail-icon-box"
+                                    style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Editorial</span>
+                                    <span class="detail-value">
+                                        <%= libro.editorial || 'N/A' %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Área -->
+                            <div class="detail-modern-item">
+                                <div class="detail-icon-box"
+                                    style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Área/Materia</span>
+                                    <span class="detail-value">
+                                        <%= libro.area %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Año -->
+                            <div class="detail-modern-item">
+                                <div class="detail-icon-box"
+                                    style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                                    <i class="fas fa-calendar"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Año de Publicación</span>
+                                    <span class="detail-value">
+                                        <%= libro.anio_publicacion || 'N/A' %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Grado -->
+                            <div class="detail-modern-item">
+                                <div class="detail-icon-box"
+                                    style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Grado Recomendado</span>
+                                    <span class="detail-value">
+                                        <%= libro.grado_recomendado ? libro.grado_recomendado + '°' : 'General' %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div class="detail-modern-item">
+                                <div class="detail-icon-box"
+                                    style="background: rgba(168, 85, 247, 0.1); color: #a855f7;">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label">Ubicación</span>
+                                    <span class="detail-value">
+                                        <%= libro.ubicacion || 'Por confirmar' %>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Disponibilidad (Estado) -->
+                            <div class="detail-modern-item"
+                                style="<%= libro.ejemplares_disponibles > 0 ? 'border-color: #10b981; background: rgba(16, 185, 129, 0.05);' : 'border-color: #ef4444; background: rgba(239, 68, 68, 0.05);' %>">
+                                <div class="detail-icon-box"
+                                    style="<%= libro.ejemplares_disponibles > 0 ? 'background: #10b981; color: white;' : 'background: #ef4444; color: white;' %>">
+                                    <i
+                                        class="fas <%= libro.ejemplares_disponibles > 0 ? 'fa-check' : 'fa-times' %>"></i>
+                                </div>
+                                <div class="detail-content">
+                                    <span class="detail-label"
+                                        style="<%= libro.ejemplares_disponibles > 0 ? 'color: #059669;' : 'color: #dc2626;' %>">Estado</span>
+                                    <span class="detail-value"
+                                        style="<%= libro.ejemplares_disponibles > 0 ? 'color: #059669;' : 'color: #dc2626;' %>">
+                                        <%= libro.ejemplares_disponibles %> / <%= libro.ejemplares_totales %>
+                                                Disponibles
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <% if (libro.descripcion) { %>
+                            <div
+                                style="background: var(--bg-subtle); border-radius: 12px; padding: 2rem; margin-top: 1rem;">
+                                <h3
+                                    style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: var(--dash-text); display: flex; align-items: center; gap: 0.5rem;">
+                                    <i class="fas fa-align-left" style="color: #6366f1;"></i> Descripción
+                                </h3>
+                                <p style="line-height: 1.8; color: var(--dash-subtext); font-size: 1.05rem;">
+                                    <%= libro.descripcion %>
+                                </p>
+                            </div>
+                            <% } %>
+
+                                <% if (libro.palabras_clave) { %>
+                                    <div style="margin-top: 2rem;">
+                                        <h3
+                                            style="font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">
+                                            Etiquetas
+                                        </h3>
+                                        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                                            <% libro.palabras_clave.split(',').forEach(palabra=> { %>
+                                                <span class="badge-modern badge-modern--neutral"
+                                                    style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                                    #<%= palabra.trim() %>
+                                                </span>
+                                                <% }) %>
+                                        </div>
+                                    </div>
+                                    <% } %>
+                    </div>
+                </article>
+            </div>
+
+            <!-- Review Calculation Logic -->
+            <% let totalResenas=resenas ? resenas.length : 0; let sumStars=0; let starCounts={1:0, 2:0, 3:0, 4:0, 5:0};
+                if (totalResenas> 0) {
+                resenas.forEach(r => {
+                sumStars += r.calificacion;
+                starCounts[Math.floor(r.calificacion)] = (starCounts[Math.floor(r.calificacion)] || 0) + 1;
+                });
+                }
+                let avgRating = totalResenas > 0 ? (sumStars / totalResenas).toFixed(1) : '0.0';
+
+                // Determinamos la calificación más común para destacarla si se desea
+                let maxStarCount = 0;
+                /* for(let i=1; i<=5; i++) { if(starCounts[i]> maxStarCount) maxStarCount = starCounts[i]; } */
+                    %>
+
+                    <!-- Custom Styles for Reviews -->
+                    <style>
+                        .review-summary-grid {
+                            display: grid;
+                            grid-template-columns: 150px 1fr;
+                            gap: 2rem;
+                            align-items: center;
+                            padding: 2rem;
+                            background: #f8fafc;
+                            border-radius: 12px;
+                            margin-bottom: 2rem;
+                        }
+
+                        .big-rating {
+                            text-align: center;
+                        }
+
+                        .big-rating-num {
+                            font-size: 3.5rem;
+                            font-weight: 800;
+                            color: #1e293b;
+                            line-height: 1;
+                        }
+
+                        .big-rating-stars {
+                            color: #f59e0b;
+                            margin: 0.5rem 0;
+                            font-size: 1rem;
+                        }
+
+                        .big-rating-count {
+                            font-size: 0.875rem;
+                            color: #64748b;
+                        }
+
+                        .rating-bars {
+                            display: flex;
+                            flex-direction: column;
+                            gap: 0.35rem;
+                        }
+
+                        .rating-bar-row {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                            font-size: 0.85rem;
+                            color: #64748b;
+                        }
+
+                        .rating-bar-container {
+                            flex: 1;
+                            height: 8px;
+                            background: #e2e8f0;
+                            border-radius: 4px;
+                            overflow: hidden;
+                        }
+
+                        .rating-bar-fill {
+                            height: 100%;
+                            background: #f59e0b;
+                            border-radius: 4px;
+                        }
+
+                        /* Compact Review List */
+                        .reviews-table-container {
+                            border: 1px solid #e2e8f0;
+                            border-radius: 12px;
+                            overflow: hidden;
+                        }
+
+                        .review-row {
+                            display: flex;
+                            gap: 1.5rem;
+                            padding: 1.25rem;
+                            border-bottom: 1px solid #f1f5f9;
+                            background: white;
+                            transition: background 0.2s;
+                        }
+
+                        .review-row:last-child {
+                            border-bottom: none;
+                        }
+
+                        .review-row:hover {
+                            background: #f8fafc;
+                        }
+
+                        .review-avatar {
+                            width: 42px;
+                            height: 42px;
+                            border-radius: 50%;
+                            background: #e0e7ff;
+                            color: #6366f1;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-weight: 600;
+                            flex-shrink: 0;
+                        }
+
+                        .review-content {
+                            flex: 1;
+                        }
+
+                        .review-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            margin-bottom: 0.25rem;
+                        }
+
+                        .review-author {
+                            font-weight: 600;
+                            color: #1e293b;
+                            font-size: 0.95rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+
+                        .review-badge {
+                            background: #f1f5f9;
+                            color: #475569;
+                            padding: 0.1rem 0.5rem;
+                            border-radius: 4px;
+                            font-size: 0.7rem;
+                            text-transform: uppercase;
+                            font-weight: 600;
+                        }
+
+                        .review-meta-top {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.75rem;
+                        }
+
+                        .review-stars-sm {
+                            color: #f59e0b;
+                            font-size: 0.8rem;
+                            letter-spacing: 1px;
+                        }
+
+                        .review-date {
+                            font-size: 0.8rem;
+                            color: #94a3b8;
+                        }
+
+                        .review-text {
+                            color: #475569;
+                            line-height: 1.5;
+                            font-size: 0.95rem;
+                            margin-top: 0.25rem;
+                        }
+
+                        .review-actions {
+                            display: flex;
+                            gap: 0.5rem;
+                            margin-left: 1rem;
+                        }
+
+                        @media (max-width: 640px) {
+                            .review-summary-grid {
+                                grid-template-columns: 1fr;
+                                text-align: center;
+                                gap: 1.5rem;
+                            }
+
+                            .rating-bars {
+                                padding: 0 1rem;
+                            }
+
+                            .review-row {
+                                flex-direction: column;
+                                gap: 0.75rem;
+                            }
+
+                            .review-actions {
+                                margin-left: 0;
+                                margin-top: 0.5rem;
+                            }
+                        }
+                    </style>
+
+                    <!-- Reseñas Section -->
+                    <section class="perfil-grid" style="margin-top: 2rem;" data-aos="fade-up" data-aos-delay="200">
+                        <article class="card-modern">
+                            <div class="card-modern__header">
+                                <div class="card-modern__title">
+                                    <i class="fas fa-comments"></i>
+                                    Opiniones de Lectores
+                                </div>
+                                <% if (usuario && (usuario.rol==='estudiante' || usuario.rol==='docente' )) { %>
+                                    <button type="button" class="btn-modern btn-modern--secondary" data-resena-open
+                                        data-libro-id="<%= libro.id %>">
+                                        <i class="fas fa-pen"></i>
+                                        Escribir reseña
+                                    </button>
+                                    <% } %>
+                            </div>
+
+                            <div class="card-modern__body" style="padding: 2rem;">
+                                <!-- Summary Block -->
+                                <% if (resenas && resenas.length> 0) { %>
+                                    <div class="review-summary-grid">
+                                        <div class="big-rating">
+                                            <div class="big-rating-num">
+                                                <%= avgRating %>
+                                            </div>
+                                            <div class="big-rating-stars">
+                                                <% for(let i=1; i<=5; i++) { %>
+                                                    <i
+                                                        class="<%= i <= Math.round(avgRating) ? 'fas' : 'far' %> fa-star"></i>
+                                                    <% } %>
+                                            </div>
+                                            <div class="big-rating-count">
+                                                <%= totalResenas %> opiniones
+                                            </div>
+                                        </div>
+
+                                        <div class="rating-bars">
+                                            <% for(let star=5; star>=1; star--) {
+                                                let count = starCounts[star] || 0;
+                                                let percent = (count / totalResenas) * 100;
+                                                %>
+                                                <div class="rating-bar-row">
+                                                    <span style="min-width: 12px;">
+                                                        <%= star %>
+                                                    </span>
+                                                    <span style="color: #cbd5e1; font-size: 0.7rem;"><i
+                                                            class="fas fa-star"></i></span>
+                                                    <div class="rating-bar-container">
+                                                        <div class="rating-bar-fill" style="width: <%= percent %>%;">
+                                                        </div>
+                                                    </div>
+                                                    <span style="min-width: 25px; text-align: right;">
+                                                        <%= count %>
+                                                    </span>
+                                                </div>
+                                                <% } %>
+                                        </div>
+                                    </div>
+
+                                    <!-- Filter Tabs (Optional for future) -->
+
+                                    <!-- Compact List -->
+                                    <div class="reviews-table-container">
+                                        <% resenas.forEach(resena=> { %>
+                                            <div class="review-row" data-resena-id="<%= resena.id %>"
+                                                data-libro-id="<%= libro.id %>"
+                                                data-calificacion="<%= resena.calificacion %>"
+                                                data-prestamo-id="<%= resena.prestamo_id %>"
+                                                data-comment="<%= encodeURIComponent(resena.comentario) %>">
+                                                <div class="review-avatar">
+                                                    <% if (resena.foto_url) { %>
+                                                        <img src="<%= resena.foto_url %>" alt="Avatar"
+                                                            style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                                                        <% } else { %>
+                                                            <%= (resena.usuario_nombre ? resena.usuario_nombre.charAt(0)
+                                                                : 'A' ) %>
+                                                                <% } %>
+                                                </div>
+                                                <div class="review-content">
+                                                    <div class="review-header">
+                                                        <div class="review-author">
+                                                            <%= resena.usuario_nombre || 'Anónimo' %>
+                                                                <% if (resena.grado) { %>
+                                                                    <span class="review-badge">
+                                                                        <%= resena.grado %>
+                                                                    </span>
+                                                                    <% } %>
+                                                        </div>
+                                                        <div class="review-meta-top">
+                                                            <div class="review-stars-sm">
+                                                                <% for(let i=1; i<=5; i++) { %>
+                                                                    <i
+                                                                        class="<%= i <= resena.calificacion ? 'fas' : 'far' %> fa-star"></i>
+                                                                    <% } %>
+                                                                        <span
+                                                                            style="color: #64748b; margin-left: 0.25rem;">
+                                                                            <%= resena.calificacion.toFixed(1) %>
+                                                                        </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="review-text">
+                                                        <%= resena.comentario %>
+                                                    </div>
+                                                    <div class="review-date"
+                                                        style="margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                                                        <span>
+                                                            <%= new
+                                                                Date(resena.fecha_creacion).toLocaleDateString('es-ES',
+                                                                { day: 'numeric' , month: 'short' , year: 'numeric' })
+                                                                %>
+                                                        </span>
+
+                                                        <!-- Action Buttons for Owner Only -->
+                                                        <% if (usuario && (resena.usuario_id &&
+                                                            usuario.id===resena.usuario_id)) { %>
+                                                            <div class="review-actions">
+                                                                <button type="button" data-resena-edit
+                                                                    data-id="<%= resena.id %>"
+                                                                    class="btn-modern btn-modern--secondary"
+                                                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                                                    <i class="fas fa-pen"></i>
+                                                                </button>
+                                                                <button type="button" data-resena-delete
+                                                                    data-id="<%= resena.id %>"
+                                                                    class="btn-modern btn-modern--secondary"
+                                                                    style="padding: 0.25rem 0.5rem; font-size: 0.75rem; color: #ef4444; border-color: #fecaca;">
+                                                                    <i class="fas fa-trash"></i>
+                                                                </button>
+                                                            </div>
+                                                            <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <% }) %>
+                                    </div>
+
+                                    <% } else { %>
+                                        <div class="empty-state" style="padding: 4rem; text-align: center;">
+                                            <i class="far fa-star"
+                                                style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                                            <h3 style="color: #475569; margin-bottom: 0.5rem;">Sin reseñas todavía</h3>
+                                            <p style="color: #94a3b8;">Sé el primero en compartir tu opinión sobre este
+                                                libro.</p>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </article>
+                    </section>
+        </main>
+
+        <%- include('../resenas/resena-modal', { modalId: 'resenaModal' , libroId: libro.id, librosElegibles: [] }) %>
+
+            <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                AOS.init({ duration: 800, once: true });
+
+                async function eliminarLibro(id) {
+                    const result = await Swal.fire({
+                        title: '¿Eliminar libro?',
+                        text: '¿Está seguro de que desea eliminar este libro? Esta acción no se puede deshacer.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#EF4444',
+                        cancelButtonColor: '#64748B',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    });
+
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        const response = await fetch(`/libros/${id}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Eliminado!',
+                                text: data.message,
+                                confirmButtonColor: '#00B4D8'
+                            }).then(() => window.location.href = '/libros');
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'No se pudo eliminar',
+                                text: data.message || 'El libro tiene préstamos activos',
+                                confirmButtonColor: '#00B4D8'
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de conexión',
+                            confirmButtonColor: '#00B4D8'
+                        });
+                    }
+                }
+            </script>
+            <script type="application/json" id="resena-config">
+        <%- JSON.stringify({
+            scope: 'libro',
+            libroId: libro.id,
+            usuario: usuario || null,
+            resumen: resumenResenas || { total: 0, promedio: 0 },
+            endpoints: {
+                crear: '/resenas',
+                actualizar: '/resenas/:id',
+                eliminar: '/resenas/:id',
+                contexto: '/resenas/contexto/:libroId',
+                listar: '/resenas/libro/:libroId'
+            }
+        }) %>
+    </script>
+            <script src="/js/resenas.js" defer></script>
+            <script src="/js/dashboard-shared.js"></script>
+
+            <%- include('../partials/footer') %>
+</body>
+
+</html>

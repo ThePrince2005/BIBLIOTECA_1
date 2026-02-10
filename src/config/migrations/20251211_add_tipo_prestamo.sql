@@ -1,0 +1,1 @@
+ALTER TABLE prestamos ADD COLUMN tipo_prestamo ENUM('dias', 'horas') DEFAULT 'dias' AFTER estado;

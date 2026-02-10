@@ -1,0 +1,792 @@
+/* ========================================================================
+   BIBLIOTECA ESCOLAR DANIEL HERNÁNDEZ
+   Archivo: /public/css/login.css
+   Propósito: Estilos para vistas de login (Docente/Estudiante)
+   ======================================================================== */
+
+/* --- Variables de Color y Diseño --- */
+:root {
+    /* Tipografía */
+    --font-family: 'Poppins', sans-serif;
+    
+    /* Colores Institucionales - TEMA CLARO */
+    --title-dark: #1E293B;           /* Azul oscuro - Títulos principales */
+    --subtitle-gray: #64748B;        /* Gris medio - Subtítulos */
+    --accent-blue: #00B4D8;          /* Azul celeste - Acentos principales */
+    --accent-blue-dark: #0077B6;     /* Azul oscuro - Hover y sombras */
+    --accent-blue-light: #90E0EF;    /* Azul claro - Degradados */
+    --bg-light: #F8FAFC;             /* Fondo claro principal */
+    --bg-white: #FFFFFF;             /* Blanco puro */
+    --auth-bg-image: url('/img/bg-biblioteca.jpg'); /* Cambia esta ruta por tu imagen */
+    --auth-bg-overlay: rgba(4, 12, 31, 0.8);
+    
+    /* Colores de Estado */
+    --success-green: #10B981;
+    --success-green-dark: #059669;
+    --error-red: #EF4444;
+    --error-red-dark: #DC2626;
+    --warning-yellow: #F59E0B;
+    
+    /* Efectos Glassmorphism */
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-bg-hover: rgba(255, 255, 255, 1);
+    --card-border: rgba(0, 180, 216, 0.15);
+    --glass-blur: 20px;
+    
+    /* Sombras */
+    --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.08);
+    --shadow-md: 0 8px 24px rgba(0, 119, 182, 0.12);
+    --shadow-lg: 0 12px 32px rgba(0, 119, 182, 0.18);
+    --shadow-hover: 0 16px 40px rgba(0, 180, 216, 0.25);
+    --shadow-input: 0 4px 12px rgba(0, 180, 216, 0.08);
+    
+    /* Espaciado y Medidas */
+    --radius-card: 32px;
+    --radius-input: 16px;
+    --radius-button: 20px;
+    --transition-speed: 0.4s;
+    --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Estilos Base --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- Fondo principal con imagen blur --- */
+.min-h-screen {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    background: #030b1a;
+    overflow-y: auto;
+}
+
+.min-h-screen::before {
+    content: '';
+    position: absolute;
+    inset: -10%;
+    background-image: var(--auth-bg-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(9px) saturate(1);
+    opacity: 0.6;
+    transform: scale(1.05);
+    animation: authPan 36s ease-in-out alternate infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.min-h-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(125deg, rgba(2, 8, 23, 0.5), rgba(5, 17, 39, 0.45)),
+        radial-gradient(circle at 12% 20%, rgba(0, 180, 216, 0.18), transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(144, 224, 239, 0.12), transparent 60%);
+    mix-blend-mode: normal;
+    opacity: 0.7;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes authPan {
+    0% { transform: scale(1.05) translate3d(0, 0, 0); }
+    50% { transform: scale(1.1) translate3d(-2%, -1%, 0); }
+    100% { transform: scale(1.05) translate3d(2%, 1%, 0); }
+}
+
+/* --- Contenedor del Card (max-w-md) --- */
+.max-w-md {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius-card);
+    border: 2px solid var(--card-border);
+    box-shadow: var(--shadow-lg);
+    padding: 3rem;
+    transition: all var(--transition-speed) var(--transition-ease);
+    overflow: hidden;
+    animation: cardEntrance 0.8s ease-out;
+}
+
+/* Animación de entrada del card */
+@keyframes cardEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Borde superior decorativo animado */
+.max-w-md::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(
+        90deg, 
+        var(--accent-blue-dark) 0%, 
+        var(--accent-blue) 50%, 
+        var(--accent-blue-light) 100%
+    );
+    background-size: 200% 100%;
+    animation: borderFlow 3s ease infinite;
+}
+
+@keyframes borderFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Efecto de brillo sutil en el fondo del card */
+.max-w-md::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle, 
+        rgba(0, 180, 216, 0.08) 0%, 
+        transparent 70%
+    );
+    animation: pulseGlow 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* Fallback para navegadores sin soporte de backdrop-filter */
+@supports not (backdrop-filter: blur(20px)) {
+    .max-w-md {
+        background: rgba(255, 255, 255, 0.98);
+    }
+}
+
+/* --- Espaciado del contenido interno --- */
+.space-y-8 > * + * {
+    margin-top: 2rem;
+}
+
+/* --- Header: Logo y Título --- */
+.text-center {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+/* Logo con animación flotante */
+.text-center img {
+    display: block;
+    margin: 0 auto 1.5rem;
+    height: 96px;
+    width: auto;
+    filter: drop-shadow(0 8px 16px rgba(0, 119, 182, 0.25));
+    transition: all var(--transition-speed) var(--transition-ease);
+    animation: floatLogo 3s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+    0%, 100% { 
+        transform: translateY(0) scale(1); 
+    }
+    50% { 
+        transform: translateY(-10px) scale(1.05); 
+    }
+}
+
+.text-center img:hover {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 12px 24px rgba(0, 180, 216, 0.4));
+    animation: none;
+}
+
+/* Títulos */
+h2.text-3xl {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 1.875rem;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    color: var(--title-dark);
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+/* Subrayado decorativo animado */
+h2.text-3xl::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+    border-radius: 2px;
+    animation: underlineGrow 2s ease-in-out infinite;
+}
+
+@keyframes underlineGrow {
+    0%, 100% { width: 100px; opacity: 0.6; }
+    50% { width: 150px; opacity: 1; }
+}
+
+/* --- Formulario --- */
+form {
+    position: relative;
+    z-index: 2;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
+
+/* Contenedor de inputs */
+.rounded-md.shadow-sm {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+/* Labels (screen reader only) */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* --- Inputs de Texto y Password --- */
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+    appearance: none;
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid rgba(0, 180, 216, 0.2);
+    background: var(--bg-white);
+    color: var(--title-dark);
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    transition: all var(--transition-speed) var(--transition-ease);
+    box-shadow: var(--shadow-input);
+    outline: none;
+}
+
+/* Input superior (email) */
+input[type="email"],
+input.rounded-t-md {
+    border-radius: var(--radius-input) var(--radius-input) 0 0;
+    border-bottom: 1px solid rgba(0, 180, 216, 0.15);
+}
+
+/* Input inferior (password) */
+input[type="password"],
+input.rounded-b-md {
+    border-radius: 0 0 var(--radius-input) var(--radius-input);
+    padding-right: 3.5rem;
+}
+
+/* Placeholder */
+input::placeholder {
+    color: var(--subtitle-gray);
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+/* Estados Focus */
+input:focus {
+    border-color: var(--accent-blue);
+    background: var(--bg-white);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15), var(--shadow-md);
+    transform: translateY(-2px);
+    z-index: 10;
+}
+
+/* Estados Hover */
+input:hover:not(:focus) {
+    border-color: rgba(0, 180, 216, 0.3);
+    box-shadow: var(--shadow-md);
+}
+
+/* Input con error */
+input.error {
+    border-color: var(--error-red);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+input.error:focus {
+    border-color: var(--error-red);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), var(--shadow-md);
+}
+
+/* --- Botón Toggle Password (Mostrar/Ocultar) --- */
+.relative {
+    position: relative;
+}
+
+.relative button[type="button"] {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--subtitle-gray);
+    transition: all 0.3s var(--transition-ease);
+    z-index: 10;
+}
+
+.relative button[type="button"]:hover {
+    color: var(--accent-blue-dark);
+    transform: scale(1.1);
+}
+
+.relative button[type="button"]:active {
+    transform: scale(0.95);
+}
+
+.relative button[type="button"] i {
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+/* --- Enlaces (Registro y Cambiar Usuario) --- */
+.flex.items-center.justify-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+a {
+    font-family: var(--font-family);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s var(--transition-ease);
+    position: relative;
+    display: inline-block;
+}
+
+/* Enlaces principales (azul) */
+a.text-indigo-600,
+a.font-medium.text-indigo-600 {
+    color: var(--accent-blue-dark);
+}
+
+a.text-indigo-600:hover,
+a.font-medium.text-indigo-600:hover {
+    color: var(--accent-blue);
+}
+
+/* Enlaces secundarios (gris) */
+a.text-gray-600,
+a.font-medium.text-gray-600 {
+    color: var(--subtitle-gray);
+}
+
+a.text-gray-600:hover,
+a.font-medium.text-gray-600:hover {
+    color: var(--title-dark);
+}
+
+/* Subrayado animado en hover */
+a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s var(--transition-ease);
+}
+
+a:hover::after {
+    width: 100%;
+}
+
+/* --- Botón Submit Principal --- */
+button[type="submit"] {
+    position: relative;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue));
+    color: var(--bg-white);
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-ease);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    z-index: 1;
+}
+
+/* Efecto de brillo animado en el botón */
+button[type="submit"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+button[type="submit"]:hover::before {
+    left: 100%;
+}
+
+/* Estados Hover */
+button[type="submit"]:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-light));
+}
+
+/* Estados Active (Click) */
+button[type="submit"]:active {
+    transform: translateY(-2px) scale(0.98);
+    transition: transform 0.1s ease;
+}
+
+/* Estados Focus (Accesibilidad) */
+button[type="submit"]:focus {
+    outline: none;
+    box-shadow: var(--shadow-hover), 0 0 0 4px rgba(0, 180, 216, 0.3);
+}
+
+/* Estado Disabled (Cargando) */
+button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button[type="submit"]:disabled:hover {
+    transform: none;
+    box-shadow: var(--shadow-md);
+}
+
+/* --- Toast Notifications (Mensajes de Éxito/Error) --- */
+#successToast,
+#errorToast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    min-width: 300px;
+    max-width: 400px;
+    background: var(--bg-white);
+    border-radius: var(--radius-input);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: slideInRight 0.4s var(--transition-ease);
+    transition: all 0.3s var(--transition-ease);
+}
+
+/* Animación de entrada del toast */
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Toast cuando está oculto */
+#successToast.hidden,
+#errorToast.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(400px);
+    pointer-events: none;
+}
+
+/* Borde lateral de éxito */
+#successToast {
+    border-left: 5px solid var(--success-green);
+}
+
+/* Borde lateral de error */
+#errorToast {
+    border-left: 5px solid var(--error-red);
+}
+
+/* Texto del toast */
+#successMessage,
+#errorMessage {
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0;
+}
+
+#successMessage {
+    color: var(--success-green-dark);
+}
+
+#errorMessage {
+    color: var(--error-red-dark);
+}
+
+/* --- Diseño Responsivo --- */
+
+/* Tablets (769px - 1024px) */
+@media (max-width: 1024px) {
+    .max-w-md {
+        max-width: 460px;
+        padding: 2.5rem;
+    }
+}
+
+/* Tablets pequeñas y móviles grandes (481px - 768px) */
+@media (max-width: 768px) {
+    :root {
+        --radius-card: 24px;
+        --radius-input: 12px;
+        --radius-button: 16px;
+    }
+
+    .min-h-screen {
+        padding: 1rem;
+    }
+
+    .max-w-md {
+        max-width: 100%;
+        padding: 2rem 1.5rem;
+    }
+
+    .text-center img {
+        height: 80px;
+    }
+
+    h2.text-3xl {
+        font-size: 1.5rem;
+    }
+
+    h2.text-3xl::after {
+        width: 80px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        padding: 0.875rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    button[type="submit"] {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    #successToast,
+    #errorToast {
+        min-width: 280px;
+        max-width: calc(100vw - 2rem);
+        right: 1rem;
+        bottom: 1rem;
+    }
+}
+
+/* Mobile Small (320px - 480px) */
+@media (max-width: 480px) {
+    .min-h-screen {
+        padding: 0.5rem;
+    }
+
+    .max-w-md {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .text-center img {
+        height: 72px;
+    }
+
+    h2.text-3xl {
+        font-size: 1.375rem;
+        margin-top: 1rem;
+    }
+
+    h2.text-3xl::after {
+        width: 60px;
+        bottom: -6px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+        padding: 0.75rem 0.875rem;
+        font-size: 0.875rem;
+    }
+
+    input[type="password"],
+    input.rounded-b-md {
+        padding-right: 3rem;
+    }
+
+    .relative button[type="button"] {
+        padding: 0 0.75rem;
+    }
+
+    button[type="submit"] {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .flex.items-center.justify-between {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    a {
+        font-size: 0.8rem;
+    }
+}
+
+/* --- Preferencias de Accesibilidad --- */
+
+/* Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .min-h-screen {
+        animation: none;
+    }
+
+    .text-center img {
+        animation: none;
+    }
+
+    .max-w-md::after {
+        animation: none;
+    }
+
+    button[type="submit"]::before {
+        display: none;
+    }
+}
+
+/* --- Mejoras de Performance --- */
+.max-w-md,
+input,
+button,
+a,
+#successToast,
+#errorToast {
+    will-change: transform;
+}
+
+/* Optimización para GPU */
+.max-w-md::before,
+.max-w-md::after,
+button[type="submit"]::before {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* --- Utilidades Adicionales --- */
+
+/* Estado de carga del formulario */
+form.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+form.loading button[type="submit"] {
+    position: relative;
+}
+
+/* Spinner de carga */
+form.loading button[type="submit"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}

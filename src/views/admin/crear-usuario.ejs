@@ -1,0 +1,192 @@
+<%
+  const isAlumno = typeof rolePreset !== 'undefined' && rolePreset === 'estudiante';
+  const pageTitle = isAlumno ? 'Registrar alumno' : 'Crear usuario';
+%>
+
+<%- include('../partials/head', { title: pageTitle }) %>
+<%- include('../partials/navbar') %>
+
+<div class="container mt-4 mb-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <div>
+            <h1 class="card-title h4 mb-0"><%= pageTitle %></h1>
+            <% if (isAlumno) { %>
+              <p class="mb-0 small opacity-75">
+                Completa los datos del alumno para registrarlo en el sistema.
+              </p>
+            <% } else { %>
+              <p class="mb-0 small opacity-75">
+                Crea una cuenta nueva para alumnos, docentes o administradores.
+              </p>
+            <% } %>
+          </div>
+          <a href="/usuario/admin/alumnos" class="btn btn-sm btn-light">
+            <i class="fa-solid fa-arrow-left me-1"></i> Volver
+          </a>
+        </div>
+
+        <div class="card-body">
+          <form action="/usuario/admin/usuarios/crear" method="POST" class="needs-validation" novalidate>
+            <!-- Datos generales -->
+            <div class="mb-4">
+              <h2 class="h6 text-uppercase text-muted mb-3">Datos generales</h2>
+              <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre completo</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nombre"
+                  name="nombre"
+                  placeholder="Ej. Juan Pérez Ramírez"
+                  required
+                >
+              </div>
+              <div class="mb-3">
+                <label for="correo" class="form-label">Correo institucional</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="correo"
+                  name="correo"
+                  placeholder="Ej. juan.perez@colegio.edu.pe"
+                  required
+                >
+                <div class="form-text">Se usará para acceder a la biblioteca virtual.</div>
+              </div>
+              <div class="mb-3">
+                <label for="contrasena" class="form-label">Contraseña temporal</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="contrasena"
+                  name="contrasena"
+                  minlength="6"
+                  required
+                >
+                <div class="form-text">El usuario podrá cambiarla luego desde su perfil.</div>
+              </div>
+            </div>
+
+            <!-- Rol / Tipo de usuario -->
+            <div class="mb-4">
+              <h2 class="h6 text-uppercase text-muted mb-3">Tipo de usuario</h2>
+
+              <% if (isAlumno) { %>
+                <!-- Modo especializado: solo alumnos -->
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                  <div>
+                    <span class="badge bg-primary-subtle text-primary">
+                      Rol: Estudiante
+                    </span>
+                    <div class="small text-muted mt-1">
+                      Este formulario está configurado específicamente para registrar alumnos.
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="rol" value="estudiante">
+              <% } else { %>
+                <!-- Modo genérico: selector de rol -->
+                <div class="mb-3">
+                  <label for="rol" class="form-label">Rol</label>
+                  <select
+                    class="form-select"
+                    id="rol"
+                    name="rol"
+                    required
+                    onchange="toggleStudentFields()"
+                  >
+                    <option value="">Seleccione un rol</option>
+                    <option value="estudiante">Estudiante</option>
+                    <option value="docente">Docente</option>
+                    <option value="admin">Administrador</option>
+                  </select>
+                  <div class="form-text">Define el tipo de acceso y vistas disponibles en la plataforma.</div>
+                </div>
+              <% } %>
+            </div>
+
+            <!-- Información académica (solo estudiantes) -->
+            <div class="mb-4" id="student-fields" style="<%= isAlumno ? '' : 'display: none;' %>">
+              <h2 class="h6 text-uppercase text-muted mb-3">Información académica</h2>
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <label for="grado" class="form-label">Grado</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="grado"
+                    name="grado"
+                    min="1"
+                    max="12"
+                    <%= isAlumno ? 'required' : '' %>
+                  >
+                </div>
+                <div class="col-sm-6">
+                  <label for="seccion" class="form-label">Sección</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="seccion"
+                    name="seccion"
+                    maxlength="1"
+                    placeholder="Ej. A, B, C"
+                    style="text-transform: uppercase;"
+                    <%= isAlumno ? 'required' : '' %>
+                  >
+                </div>
+              </div>
+              <div class="form-text mt-2">
+                Estos datos se usan para reportes de lectura y ranking por grado y sección.
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2">
+              <a href="/usuario/admin/alumnos" class="btn btn-outline-secondary">
+                Cancelar
+              </a>
+              <button type="submit" class="btn btn-success">
+                <i class="fa-solid fa-check me-1"></i>
+                <%= isAlumno ? 'Registrar alumno' : 'Crear usuario' %>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleStudentFields() {
+    const rolSelect = document.getElementById('rol');
+    const studentFields = document.getElementById('student-fields');
+    if (!rolSelect || !studentFields) return;
+
+    const rol = rolSelect.value;
+    const grado = document.getElementById('grado');
+    const seccion = document.getElementById('seccion');
+
+    if (rol === 'estudiante') {
+      studentFields.style.display = '';
+      if (grado) grado.setAttribute('required', 'required');
+      if (seccion) seccion.setAttribute('required', 'required');
+    } else {
+      studentFields.style.display = 'none';
+      if (grado) grado.removeAttribute('required');
+      if (seccion) seccion.removeAttribute('required');
+    }
+  }
+
+  // Solo aplica el toggle cuando existe el selector de rol (modo genérico)
+  document.addEventListener('DOMContentLoaded', function () {
+    const rolSelect = document.getElementById('rol');
+    if (rolSelect) {
+      toggleStudentFields();
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>

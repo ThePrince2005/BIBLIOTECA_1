@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Catálogo de Libros - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/libros.css">
+        <link rel="stylesheet" href="/css/resenas.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+        <style>
+            .btn-heart i {
+                color: #94a3b8;
+                /* Slate-400 visible gray */
+                transition: all 0.2s;
+                filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
+                stroke: #64748b;
+                stroke-width: 1px;
+            }
+
+            .btn-heart:hover i {
+                color: #ef4444;
+                /* Red on hover */
+                transform: scale(1.1);
+            }
+
+            .btn-heart.active i {
+                color: #ef4444;
+                fill: #ef4444;
+            }
+
+            /* Table styles moved to external CSS for better responsiveness */
+
+            /* Optimized Column Widths (Percentages for responsiveness) */
+            th:nth-child(1),
+            td:nth-child(1) {
+                width: 28%;
+            }
+
+            /* Título */
+
+            th:nth-child(2),
+            td:nth-child(2) {
+                width: 17%;
+            }
+
+            /* Autor */
+
+            th:nth-child(3),
+            td:nth-child(3) {
+                width: 10%;
+            }
+
+            /* Area */
+
+            th:nth-child(4),
+            td:nth-child(4) {
+                width: 12%;
+            }
+
+            /* Disponibilidad */
+
+            th:nth-child(5),
+            td:nth-child(5) {
+                width: 5%;
+                text-align: center;
+            }
+
+            /* Fav */
+
+            th:nth-child(6),
+            td:nth-child(6) {
+                width: 28%;
+                text-align: right;
+            }
+
+            /* Acciones */
+
+            /* Fav */
+
+            .btn-heart.active i {
+                color: #ef4444;
+                /* Red-500 */
+            }
+
+            /* Dark Mode Enhancements */
+            [data-theme='dark'] .data-table th {
+                color: #e2e8f0;
+                background-color: #1e293b;
+            }
+
+            [data-theme='dark'] .data-table td {
+                color: #cbd5e1 !important;
+                /* Force readable text */
+            }
+
+            [data-theme='dark'] .status-pill {
+                background: rgba(255, 255, 255, 0.1) !important;
+                color: #e2e8f0 !important;
+            }
+
+            [data-theme='dark'] .libros-card,
+            [data-theme='dark'] .card {
+                background: #1e293b !important;
+                border-color: #334155 !important;
+            }
+
+            /* Pagination */
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                gap: 1rem;
+                margin-top: 2rem;
+                padding-bottom: 2rem;
+            }
+
+            .btn-page {
+                padding: 0.5rem 1.5rem;
+                border-radius: 9999px;
+                background: var(--bg-surface);
+                border: 1px solid var(--border-surface);
+                color: var(--dash-text);
+                font-weight: 500;
+                text-decoration: none;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .btn-page:hover:not(:disabled) {
+                background: var(--bg-subtle);
+                border-color: var(--dash-muted);
+            }
+
+            .btn-page.disabled {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+
+            [data-theme='dark'] .btn-page {
+                background: rgba(30, 41, 59, 0.8);
+                border-color: rgba(148, 224, 239, 0.2);
+                color: #e2e8f0;
+            }
+        </style>
+</head>
+
+<body class="libros-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="libros-wrapper">
+            <!-- Hero Section -->
+            <header class="hero-modern" data-aos="fade-up">
+                <div class="hero-modern__content">
+                    <div class="hero-modern__badge">
+                        <i class="fa-solid fa-book"></i>
+                        <span>Catálogo de la biblioteca</span>
+                    </div>
+                    <h1 class="hero-modern__title">Explora y solicita tus libros</h1>
+                    <p class="hero-modern__subtitle">
+                        Explora el catálogo completo, revisa la disponibilidad en tiempo real y solicita el préstamo de
+                        tus libros favoritos.
+                    </p>
+                </div>
+            </header>
+
+            <!-- Filtros -->
+            <section class="filters-modern" data-aos="fade-up" data-aos-delay="100">
+                <div class="filters-modern__header">
+                    <div class="filters-modern__title">
+                        <i class="fa-solid fa-filter"></i>
+                        <span>Búsqueda Avanzada</span>
+                    </div>
+                </div>
+                <form id="filtrosForm" class="filters-modern__grid">
+                    <div class="input-group">
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Título</label>
+                        <div class="input-wrapper-modern">
+                            <i class="fa-solid fa-heading"></i>
+                            <input type="text" name="titulo" class="input-modern" placeholder="Buscar por título...">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Autor</label>
+                        <div class="input-wrapper-modern">
+                            <i class="fa-solid fa-user-pen"></i>
+                            <input type="text" name="autor" class="input-modern" placeholder="Nombre del autor...">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Editorial</label>
+                        <div class="input-wrapper-modern">
+                            <i class="fa-solid fa-building"></i>
+                            <input type="text" name="editorial" class="input-modern" placeholder="Editorial...">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Año</label>
+                        <div class="input-wrapper-modern">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <input type="number" name="anio_publicacion" min="1900"
+                                max="<%= new Date().getFullYear() %>" class="input-modern" placeholder="Ej: 2024">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Área</label>
+                        <div class="input-wrapper-modern">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <select name="area" class="input-modern">
+                                <option value="">Todas las áreas</option>
+                                <% areas.forEach(area=> { %>
+                                    <option value="<%= area %>">
+                                        <%= area %>
+                                    </option>
+                                    <% }) %>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label
+                            style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Etiquetas</label>
+                        <div class="input-wrapper-modern">
+                            <i class="fa-solid fa-tags"></i>
+                            <input type="text" name="etiquetas" class="input-modern"
+                                placeholder="Ej: ciencia, historia...">
+                        </div>
+                    </div>
+                    <div class="input-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+                        <button type="submit" class="btn-modern btn-modern--primary" style="min-width: 200px;">
+                            <i class="fa-solid fa-search"></i>
+                            <span>Buscar</span>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Tabla de libros -->
+            <section class="libros-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="table-container-modern">
+                    <table id="tablaLibros" class="table-modern">
+                        <thead>
+                            <tr>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Área</th>
+                                <th>Disponibilidad</th>
+                                <th class="text-center"><i class="fas fa-heart text-gray-400"></i></th>
+                                <th class="text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% libros.forEach(libro=> { %>
+                                <tr data-libro-row-id="<%= libro.id %>">
+                                    <td data-label="Título">
+                                        <div style="font-weight: 600; color: var(--title-dark);">
+                                            <%= libro.titulo %>
+                                        </div>
+                                    </td>
+                                    <td data-label="Autor">
+                                        <%= libro.autor %>
+                                    </td>
+                                    <td data-label="Área">
+                                        <span class="status-pill"
+                                            style="background: rgba(148, 224, 239, 0.15); color: var(--accent-blue-dark);">
+                                            <%= libro.area %>
+                                        </span>
+                                    </td>
+                                    <td data-label="Disponibilidad">
+                                        <span class="status-pill"
+                                            data-state="<%= libro.ejemplares_disponibles > 0 ? 'disponible' : 'no_disponible' %>">
+                                            <%= libro.ejemplares_disponibles %> / <%= libro.ejemplares_totales %>
+                                        </span>
+                                    </td>
+                                    <td data-label="Favoritos" class="text-center">
+                                        <% if (usuario && (usuario.rol==='estudiante' || usuario.rol==='docente' )) {
+                                            const isFav=favoritosIds && favoritosIds.includes(libro.id); %>
+                                            <button class="btn-heart <%= isFav ? 'active' : '' %>"
+                                                data-libro-id="<%= libro.id %>"
+                                                title="<%= isFav ? 'Quitar de favoritos' : 'Agregar a favoritos' %>">
+                                                <i class="<%= isFav ? 'fas' : 'far' %> fa-heart"></i>
+                                            </button>
+                                            <% } else { %>
+                                                <span class="text-gray-300">-</span>
+                                                <% } %>
+                                    </td>
+                                    <td class="text-right" data-label="Acciones">
+                                        <div
+                                            style="display: flex; gap: 0.25rem; justify-content: flex-end; align-items: center; flex-wrap: nowrap;">
+                                            <a href="/libros/<%= libro.id %>" class="btn-modern btn-modern--secondary"
+                                                style="padding: 0.35rem 0.65rem; font-size: 0.75rem; white-space: nowrap;">
+                                                <i class="fa-solid fa-eye"></i>
+                                                <span>Ver</span>
+                                            </a>
+
+                                            <% if (usuario && (usuario.rol==='estudiante' || usuario.rol==='docente' ))
+                                                { %>
+                                                <% if (libro.ejemplares_disponibles> 0) { %>
+                                                    <a href="/prestamos/crear/<%= libro.id %>"
+                                                        class="btn-modern btn-modern--primary"
+                                                        style="padding: 0.35rem 0.65rem; font-size: 0.75rem; white-space: nowrap;">
+                                                        <i class="fa-solid fa-book-open"></i>
+                                                        <span>Solicitar</span>
+                                                    </a>
+                                                    <% } else { %>
+                                                        <span class="badge-modern badge-modern--danger"
+                                                            style="padding: 0.35rem 0.65rem; font-size: 0.75rem; white-space: nowrap;">
+                                                            <i class="fa-solid fa-ban"></i>
+                                                            <span>Agotado</span>
+                                                        </span>
+                                                        <% } %>
+                                                            <% } %>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination Controls -->
+                <div class="pagination-container">
+                    <% if (paginaActual> 1) { %>
+                        <a href="?pagina=<%= paginaActual - 1 %><%= filtros.titulo ? '&titulo=' + filtros.titulo : '' %><%= filtros.area ? '&area=' + filtros.area : '' %>"
+                            class="btn-page">
+                            <i class="fas fa-chevron-left"></i> Anterior
+                        </a>
+                        <% } else { %>
+                            <span class="btn-page disabled">
+                                <i class="fas fa-chevron-left"></i> Anterior
+                            </span>
+                            <% } %>
+
+                                <span class="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400">
+                                    Página <%= paginaActual %> de <%= paginas %>
+                                </span>
+
+                                <% if (paginaActual < paginas) { %>
+                                    <a href="?pagina=<%= paginaActual + 1 %><%= filtros.titulo ? '&titulo=' + filtros.titulo : '' %><%= filtros.area ? '&area=' + filtros.area : '' %>"
+                                        class="btn-page">
+                                        Siguiente <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                    <% } else { %>
+                                        <span class="btn-page disabled">
+                                            Siguiente <i class="fas fa-chevron-right"></i>
+                                        </span>
+                                        <% } %>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal Nuevo Libro -->
+        <div id="modalNuevoLibro" class="modal-overlay">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fa-solid fa-plus-circle"></i> Registrar Nuevo Libro
+                    </div>
+                    <button class="modal-close" onclick="closeModal('modalNuevoLibro')">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <form id="formNuevoLibro">
+                    <div class="modal-body">
+                        <div class="form-premium-grid">
+                            <!-- Título -->
+                            <div class="input-group">
+                                <label for="titulo">Título *</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-heading"></i>
+                                    <input class="input-control" id="titulo" name="titulo" type="text" required
+                                        placeholder="Título completo del libro">
+                                </div>
+                            </div>
+
+                            <!-- Autor -->
+                            <div class="input-group">
+                                <label for="autor">Autor *</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-user-pen"></i>
+                                    <input class="input-control" id="autor" name="autor" type="text" required
+                                        placeholder="Nombre del autor">
+                                </div>
+                            </div>
+
+                            <!-- Editorial -->
+                            <div class="input-group">
+                                <label for="editorial">Editorial *</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-building"></i>
+                                    <input class="input-control" id="editorial" name="editorial" type="text" required
+                                        placeholder="Editorial">
+                                </div>
+                            </div>
+
+                            <!-- ISBN -->
+                            <div class="input-group">
+                                <label for="isbn">ISBN</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-barcode"></i>
+                                    <input class="input-control" id="isbn" name="isbn" type="text"
+                                        pattern="^(?:\d{10}|\d{13})$" title="ISBN debe tener 10 o 13 dígitos"
+                                        placeholder="ISBN (10 o 13 dígitos)">
+                                </div>
+                            </div>
+
+                            <!-- Área -->
+                            <div class="input-group">
+                                <label for="area">Área *</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                    <select class="input-control" id="area" name="area" required>
+                                        <option value="">Seleccione un área...</option>
+                                        <% areas.forEach(area=> { %>
+                                            <option value="<%= area %>">
+                                                <%= area %>
+                                            </option>
+                                            <% }) %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Grado recomendado -->
+                            <div class="input-group">
+                                <label for="grado_recomendado">Grado recomendado</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-graduation-cap"></i>
+                                    <select class="input-control" id="grado_recomendado" name="grado_recomendado">
+                                        <option value="">Sin grado específico</option>
+                                        <% for(let i=1; i <=5; i++) { %>
+                                            <option value="<%= i %>">
+                                                <%= i %>° grado
+                                            </option>
+                                            <% } %>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Año de publicación -->
+                            <div class="input-group">
+                                <label for="anio_publicacion">Año de publicación</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    <input class="input-control" id="anio_publicacion" name="anio_publicacion"
+                                        type="number" min="1800" max="<%= new Date().getFullYear() %>"
+                                        placeholder="Ej: 2023">
+                                </div>
+                            </div>
+
+                            <!-- Ejemplares -->
+                            <div class="input-group">
+                                <label for="ejemplares_totales">Número de ejemplares *</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-copy"></i>
+                                    <input class="input-control" id="ejemplares_totales" name="ejemplares_totales"
+                                        type="number" min="1" required value="1">
+                                </div>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div class="input-group">
+                                <label for="ubicacion">Ubicación *</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-map-location-dot"></i>
+                                    <input class="input-control" id="ubicacion" name="ubicacion" type="text" required
+                                        placeholder="Ej: Estante A, Nivel 2">
+                                </div>
+                            </div>
+
+                            <!-- Palabras clave -->
+                            <div class="input-group">
+                                <label for="palabras_clave">Palabras clave</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-tags"></i>
+                                    <input class="input-control" id="palabras_clave" name="palabras_clave" type="text"
+                                        placeholder="Separadas por comas">
+                                </div>
+                            </div>
+
+                            <!-- Descripción -->
+                            <div class="input-group form-full-width">
+                                <label for="descripcion">Descripción</label>
+                                <textarea class="input-control" id="descripcion" name="descripcion" rows="3"
+                                    placeholder="Breve descripción del libro..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-secondary btn-cancel-modal">Cancelar</button>
+                        <button type="submit" class="btn-action-primary">Guardar Libro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Toast para mensajes -->
+        <div id="toast" class="fixed bottom-5 right-5 hidden bg-white border-l-4 py-2 px-3 shadow-md rounded-lg"></div>
+
+        <%- include('../resenas/resena-modal', { modalId: 'resenaModal' , dynamicLibro: true, librosElegibles: libros })
+            %>
+
+            <!-- Scripts -->
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+            <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+            <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+            <script src="/js/libros.js"></script>
+            <script>
+                // Handle Form Submission
+                document.getElementById('formNuevoLibro').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const form = e.target;
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData.entries());
+
+                    // Convert numeric fields
+                    ['grado_recomendado', 'anio_publicacion', 'ejemplares_totales'].forEach(field => {
+                        if (data[field]) data[field] = parseInt(data[field]);
+                    });
+
+                    try {
+                        const response = await fetch('/libros', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            showToast(result.message, 'success');
+                            closeModal('modalNuevoLibro');
+                            form.reset();
+                            setTimeout(() => window.location.reload(), 1000); // Reload to show new book
+                        } else {
+                            showToast(result.message || 'Error al guardar el libro', 'error');
+                        }
+                    } catch (error) {
+                        showToast('Error de conexión', 'error');
+                    }
+                });
+
+                // Declarar la función en el ámbito global para que onclick la encuentre
+                async function eliminarLibro(id) {
+                    const result = await Swal.fire({
+                        title: '¿Eliminar libro?',
+                        text: 'Esta acción no se puede deshacer.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#EF4444',
+                        cancelButtonColor: '#64748B',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    });
+                    if (!result.isConfirmed) return;
+
+                    try {
+                        const response = await fetch(`/libros/${id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            showToast(data.message, 'success');
+                            // Eliminar la fila de la tabla visualmente o recargar la página
+                            setTimeout(() => window.location.reload(), 1500);
+                        } else {
+                            showToast(data.message || 'No se pudo eliminar el libro.', 'error');
+                        }
+                    } catch (error) {
+                        showToast('Error de conexión al intentar eliminar el libro.', 'error');
+                    }
+                }
+
+                $(document).ready(function () {
+                    // DataTables Removed for Custom Pagination
+                    // Keeping simple table functionality
+
+                    // Manejo de Favoritos (Corazón)
+                    $(document).on('click', '.btn-heart', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const btn = $(this);
+                        const icon = btn.find('i');
+                        const libroId = btn.data('libro-id');
+                        const isFavorito = btn.hasClass('active');
+                        const method = isFavorito ? 'DELETE' : 'POST';
+                        const url = isFavorito ? `/favoritos/${libroId}` : '/favoritos';
+
+                        // Optimistic UI update
+                        btn.toggleClass('active');
+                        icon.toggleClass('fas far'); // Solid/Regular toggle
+                        if (!isFavorito) icon.addClass('text-red-500'); // Ensure color on add
+
+                        $.ajax({
+                            url: url,
+                            method: method,
+                            contentType: 'application/json',
+                            data: method === 'POST' ? JSON.stringify({ libro_id: libroId }) : undefined,
+                            success: function (res) {
+                                showToast(isFavorito ? 'Eliminado de favoritos' : '¡Agregado a favoritos!', 'success');
+                            },
+                            error: function () {
+                                // Revert on error
+                                btn.toggleClass('active');
+                                icon.toggleClass('fas far');
+                                showToast('Error al actualizar favorito', 'error');
+                            }
+                        });
+                    });
+
+                    // AJAX favoritos - Usa delegación de eventos para que funcione con DataTables
+                    $(document).on('click', '.btn-favorito', function (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const btn = $(this);
+                        const icon = btn.find('i');
+                        const libroId = btn.data('libro-id');
+                        const isFavorito = icon.css('color') === 'rgb(251, 191, 36)'; // Check if yellow
+                        const method = isFavorito ? 'DELETE' : 'POST';
+                        const url = isFavorito ? `/favoritos/${libroId}` : '/favoritos';
+
+                        $.ajax({
+                            url: url,
+                            method: method,
+                            contentType: 'application/json',
+                            data: method === 'POST' ? JSON.stringify({ libro_id: libroId }) : undefined,
+                            success: function (res) {
+                                if (method === 'POST') {
+                                    icon.css('color', '#FBBF24'); // Yellow
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: '¡Agregado a favoritos!',
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                        timerProgressBar: true
+                                    });
+                                } else {
+                                    icon.css('color', '#9CA3AF'); // Gray
+                                    Swal.fire({
+                                        toast: true,
+                                        position: 'top-end',
+                                        icon: 'info',
+                                        title: 'Eliminado de favoritos',
+                                        showConfirmButton: false,
+                                        timer: 2000,
+                                        timerProgressBar: true
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'error',
+                                    title: 'Error al actualizar favorito',
+                                    showConfirmButton: false,
+                                    timer: 3000
+                                });
+                            }
+                        });
+                    });
+
+                    // Función para mostrar toast
+                    function showToast(message, type = 'success') {
+                        const toast = document.getElementById('toast');
+                        toast.textContent = message;
+                        toast.classList.remove('hidden', 'border-red-500', 'border-green-500');
+                        toast.classList.add(type === 'success' ? 'border-green-500' : 'border-red-500');
+
+                        toast.classList.remove('hidden');
+                        setTimeout(() => toast.classList.add('hidden'), 3000);
+                    }
+                });
+            </script>
+            <script type="application/json" id="resena-config">
+        <%- JSON.stringify({
+            scope: 'listado',
+            modalId: 'resenaModal',
+            usuario: usuario || null,
+            endpoints: {
+                crear: '/resenas',
+                actualizar: '/resenas/:id',
+                eliminar: '/resenas/:id',
+                contexto: '/resenas/contexto/:libroId',
+                listar: '/resenas/libro/:libroId'
+            }
+        }) %>
+    </script>
+            <script src="/js/resenas.js" defer></script>
+            <script src="/js/dashboard-shared.js"></script>
+</body>
+
+</html>

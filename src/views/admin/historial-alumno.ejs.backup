@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <%- include('../partials/head') %>
+    <title>Historial de <%= usuario.nombre %> | Biblioteca</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/components/export-dropdown.css">
+</head>
+
+<body class="dashboard-body">
+  <%- include('../partials/navbar') %>
+
+    <main class="container my-4">
+      <% if (session && session.flash) { %>
+        <div data-flash-message data-flash-type="<%= session.flash.tipo %>" class="d-none">
+          <%= session.flash.mensaje %>
+        </div>
+        <% session.flash=null; %>
+          <% } %>
+
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <p class="text-muted mb-1">
+                  <i class="fa-solid fa-book-open"></i> Historial de lectura
+                </p>
+                <h1 class="h3 mb-0">
+                  <%= usuario.nombre %>
+                </h1>
+                <p class="text-muted small mb-0">
+                  <% if (usuario.rol==='estudiante' ) { %>
+                    <i class="fa-solid fa-graduation-cap"></i> Grado <%= usuario.grado || '-' %>° - Sección <%=
+                        usuario.seccion || '-' %> ·
+                        <% if (usuario.dni) { %>
+                          <i class="fa-solid fa-id-card"></i> DNI: <%= usuario.dni %> ·
+                            <% } %>
+                              <i class="fa-solid fa-envelope"></i>
+                              <%= usuario.correo %>
+                                <% } else { %>
+                                  <i class="fa-solid fa-user-tie"></i> Rol: <%= usuario.rol %> ·
+                                    <% if (usuario.area_docente) { %>
+                                      <i class="fa-solid fa-chalkboard-teacher"></i> Área: <%= usuario.area_docente %> ·
+                                        <% } %>
+                                          <% if (usuario.dni) { %>
+                                            <i class="fa-solid fa-id-card"></i> DNI: <%= usuario.dni %> ·
+                                              <% } %>
+                                                <i class="fa-solid fa-envelope"></i>
+                                                <%= usuario.correo %>
+                                                  <% } %>
+                </p>
+              </div>
+              <a href="/usuario/admin/alumnos" class="btn btn--ghost btn--sm">
+                <i class="fa-solid fa-arrow-left"></i> Volver a usuarios
+              </a>
+            </div>
+
+            <!-- Filtros y Exportación -->
+            <div class="card shadow-sm border-0 mb-4" style="position: relative; z-index: 1;">
+              <div class="card-body" style="position: relative;">
+                <div class="row align-items-end">
+                  <div class="col-md-4">
+                    <label class="form-label">Filtrar por período:</label>
+                    <select class="form-select" id="filtroPeriodo" onchange="filtrarHistorial()">
+                      <option value="historico" <%=periodo==='historico' || !periodo ? 'selected' : '' %>>Todo el tiempo
+                      </option>
+                      <option value="anio_actual" <%=periodo==='anio_actual' ? 'selected' : '' %>>Este Año</option>
+                      <option value="mes_actual" <%=periodo==='mes_actual' ? 'selected' : '' %>>Este Mes</option>
+                      <option value="trimestre" <%=periodo==='trimestre' ? 'selected' : '' %>>Último Trimestre</option>
+                      <option value="bimestre" <%=periodo==='bimestre' ? 'selected' : '' %>>Último Bimestre</option>
+                    </select>
+                  </div>
+                  <div class="col-md-8 text-end" style="position: relative; z-index: 10000; overflow: visible;">
+                    <div class="export-dropdown" id="exportDropdown" style="position: relative; display: inline-block;">
+                      <button type="button" class="btn btn--sm btn--ghost export-dropdown__trigger" id="exportTrigger"
+                        style="cursor: pointer;">
+                        <i class="fas fa-download"></i>
+                        Exportar
+                        <i class="fas fa-chevron-down"></i>
+                      </button>
+                      <div class="export-dropdown__menu" id="exportMenu"
+                        style="position: absolute; top: calc(100% + 0.5rem); right: 0; min-width: 180px; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px); border-radius: 12px; border: 1px solid rgba(148, 224, 239, 0.25); box-shadow: 0 12px 32px rgba(15, 23, 42, 0.15); padding: 0.5rem; z-index: 99999; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                        <a href="#" class="export-dropdown__item" onclick="exportarHistorial('pdf'); return false;"
+                          style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; color: #1e293b; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.2s ease; cursor: pointer;">
+                          <i class="fas fa-file-pdf" style="color: #EF4444;"></i> PDF
+                        </a>
+                        <a href="#" class="export-dropdown__item" onclick="exportarHistorial('excel'); return false;"
+                          style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; color: #1e293b; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.2s ease; cursor: pointer;">
+                          <i class="fas fa-file-excel" style="color: #10B981;"></i> Excel
+                        </a>
+                        <a href="#" class="export-dropdown__item" onclick="exportarHistorial('word'); return false;"
+                          style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; color: #1e293b; text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: all 0.2s ease; cursor: pointer;">
+                          <i class="fas fa-file-word" style="color: #2563EB;"></i> Word
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estadísticas resumidas -->
+            <div class="row mb-4">
+              <div class="col-md-4">
+                <div class="stat-card" data-color="blue">
+                  <div class="stat-card__icon">
+                    <i class="fa-solid fa-book"></i>
+                  </div>
+                  <div class="stat-card__info">
+                    <h3>Libros físicos</h3>
+                    <div class="stat-card__value">
+                      <%= prestamos ? prestamos.length : 0 %>
+                    </div>
+                    <p class="stat-card__meta">Préstamos realizados</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card" data-color="cyan">
+                  <div class="stat-card__icon">
+                    <i class="fa-solid fa-laptop"></i>
+                  </div>
+                  <div class="stat-card__info">
+                    <h3>Libros virtuales</h3>
+                    <div class="stat-card__value">
+                      <%= virtuales ? virtuales.length : 0 %>
+                    </div>
+                    <p class="stat-card__meta">Lecturas digitales</p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-card" data-color="purple">
+                  <div class="stat-card__icon">
+                    <i class="fa-solid fa-book-reader"></i>
+                  </div>
+                  <div class="stat-card__info">
+                    <h3>Total lecturas</h3>
+                    <div class="stat-card__value">
+                      <%= (prestamos ? prestamos.length : 0) + (virtuales ? virtuales.length : 0) %>
+                    </div>
+                    <p class="stat-card__meta">Historial completo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Libros físicos -->
+            <div class="table-container-modern mb-4">
+              <div class="table-toolbar">
+                <div class="table-toolbar__left">
+                  <h2 class="h5 mb-0">
+                    <i class="fa-solid fa-book"></i> Préstamos de libros físicos
+                  </h2>
+                  <span class="badge bg-primary-subtle text-primary">
+                    Total: <%= prestamos ? prestamos.length : 0 %>
+                  </span>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table-modern">
+                  <thead>
+                    <tr>
+                      <th>Título del libro</th>
+                      <th>Autor</th>
+                      <th>Editorial</th>
+                      <th>ISBN</th>
+                      <th>Área</th>
+                      <th>Año</th>
+                      <th>Fecha préstamo</th>
+                      <th>Fecha límite</th>
+                      <th>Fecha devolución</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (!prestamos || !prestamos.length) { %>
+                      <tr>
+                        <td colspan="10" class="text-center py-5 text-muted">
+                          <i class="fa-solid fa-inbox fa-2x mb-3 d-block"></i>
+                          No registra préstamos de libros físicos.
+                        </td>
+                      </tr>
+                      <% } else { %>
+                        <% prestamos.forEach(p=> { %>
+                          <tr>
+                            <td data-label="Título">
+                              <div class="fw-semibold" style="color: #1e40af;">
+                                <%= p.titulo %>
+                              </div>
+                              <% if (p.grado_recomendado) { %>
+                                <small class="text-muted">Grado recomendado: <%= p.grado_recomendado %>°</small>
+                                <% } %>
+                            </td>
+                            <td data-label="Autor">
+                              <span class="fw-medium">
+                                <%= p.autor || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Editorial">
+                              <span class="text-muted">
+                                <%= p.editorial || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="ISBN">
+                              <span class="text-muted small font-monospace">
+                                <%= p.isbn || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Área">
+                              <span class="badge bg-soft-info text-info">
+                                <%= p.area || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Año">
+                              <span class="text-muted">
+                                <%= p.anio_publicacion || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Fecha préstamo">
+                              <% if (p.fecha_prestamo) { %>
+                                <div class="fw-semibold">
+                                  <%= new Date(p.fecha_prestamo).toLocaleDateString('es-PE', { year: 'numeric' ,
+                                    month: 'short' , day: 'numeric' }) %>
+                                </div>
+                                <small class="text-muted">
+                                  <%= new Date(p.fecha_prestamo).toLocaleTimeString('es-PE', { hour: '2-digit' ,
+                                    minute: '2-digit' }) %>
+                                </small>
+                                <% } else { %>
+                                  <span class="text-muted">-</span>
+                                  <% } %>
+                            </td>
+                            <td data-label="Fecha límite">
+                              <% if (p.fecha_devolucion_esperada) { %>
+                                <div class="fw-semibold">
+                                  <%= new Date(p.fecha_devolucion_esperada).toLocaleDateString('es-PE', {
+                                    year: 'numeric' , month: 'short' , day: 'numeric' }) %>
+                                </div>
+                                <% } else { %>
+                                  <span class="text-muted">-</span>
+                                  <% } %>
+                            </td>
+                            <td data-label="Fecha devolución">
+                              <% if (p.fecha_devolucion_real) { %>
+                                <div class="text-success fw-semibold">
+                                  <%= new Date(p.fecha_devolucion_real).toLocaleDateString('es-PE', { year: 'numeric' ,
+                                    month: 'short' , day: 'numeric' }) %>
+                                </div>
+                                <small class="text-muted">
+                                  <%= new Date(p.fecha_devolucion_real).toLocaleTimeString('es-PE', { hour: '2-digit' ,
+                                    minute: '2-digit' }) %>
+                                </small>
+                                <% } else { %>
+                                  <span class="text-muted">Pendiente</span>
+                                  <% } %>
+                            </td>
+                            <td data-label="Estado">
+                              <% let estadoClass='bg-soft-secondary text-secondary' ; let estadoTexto=p.estado
+                                || 'pendiente' ; if (p.estado==='devuelto' ) {
+                                estadoClass='bg-soft-success text-success' ; } else if (p.estado==='vencido' ) {
+                                estadoClass='bg-soft-danger text-danger' ; } else if (p.estado==='activo' ) {
+                                estadoClass='bg-soft-primary text-primary' ; } %>
+                                <div class="d-flex flex-column gap-1">
+                                  <span class="badge <%= estadoClass %> text-uppercase">
+                                    <%= estadoTexto %>
+                                  </span>
+
+                                  <% if (p.validado) { %>
+                                    <button type="button" class="btn btn-sm btn-outline-success mt-1 btn-ver-resultado"
+                                      data-tipo="fisico" data-id="<%= p.id %>" data-opinion="<%= p.opinion_libro %>"
+                                      data-resumen="<%= p.resumen_libro %>"
+                                      data-personajes="<%= p.personajes_principales %>"
+                                      data-tema="<%= p.tema_principal %>"
+                                      data-lecciones="<%= p.lecciones_aprendidas %>">
+                                      <i class="fas fa-check-double"></i> Ver Resultado
+                                    </button>
+                                    <% } %>
+                                </div>
+                            </td>
+                          </tr>
+                          <% }) %>
+                            <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Libros virtuales -->
+            <div class="table-container-modern" style="position: relative; z-index: 1;">
+              <div class="table-toolbar">
+                <div class="table-toolbar__left">
+                  <h2 class="h5 mb-0">
+                    <i class="fa-solid fa-laptop"></i> Lecturas de libros virtuales
+                  </h2>
+                  <span class="badge bg-success-subtle text-success">
+                    Total: <%= virtuales ? virtuales.length : 0 %>
+                  </span>
+                </div>
+              </div>
+
+              <div class="table-responsive">
+                <table class="table-modern">
+                  <thead>
+                    <tr>
+                      <th>Título del libro</th>
+                      <th>Autor</th>
+                      <th>Editorial</th>
+                      <th>ISBN</th>
+                      <th>Categoría</th>
+                      <th>Año</th>
+                      <th>Fecha lectura</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (!virtuales || !virtuales.length) { %>
+                      <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                          <i class="fa-solid fa-inbox fa-2x mb-3 d-block"></i>
+                          No registra lecturas de libros virtuales.
+                        </td>
+                      </tr>
+                      <% } else { %>
+                        <% virtuales.forEach(v=> { %>
+                          <tr>
+                            <td data-label="Título">
+                              <div class="fw-semibold">
+                                <%= v.titulo %>
+                              </div>
+                            </td>
+                            <td data-label="Autor">
+                              <span class="text-muted">
+                                <%= v.autor || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Editorial">
+                              <span class="text-muted small">
+                                <%= v.editorial || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="ISBN">
+                              <span class="text-muted small">
+                                <%= v.isbn || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Categoría">
+                              <span class="badge bg-soft-info text-info">
+                                <%= v.categoria || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Año">
+                              <span class="text-muted">
+                                <%= v.anio_publicacion || '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Fecha lectura">
+                              <span class="text-muted">
+                                <%= v.fecha_lectura ? new Date(v.fecha_lectura).toLocaleDateString('es-PE', {
+                                  year: 'numeric' , month: 'short' , day: 'numeric' }) : '-' %>
+                              </span>
+                            </td>
+                            <td data-label="Acción">
+                              <% if (v.preview_link) { %>
+                                <a href="<%= v.preview_link %>" target="_blank" class="btn btn--ghost btn--sm"
+                                  title="Ver libro">
+                                  <i class="fa-solid fa-external-link"></i> Ver
+                                </a>
+                                <% } else { %>
+                                  <span class="text-muted">-</span>
+                                  <% } %>
+
+                                    <% if (v.validado) { %>
+                                      <button type="button"
+                                        class="btn btn-sm btn-outline-success ms-1 btn-ver-resultado"
+                                        data-tipo="virtual" data-id="<%= v.id %>" data-opinion="<%= v.opinion_libro %>"
+                                        data-resumen="<%= v.resumen_libro %>"
+                                        data-personajes="<%= v.personajes_principales %>"
+                                        data-tema="<%= v.tema_principal %>"
+                                        data-lecciones="<%= v.lecciones_aprendidas %>">
+                                        <i class="fas fa-check-double"></i> Ver Resultado
+                                      </button>
+                                      <% } %>
+                            </td>
+                          </tr>
+                          <% }) %>
+                            <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+    </main>
+
+    <div id="toastStack" class="toast-stack"></div>
+    <%- include('../partials/footer') %>
+
+      <script>
+        (function () {
+          const stack = document.getElementById('toastStack');
+          if (!stack) return;
+
+          function showToast(type, message) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'toast-message toast-message--' + type;
+
+            wrapper.innerHTML = `
+            <div class="toast-message__icon">
+              ${type === 'success' ? '✓' : '⚠'}
+            </div>
+            <div class="toast-message__text">${message}</div>
+            <button class="toast-message__close" type="button" aria-label="Cerrar">&times;</button>
+          `;
+
+            stack.appendChild(wrapper);
+            requestAnimationFrame(() => wrapper.classList.add('is-visible'));
+
+            const remove = () => {
+              wrapper.classList.remove('is-visible');
+              setTimeout(() => wrapper.remove(), 220);
+            };
+            wrapper.querySelector('.toast-message__close').addEventListener('click', remove);
+            setTimeout(remove, 3500);
+          }
+
+          const flashEl = document.querySelector('[data-flash-message]');
+          if (flashEl) {
+            const type = flashEl.getAttribute('data-flash-type') || 'success';
+            const msg = flashEl.textContent.trim();
+            if (msg) showToast(type, msg);
+            flashEl.remove();
+          }
+
+          window.showToast = showToast;
+        })();
+
+        // Función para filtrar historial
+        function filtrarHistorial() {
+          const periodo = document.getElementById('filtroPeriodo').value;
+          const url = new URL(window.location.href);
+          url.searchParams.set('periodo', periodo);
+          window.location.href = url.toString();
+        }
+
+        // Función para exportar historial
+        function exportarHistorial(formato) {
+          const periodo = document.getElementById('filtroPeriodo').value;
+          const url = window.location.pathname.replace('/historial', '/historial/exportar');
+          const params = new URLSearchParams({
+            formato: formato,
+            periodo: periodo
+          });
+          window.location.href = `${url}?${params.toString()}`;
+        }
+
+        // Inicializar dropdown de exportación
+        function initExportDropdown() {
+          const dropdown = document.getElementById('exportDropdown');
+          const trigger = document.getElementById('exportTrigger');
+          const menu = document.getElementById('exportMenu');
+
+          if (dropdown && trigger && menu) {
+            // Remover cualquier listener anterior
+            const newTrigger = trigger.cloneNode(true);
+            trigger.parentNode.replaceChild(newTrigger, trigger);
+
+            newTrigger.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              const isActive = dropdown.classList.contains('active');
+              dropdown.classList.toggle('active');
+
+              // Aplicar estilos inline cuando está activo
+              if (dropdown.classList.contains('active')) {
+                menu.style.opacity = '1';
+                menu.style.visibility = 'visible';
+                menu.style.transform = 'translateY(0)';
+              } else {
+                menu.style.opacity = '0';
+                menu.style.visibility = 'hidden';
+                menu.style.transform = 'translateY(-10px)';
+              }
+            });
+
+            // Cerrar al hacer clic fuera
+            const closeOnOutsideClick = function (e) {
+              if (dropdown && !dropdown.contains(e.target)) {
+                dropdown.classList.remove('active');
+              }
+            };
+
+            document.addEventListener('click', closeOnOutsideClick);
+
+            // Cerrar al presionar Escape
+            const closeOnEscape = function (e) {
+              if (e.key === 'Escape' && dropdown) {
+                dropdown.classList.remove('active');
+              }
+            };
+
+            document.addEventListener('keydown', closeOnEscape);
+          } else {
+            console.error('Export dropdown elements not found:', { dropdown, trigger, menu });
+          }
+        }
+
+        // Ejecutar cuando el DOM esté listo
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', initExportDropdown);
+        } else {
+          // DOM ya está listo
+          setTimeout(initExportDropdown, 100);
+        }
+      </script>
+
+      <!-- Modal para ver resultados de validación -->
+      <div id="modalResultado" class="modal-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 99999; justify-content: center; align-items: center;">
+        <div class="modal-content"
+          style="background: white; padding: 2rem; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="h5 mb-0"><i class="fas fa-clipboard-check text-success"></i> Resultado de Validación</h3>
+            <button type="button" class="btn-close btn-close-modal"
+              style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+          </div>
+
+          <div id="modalBody">
+            <!-- Content will be injected here -->
+          </div>
+
+          <div class="mt-4 text-end">
+            <button class="btn btn-secondary btn-close-modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          // Delegación de eventos para los botones
+          document.body.addEventListener('click', function (e) {
+            const btn = e.target.closest('.btn-ver-resultado');
+            if (btn) {
+              const datos = {
+                opinion: btn.dataset.opinion,
+                resumen: btn.dataset.resumen,
+                personajes: btn.dataset.personajes,
+                tema: btn.dataset.tema,
+                lecciones: btn.dataset.lecciones
+              };
+              verResultadoValidacion(btn.dataset.tipo, btn.dataset.id, datos);
+            }
+
+            // Close buttons
+            if (e.target.closest('.btn-close-modal')) {
+              cerrarModalResultado();
+            }
+          });
+        });
+
+        function verResultadoValidacion(tipo, id, datos) {
+          const modal = document.getElementById('modalResultado');
+          const modalBody = document.getElementById('modalBody');
+
+          // Función segura para evitar XSS básico
+          const escapeHtml = (unsafe) => {
+            if (!unsafe || unsafe === 'undefined' || unsafe === 'null') return 'No especificado';
+            return unsafe
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;")
+              .replace(/'/g, "&#039;");
+          };
+
+          // Generate content
+          let html = `
+                <div class="mb-3">
+                    <label class="fw-bold text-muted small">Opinión Personal:</label>
+                    <div class="p-2 bg-light rounded mt-1 text-break">${escapeHtml(datos.opinion)}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold text-muted small">Resumen:</label>
+                    <div class="p-2 bg-light rounded mt-1 text-break">${escapeHtml(datos.resumen)}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold text-muted small">Personajes Principales:</label>
+                    <div class="p-2 bg-light rounded mt-1 text-break">${escapeHtml(datos.personajes)}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold text-muted small">Tema Principal:</label>
+                    <div class="p-2 bg-light rounded mt-1 text-break">${escapeHtml(datos.tema)}</div>
+                </div>
+                <div class="mb-3">
+                    <label class="fw-bold text-muted small">Lecciones Aprendidas:</label>
+                    <div class="p-2 bg-light rounded mt-1 text-break">${escapeHtml(datos.lecciones)}</div>
+                </div>
+            `;
+
+          modalBody.innerHTML = html;
+          modal.style.display = 'flex';
+        }
+
+        function cerrarModalResultado() {
+          document.getElementById('modalResultado').style.display = 'none';
+        }
+
+        document.getElementById('modalResultado').addEventListener('click', function (e) {
+          if (e.target === this) cerrarModalResultado();
+        });
+      </script>
+</body>
+
+</html>

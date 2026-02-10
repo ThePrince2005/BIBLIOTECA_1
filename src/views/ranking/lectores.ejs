@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head', { title: 'Ranking de Lectores' }) %>
+    <link rel="stylesheet" href="/css/sistema-moderno.css">
+    <link rel="stylesheet" href="/css/ranking-moderno.css">
+</head>
+<body class="dashboard-body">
+    <%- include('../partials/navbar') %>
+
+    <main class="ranking-wrapper">
+        <!-- Hero Section -->
+        <header class="ranking-hero">
+            <div class="ranking-hero__content">
+                <div class="ranking-hero__badge">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span>Competencia Lectora</span>
+                </div>
+                <h1 class="ranking-hero__title">Ranking de Lectores</h1>
+                <p class="ranking-hero__subtitle">
+                    Descubre quiénes son los lectores más destacados de la biblioteca escolar.
+                </p>
+            </div>
+        </header>
+
+        <!-- Tabs -->
+        <div class="ranking-tabs">
+            <a href="/ranking/lectores" 
+               class="ranking-tab <%= tipoActual === 'estudiantes' ? 'ranking-tab--active' : 'ranking-tab--inactive' %>">
+                <i class="fa-solid fa-user-graduate"></i>
+                <span>Estudiantes</span>
+            </a>
+            <a href="/ranking/docentes" 
+               class="ranking-tab <%= tipoActual === 'docentes' ? 'ranking-tab--active' : 'ranking-tab--inactive' %>">
+                <i class="fa-solid fa-chalkboard-teacher"></i>
+                <span>Docentes</span>
+            </a>
+        </div>
+
+        <!-- Filtros -->
+        <section class="ranking-filters">
+            <div class="ranking-filters__header">
+                <div class="ranking-filters__title">
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Filtros de Búsqueda</span>
+                </div>
+            </div>
+            <form id="filtroForm" method="GET" action="/ranking/lectores" class="ranking-filters__grid">
+                <div class="input-group">
+                    <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Buscar por nombre</label>
+                    <div class="input-wrapper-modern">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="busqueda" name="busqueda" value="<%= busqueda || '' %>"
+                               class="input-modern" placeholder="Nombre del estudiante">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Grado</label>
+                    <div class="input-wrapper-modern">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <select id="grado" name="grado" class="input-modern">
+                            <option value="">Todos los grados</option>
+                            <option value="1°" <%= grado === '1°' ? 'selected' : '' %>>1° Grado</option>
+                            <option value="2°" <%= grado === '2°' ? 'selected' : '' %>>2° Grado</option>
+                            <option value="3°" <%= grado === '3°' ? 'selected' : '' %>>3° Grado</option>
+                            <option value="4°" <%= grado === '4°' ? 'selected' : '' %>>4° Grado</option>
+                            <option value="5°" <%= grado === '5°' ? 'selected' : '' %>>5° Grado</option>
+                            <option value="6°" <%= grado === '6°' ? 'selected' : '' %>>6° Grado</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Fecha inicio</label>
+                    <div class="input-wrapper-modern">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <input type="date" id="fechaInicio" name="fechaInicio" value="<%= fechaInicio || '' %>"
+                               class="input-modern">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label style="font-weight: 600; margin-bottom: 0.5rem; display: block; color: var(--dash-text);">Fecha fin</label>
+                    <div class="input-wrapper-modern">
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <input type="date" id="fechaFin" name="fechaFin" value="<%= fechaFin || '' %>"
+                               class="input-modern">
+                    </div>
+                </div>
+                
+                <div class="input-group" style="grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 1rem;">
+                    <button type="button" onclick="resetForm()" class="btn-modern btn-modern--secondary">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Limpiar</span>
+                    </button>
+                    <button type="submit" class="btn-modern btn-modern--primary">
+                        <i class="fa-solid fa-search"></i>
+                        <span>Buscar</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Tabla de resultados -->
+        <section class="ranking-table-wrapper">
+            <% if (ranking && ranking.length > 0) { %>
+                <div style="overflow-x: auto;">
+                    <table class="ranking-table">
+                        <thead>
+                            <tr>
+                                <th>Posición</th>
+                                <th>Nombre</th>
+                                <th>Grado</th>
+                                <th>Libros leídos</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% ranking.forEach((r, idx) => { 
+                                let positionClass = 'ranking-position--default';
+                                if (idx === 0) positionClass = 'ranking-position--gold';
+                                else if (idx === 1) positionClass = 'ranking-position--silver';
+                                else if (idx === 2) positionClass = 'ranking-position--bronze';
+                            %>
+                                <tr>
+                                    <td>
+                                        <span class="ranking-position <%= positionClass %>">
+                                            <%= idx + 1 %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="ranking-name"><%= r.nombre %></span>
+                                    </td>
+                                    <td>
+                                        <span class="badge-modern badge-modern--primary">
+                                            <%= r.grado || '-' %>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="ranking-badge ranking-badge--success">
+                                            <i class="fa-solid fa-book"></i>
+                                            <span><%= r.totalLibros || 0 %> libros</span>
+                                        </span>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            <% } else { %>
+                <div class="empty-modern">
+                    <div class="empty-modern__icon">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="empty-modern__title">No se encontraron resultados</h3>
+                    <p class="empty-modern__text">
+                        Intenta con otros criterios de búsqueda o verifica los filtros aplicados.
+                    </p>
+                </div>
+            <% } %>
+        </section>
+    </main>
+
+    <%- include('../partials/footer') %>
+    
+    <script>
+        // Función para limpiar los filtros
+        function resetForm() {
+            document.getElementById('busqueda').value = '';
+            document.getElementById('grado').value = '';
+            document.getElementById('fechaInicio').value = '';
+            document.getElementById('fechaFin').value = '';
+            document.getElementById('filtroForm').submit();
+        }
+
+        // Aplicar búsqueda al cambiar los filtros
+        document.addEventListener('DOMContentLoaded', function() {
+            const selects = document.querySelectorAll('select');
+            selects.forEach(select => {
+                select.addEventListener('change', function() {
+                    document.getElementById('filtroForm').submit();
+                });
+            });
+        });
+    </script>
+</body>
+</html>

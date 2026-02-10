@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Material de Estudio - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/prestamos.css">
+        <link rel="stylesheet" href="/css/resenas.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+        <style>
+            .btn-page {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 1.5rem;
+                border-radius: 9999px;
+                background: var(--bg-surface);
+                color: var(--dash-text);
+                font-weight: 500;
+                font-size: 0.875rem;
+                border: 1px solid #e2e8f0;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-decoration: none;
+            }
+
+            .btn-page:hover:not(:disabled) {
+                background-color: #f8fafc;
+                border-color: #cbd5e1;
+                color: #1e293b;
+            }
+
+            .btn-page:disabled,
+            .btn-page.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                background-color: #f3f4f6;
+                pointer-events: none;
+            }
+
+            .pagination-container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                gap: 1rem;
+                margin-top: 2rem;
+                padding-bottom: 1rem;
+            }
+
+            [data-theme='dark'] .btn-page {
+                background: #1e293b;
+                border-color: #334155;
+                color: #e2e8f0;
+            }
+
+            /* Document Badge Styles */
+            .doc-kind-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.25rem;
+                padding: 0.25rem 0.75rem;
+                border-radius: 999px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
+
+            .kind-examen {
+                background: rgba(239, 68, 68, 0.1);
+                color: #ef4444;
+            }
+
+            .kind-guia {
+                background: rgba(59, 130, 246, 0.1);
+                color: #3b82f6;
+            }
+
+            .kind-resolucion {
+                background: rgba(245, 158, 11, 0.1);
+                color: #f59e0b;
+            }
+
+            .kind-otro {
+                background: rgba(107, 114, 128, 0.1);
+                color: #6b7280;
+            }
+
+            .action-btn-group {
+                display: flex;
+                gap: 0.5rem;
+            }
+        </style>
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-folder-open"></i>
+                        <span>Recursos Académicos</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Material de Estudio</h1>
+                        <p>Accede a exámenes, guías y resoluciones para potenciar tu aprendizaje.</p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right">
+                    <% if (user && (user.rol==='docente' || user.rol==='admin' )) { %>
+                        <a href="/admin/documentos" class="btn-modern btn-modern--primary">
+                            <i class="fas fa-file-invoice"></i>
+                            <span>Gestionar Documentos</span>
+                        </a>
+                        <% } %>
+                </div>
+            </header>
+
+            <!-- Feedback Messages -->
+            <% if (success && success.length> 0) { %>
+                <div class="mb-6 rounded-lg bg-green-50 p-4 text-green-700 border-l-4 border-green-500 shadow-sm mx-6"
+                    data-aos="fade-in">
+                    <p class="font-medium"><i class="fas fa-check-circle mr-2"></i>
+                        <%= success %>
+                    </p>
+                </div>
+                <% } %>
+
+                    <% if (error && error.length> 0) { %>
+                        <div class="mb-6 rounded-lg bg-red-50 p-4 text-red-700 border-l-4 border-red-500 shadow-sm mx-6"
+                            data-aos="fade-in">
+                            <p class="font-medium"><i class="fas fa-exclamation-circle mr-2"></i>
+                                <%= error %>
+                            </p>
+                        </div>
+                        <% } %>
+
+                            <!-- Search Bar moved inside card -->
+
+                            <!-- Unified Document List -->
+                            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                                <!-- Top Pagination removed as per request -->
+
+                                <article class="card-modern">
+                                    <div class="card-modern__header">
+                                        <div class="card-modern__title">
+                                            <i class="fas fa-file-alt"></i>
+                                            Listado de Recursos
+                                            <span class="badge-modern badge-modern--neutral" id="showingInfo"
+                                                style="font-size: 0.9rem;">
+                                                Mostrando <%= documentos.length %> documentos
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Filters Modern -->
+                                    <div class="filters-modern">
+                                        <div class="filters-modern__grid" style="align-items: end;">
+                                            <div class="form-group" style="margin-bottom: 0;">
+                                                <label class="form-label"
+                                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">Buscar</label>
+                                                <div class="input-wrapper-modern">
+                                                    <i class="fas fa-search"></i>
+                                                    <input type="text" id="docSearchInput" class="input-modern"
+                                                        placeholder="Buscar por título, autor o área...">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="margin-bottom: 0;">
+                                                <label class="form-label"
+                                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">Tipo</label>
+                                                <select id="docTypeFilter" class="input-modern">
+                                                    <option value="">Todos los Tipos</option>
+                                                    <option value="examen">Exámenes</option>
+                                                    <option value="guía">Guías</option>
+                                                    <option value="resolución">Resoluciones</option>
+                                                    <option value="otro">Otros</option>
+                                                </select>
+                                            </div>
+
+                                            <div style="display: flex; gap: 0.5rem;">
+                                                <!-- Button removed for instant search -->
+                                                <!-- <button type="button" id="searchBtn" class="btn-modern btn-modern--secondary" title="Buscar"><i class="fas fa-search"></i></button> -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Table Modern Enhanced -->
+                                    <div class="table-container-modern">
+                                        <% if (documentos.length===0) { %>
+                                            <div class="empty-state" style="padding: 3rem; text-align: center;">
+                                                <i class="fas fa-inbox"
+                                                    style="font-size: 3rem; color: var(--dash-muted);"></i>
+                                                <p style="color: var(--dash-muted); margin-top: 1rem;">No hay documentos
+                                                    disponibles por el momento.</p>
+                                            </div>
+                                            <% } else { %>
+                                                <table class="table-modern-enhanced" id="docsTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Documento</th>
+                                                            <th>Categoría</th>
+                                                            <th>Tipo</th>
+                                                            <th class="text-end">Acciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="docsTableBody">
+                                                        <% documentos.forEach(doc=> { %>
+                                                            <tr class="doc-row libro-row"
+                                                                data-title="<%= doc.titulo.toLowerCase() %>"
+                                                                data-description="<%= (doc.descripcion || '').toLowerCase() %>"
+                                                                data-type="<%= doc.tipo.toLowerCase() %>">
+                                                                <td data-label="Documento">
+                                                                    <div style="display: flex; flex-direction: column;">
+                                                                        <span
+                                                                            style="font-weight: 600; color: var(--dash-text); font-size: 1rem;">
+                                                                            <%= doc.titulo %>
+                                                                        </span>
+                                                                        <span
+                                                                            style="font-size: 0.85rem; color: var(--dash-muted);">
+                                                                            <%= doc.descripcion || 'Sin descripción' %>
+                                                                        </span>
+                                                                    </div>
+                                                                </td>
+                                                                <td data-label="Categoría">
+                                                                    <% let badgeClass='badge-modern--neutral' ; const
+                                                                        tipoLower=doc.tipo.toLowerCase();
+                                                                        if(tipoLower.includes('examen'))
+                                                                        badgeClass='badge-modern--danger' ; else
+                                                                        if(tipoLower.includes('guía') ||
+                                                                        tipoLower.includes('guia'))
+                                                                        badgeClass='badge-modern--primary' ; else
+                                                                        if(tipoLower.includes('resolu'))
+                                                                        badgeClass='badge-modern--warning' ; %>
+                                                                        <span class="badge-modern <%= badgeClass %>">
+                                                                            <%= doc.tipo %>
+                                                                        </span>
+                                                                </td>
+                                                                <td data-label="Tipo">
+                                                                    <span
+                                                                        style="color: var(--dash-text); font-weight: 600; text-transform: uppercase; font-size: 0.8rem;">
+                                                                        <%= doc.tipo_archivo %>
+                                                                    </span>
+                                                                </td>
+                                                                <td data-label="Acciones" class="text-end">
+                                                                    <div class="table-actions-cell"
+                                                                        style="justify-content: flex-end;">
+                                                                        <a href="/admin/material/ver/<%= doc.id %>"
+                                                                            class="btn-modern btn-modern--neutral"
+                                                                            title="Ver">
+                                                                            <i class="fas fa-eye"></i>
+                                                                        </a>
+                                                                        <a href="/admin/material/descargar/<%= doc.id %>"
+                                                                            class="btn-modern btn-modern--primary"
+                                                                            title="Descargar">
+                                                                            <i class="fas fa-download"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <% }); %>
+                                                    </tbody>
+                                                </table>
+
+                                                <div id="noResults" class="empty-state hidden"
+                                                    style="display: none; padding: 2rem; text-align: center;">
+                                                    <i class="fas fa-search"
+                                                        style="font-size: 2rem; color: var(--dash-muted);"></i>
+                                                    <p style="color: var(--dash-muted); margin-top: 1rem;">No se
+                                                        encontraron resultados</p>
+                                                </div>
+                                                <% } %>
+                                    </div>
+
+                                    <!-- Footer Pagination -->
+                                    <% if (documentos.length> 0) { %>
+                                        <div class="card-modern__footer" id="paginationControls">
+                                            <div id="pageInfo" style="font-size: 0.9rem; color: var(--dash-muted);">
+                                                Página 1 de 1
+                                            </div>
+                                            <div style="display: flex; gap: 0.5rem;">
+                                                <button type="button" id="prevPageBtn"
+                                                    class="btn-modern btn-modern--neutral" disabled>
+                                                    <i class="fas fa-chevron-left"></i> Anterior
+                                                </button>
+                                                <button type="button" id="nextPageBtn"
+                                                    class="btn-modern btn-modern--neutral" disabled>
+                                                    Siguiente <i class="fas fa-chevron-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                </article>
+                            </section>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>
+            AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50
+            });
+
+            // Advanced Search & Pagination Functionality
+            document.addEventListener('DOMContentLoaded', () => {
+                const searchInput = document.getElementById('docSearchInput');
+                const typeFilter = document.getElementById('docTypeFilter');
+                // const searchBtn = document.getElementById('searchBtn'); // Removed
+                const tableRows = Array.from(document.querySelectorAll('.doc-row')); // Convert to Array
+                const noResults = document.getElementById('noResults');
+                const tableElement = document.getElementById('docsTable');
+
+                // Pagination Elements
+                const prevBtn = document.getElementById('prevPageBtn');
+                const nextBtn = document.getElementById('nextPageBtn');
+                const pageInfo = document.getElementById('pageInfo');
+                const paginationControls = document.getElementById('paginationControls');
+
+                // Helper to normalize strings (remove accents)
+                const normalizeText = (text) => {
+                    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+                };
+
+                const showingInfo = document.getElementById('showingInfo');
+
+                let currentPage = 1;
+                const itemsPerPage = 20; // As requested "mostrar 20"
+                let visibleRows = [...tableRows]; // Initially all rows are "visible" match candidates
+
+                function filterData() {
+                    const term = normalizeText(searchInput.value.trim());
+                    // Normalize the filter value too (e.g. "guía" -> "guia")
+                    const category = normalizeText(typeFilter.value);
+
+                    // Filter the rows array
+                    visibleRows = tableRows.filter(row => {
+                        // Get attributes and normalize them too 
+                        const title = normalizeText(row.getAttribute('data-title'));
+                        const desc = normalizeText(row.getAttribute('data-description'));
+                        const type = normalizeText(row.getAttribute('data-type'));
+
+                        const matchesTerm = title.includes(term) || desc.includes(term);
+                        // Check if type includes the category to handle "Guía" vs "Guías de estudio" matches
+                        const matchesCategory = category === '' || type.includes(category);
+
+                        return matchesTerm && matchesCategory;
+                    });
+
+                    // Reset to page 1 after filter change
+                    currentPage = 1;
+                    updateTableDisplay();
+                }
+
+                function updateTableDisplay() {
+                    // Hide all rows first
+                    tableRows.forEach(row => row.style.removeProperty('display')); // Reset logic
+                    // Actually, we need to hide everything not in current page page
+                    // But first set display:none to all, then show specific ones
+                    tableRows.forEach(row => row.style.display = 'none');
+
+                    if (visibleRows.length === 0) {
+                        if (tableElement) tableElement.style.display = 'none';
+                        if (noResults) noResults.style.display = 'flex';
+                        if (paginationControls) paginationControls.style.display = 'none';
+                        if (showingInfo) showingInfo.textContent = `Mostrando 0 de 0 documentos`;
+                        return;
+                    }
+
+                    if (tableElement) tableElement.style.display = '';
+                    if (noResults) noResults.style.display = 'none';
+                    if (paginationControls) paginationControls.style.display = 'flex';
+
+                    // Calculate slices for pagination
+                    const totalPages = Math.ceil(visibleRows.length / itemsPerPage);
+                    const startIndex = (currentPage - 1) * itemsPerPage;
+                    const endIndex = Math.min(startIndex + itemsPerPage, visibleRows.length); // Not used direct but for logic
+                    const currentParsel = visibleRows.slice(startIndex, startIndex + itemsPerPage);
+
+                    // Show only current page rows
+                    currentParsel.forEach(row => row.style.display = '');
+
+                    // Update Info Text
+                    if (showingInfo) showingInfo.textContent = `Mostrando ${currentParsel.length} de ${visibleRows.length} documentos`;
+
+                    // Update Pagination UI
+                    if (pageInfo) pageInfo.textContent = `Página ${currentPage} de ${totalPages || 1}`;
+
+                    if (prevBtn) {
+                        prevBtn.disabled = currentPage === 1;
+                        prevBtn.onclick = () => {
+                            if (currentPage > 1) {
+                                currentPage--;
+                                updateTableDisplay();
+                            }
+                        };
+                    }
+
+                    if (nextBtn) {
+                        nextBtn.disabled = currentPage >= totalPages;
+                        nextBtn.onclick = () => {
+                            if (currentPage < totalPages) {
+                                currentPage++;
+                                updateTableDisplay();
+                            }
+                        };
+                    }
+                }
+
+                // Event Listeners
+                if (searchInput) {
+                    // 'input' covers typing, pasting, clearing - crucial for mobile
+                    ['input', 'keyup', 'change'].forEach(evt => searchInput.addEventListener(evt, filterData));
+                }
+                if (typeFilter) {
+                    typeFilter.addEventListener('change', filterData);
+                }
+
+                // Initial Load
+                updateTableDisplay();
+            });
+        </script>
+</body>
+
+</html>

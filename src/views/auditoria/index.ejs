@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Auditoría - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Seguridad</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Registro de Auditoría</h1>
+                        <p>Monitorea todas las acciones realizadas en el sistema para mantener la seguridad y
+                            trazabilidad.</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Estadísticas -->
+            <section class="perfil-grid perfil-grid--three" data-aos="fade-up" data-aos-delay="100">
+                <article class="card card--elevated">
+                    <div class="card__body">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--primary">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <p class="stat-card__label">Total Registros</p>
+                                <p class="stat-card__value">
+                                    <%= estadisticas.total_registros %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card card--elevated">
+                    <div class="card__body">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--success">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <p class="stat-card__label">Usuarios Activos</p>
+                                <p class="stat-card__value">
+                                    <%= estadisticas.usuarios_distintos %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="card card--elevated">
+                    <div class="card__body">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--error">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <p class="stat-card__label">Errores</p>
+                                <p class="stat-card__value">
+                                    <%= estadisticas.total_errores %>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Filtros -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="200">
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-filter"></i>
+                                <span>Búsqueda avanzada</span>
+                            </p>
+                            <h2 class="card__title">Filtros</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <form id="filtrosForm" class="form-grid-six">
+                            <div class="form-group">
+                                <label class="form-label">Acción</label>
+                                <select name="accion" class="form-select">
+                                    <option value="">Todas</option>
+                                    <% estadisticas.accionesPorTipo.forEach(accion=> { %>
+                                        <option value="<%= accion.accion %>" <%=filtros.accion===accion.accion
+                                            ? 'selected' : '' %>>
+                                            <%= accion.accion %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Entidad</label>
+                                <select name="entidad" class="form-select">
+                                    <option value="">Todas</option>
+                                    <option value="LIBRO" <%=filtros.entidad==='LIBRO' ? 'selected' : '' %>>Libros
+                                    </option>
+                                    <option value="PRESTAMO" <%=filtros.entidad==='PRESTAMO' ? 'selected' : '' %>
+                                        >Préstamos</option>
+                                    <option value="USUARIO" <%=filtros.entidad==='USUARIO' ? 'selected' : '' %>>Usuarios
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Usuario</label>
+                                <select name="usuario_id" class="form-select">
+                                    <option value="">Todos</option>
+                                    <% estadisticas.accionesPorUsuario.forEach(usuario=> { %>
+                                        <option value="<%= usuario.id %>" <%=filtros.usuario_id===usuario.id
+                                            ? 'selected' : '' %>>
+                                            <%= usuario.nombre %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Fecha Inicio</label>
+                                <input type="date" name="fecha_inicio" class="form-input"
+                                    value="<%= filtros.fecha_inicio || '' %>">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Fecha Fin</label>
+                                <input type="date" name="fecha_fin" class="form-input"
+                                    value="<%= filtros.fecha_fin || '' %>">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn--primary">
+                                    <i class="fas fa-search"></i>
+                                    Filtrar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Tabla de registros -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="300">
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-list"></i>
+                                <span>
+                                    <%= registros.length %> registros
+                                </span>
+                            </p>
+                            <h2 class="card__title">Historial de Acciones</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <!-- Toolbar -->
+                        <div class="table-toolbar">
+                            <div class="table-toolbar__left">
+                                <div class="table-search">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" id="searchAuditoria" placeholder="Buscar en registros...">
+                                </div>
+                            </div>
+                            <div class="table-toolbar__right">
+                                <div class="table-actions">
+                                    <button class="btn btn--sm btn--ghost" onclick="exportar('pdf')">
+                                        <i class="fas fa-file-pdf"></i>
+                                        PDF
+                                    </button>
+                                    <button class="btn btn--sm btn--ghost" onclick="exportar('excel')">
+                                        <i class="fas fa-file-excel"></i>
+                                        Excel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabla -->
+                        <div class="table-container-modern">
+                            <table class="table-modern" id="tablaAuditoria">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Usuario</th>
+                                        <th>Acción</th>
+                                        <th>Entidad</th>
+                                        <th>Detalles</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% registros.forEach(registro=> { %>
+                                        <tr>
+                                            <td data-label="Fecha">
+                                                <%= new Date(registro.fecha_registro).toLocaleString('es-ES') %>
+                                            </td>
+                                            <td data-label="Usuario">
+                                                <div class="libro-info">
+                                                    <div class="libro-info__title">
+                                                        <%= registro.usuario_nombre %>
+                                                    </div>
+                                                    <div class="libro-info__author">
+                                                        <%= registro.usuario_rol %>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td data-label="Acción">
+                                                <span class="badge <%= 
+                                                registro.accion.includes('ERROR') ? 'badge--error' : 
+                                                registro.accion.includes('CREAR') ? 'badge--success' :
+                                                registro.accion.includes('ELIMINAR') ? 'badge--error' :
+                                                'badge--primary' %>">
+                                                    <%= registro.accion %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Entidad">
+                                                <%= registro.entidad %>
+                                            </td>
+                                            <td data-label="Detalles">
+                                                <details class="audit-details">
+                                                    <summary>Ver detalles</summary>
+                                                    <% try { %>
+                                                        <% const detalles=JSON.parse(registro.detalles); %>
+                                                            <pre><%= JSON.stringify(detalles, null, 2) %></pre>
+                                                            <% } catch (e) { %>
+                                                                <%= registro.detalles %>
+                                                                    <% } %>
+                                                </details>
+                                            </td>
+                                        </tr>
+                                        <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>
+            AOS.init({ duration: 800, once: true });
+
+            // Búsqueda
+            const searchAuditoria = document.getElementById('searchAuditoria');
+            const tablaAuditoria = document.getElementById('tablaAuditoria');
+
+            if (searchAuditoria && tablaAuditoria) {
+                searchAuditoria.addEventListener('input', () => {
+                    const searchTerm = searchAuditoria.value.toLowerCase();
+                    const rows = tablaAuditoria.querySelectorAll('tbody tr');
+
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+
+            // Exportar
+            function exportar(formato) {
+                const params = new URLSearchParams(window.location.search);
+                params.append('formato', formato);
+                window.location.href = `/auditoria/exportar?${params.toString()}`;
+            }
+
+            // Filtros
+            document.getElementById('filtrosForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                const params = new URLSearchParams();
+
+                for (let [key, value] of formData.entries()) {
+                    if (value) params.append(key, value);
+                }
+
+                window.location.href = `/auditoria?${params.toString()}`;
+            });
+        </script>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

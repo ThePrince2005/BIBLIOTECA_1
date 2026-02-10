@@ -1,0 +1,414 @@
+/* ========================================================================
+   COMPONENTES MEJORADOS - SISTEMA UNIFICADO
+   ======================================================================== */
+
+/* ========================================================================
+   BOTONES UNIFICADOS MEJORADOS
+   ======================================================================== */
+
+/* Botones base mejorados */
+.btn-primary,
+.btn-action-primary,
+.btn-primary-table {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before,
+.btn-action-primary::before,
+.btn-primary-table::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary:hover::before,
+.btn-action-primary:hover::before,
+.btn-primary-table:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary:hover,
+.btn-action-primary:hover,
+.btn-primary-table:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:active,
+.btn-action-primary:active,
+.btn-primary-table:active {
+    transform: translateY(0);
+}
+
+.btn-secondary,
+.btn-secondary-table {
+    background: white;
+    color: var(--accent-blue-dark);
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid var(--accent-blue);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.btn-secondary:hover,
+.btn-secondary-table:hover {
+    background: var(--accent-blue);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 180, 216, 0.3);
+}
+
+/* Botones pequeños para tablas */
+.btn-primary-table,
+.btn-secondary-table {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* ========================================================================
+   CARDS MEJORADOS
+   ======================================================================== */
+
+.libros-card,
+.card {
+    background: var(--dash-card);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--dash-card-border);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.libros-card::before,
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.libros-card:hover,
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.libros-card:hover::before,
+.card:hover::before {
+    transform: scaleX(1);
+}
+
+.libros-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--dash-card-border);
+}
+
+.libros-card__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.libros-card__title i {
+    color: var(--accent-blue);
+}
+
+/* ========================================================================
+   INPUTS MEJORADOS
+   ======================================================================== */
+
+.input-control,
+.form-control {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--dash-card-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: var(--bg-white);
+    color: var(--dash-text);
+    transition: all 0.3s ease;
+    font-family: var(--font-family);
+}
+
+.input-control:focus,
+.form-control:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.1);
+    background: white;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 1rem;
+    color: var(--accent-blue);
+    font-size: 1.1rem;
+    z-index: 1;
+}
+
+.input-wrapper .input-control {
+    padding-left: 3rem;
+}
+
+/* ========================================================================
+   BADGES Y STATUS MEJORADOS
+   ======================================================================== */
+
+.status-pill,
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.status-pill[data-state="disponible"] {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.status-pill[data-state="no_disponible"] {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge--success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge--error,
+.badge--danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge--warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge--muted {
+    background: rgba(148, 163, 184, 0.1);
+    color: #64748b;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* ========================================================================
+   TABLAS MEJORADAS
+   ======================================================================== */
+
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--dash-card);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.data-table thead th {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.data-table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--dash-card-border);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.05);
+    transform: scale(1.01);
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.data-table tbody td {
+    padding: 1.25rem 1.5rem;
+    color: var(--dash-text);
+}
+
+/* ========================================================================
+   HERO SECTIONS MEJORADOS
+   ======================================================================== */
+
+.libros-hero {
+    position: relative;
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 32px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.libros-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.libros-hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.libros-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.libros-hero__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.libros-hero__subtitle {
+    font-size: 1.25rem;
+    opacity: 0.95;
+    line-height: 1.6;
+}
+
+/* ========================================================================
+   RESPONSIVE
+   ======================================================================== */
+
+@media (max-width: 768px) {
+    .libros-hero {
+        padding: 2.5rem 1.5rem;
+        border-radius: 24px;
+    }
+    
+    .libros-card,
+    .card {
+        padding: 1.5rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary,
+    .btn-action-primary {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================================================
+   DARK MODE
+   ======================================================================== */
+
+.dashboard-body.theme-dark .libros-card,
+.dashboard-body.theme-dark .card,
+:root[data-theme="dark"] .libros-card,
+:root[data-theme="dark"] .card {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 224, 239, 0.25);
+}
+
+.dashboard-body.theme-dark .input-control,
+:root[data-theme="dark"] .input-control {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 224, 239, 0.25);
+    color: #f8fafc;
+}
+
+.dashboard-body.theme-dark .data-table tbody tr:hover,
+:root[data-theme="dark"] .data-table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.15);
+}

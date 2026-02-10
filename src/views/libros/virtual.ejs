@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <%- include('../partials/head', { title: tituloPagina || 'Libros virtuales' }) %>
+    <title>
+      <%= tituloPagina %> | Biblioteca
+    </title>
+    <!-- Use standard systems too -->
+    <link rel="stylesheet" href="/css/sistema-moderno.css">
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/libros-virtuales.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+      /* Unified Header Style */
+      .dashboard-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+      }
+
+      .header-modern {
+        margin-bottom: 2rem;
+        animation: fadeInDown 0.8s ease-out;
+      }
+
+      .header-modern h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.05rem;
+      }
+
+      .header-modern p {
+        color: #64748b;
+        font-size: 1.1rem;
+      }
+
+      [data-theme='dark'] .header-modern h1 {
+        color: #f1f5f9;
+      }
+
+      [data-theme='dark'] .header-modern p {
+        color: #94a3b8;
+      }
+
+      /* Search Bar Unified */
+      .virtual-search__container {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 2rem;
+      }
+
+      [data-theme='dark'] .virtual-search__container {
+        background: #1e293b;
+        border-color: #334155;
+      }
+
+      .virtual-search__input {
+        width: 100%;
+        background: #f8fafc;
+        border: 2px solid #e2e8f0;
+        color: #1e293b;
+        padding: 1rem 1rem 1rem 3rem;
+        border-radius: 12px;
+        transition: all 0.3s;
+      }
+
+      .virtual-search__input:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        background: white;
+        outline: none;
+      }
+
+      [data-theme='dark'] .virtual-search__input {
+        background: #0f172a;
+        border-color: #334155;
+        color: white;
+      }
+
+      [data-theme='dark'] .virtual-search__input:focus {
+        background: #0f172a;
+        border-color: #6366f1;
+      }
+
+      /* Results Grid */
+      .virtual-results__title span {
+        color: #334155;
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      [data-theme='dark'] .virtual-results__title span {
+        color: #f1f5f9;
+      }
+
+      /* Empty State */
+      .virtual-empty {
+        text-align: center;
+        padding: 4rem;
+        background: white;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        margin-top: 2rem;
+      }
+
+      [data-theme='dark'] .virtual-empty {
+        background: #1e293b;
+        border-color: #334155;
+      }
+
+      .virtual-empty__title {
+        color: #1e293b;
+      }
+
+      .virtual-empty__text {
+        color: #64748b;
+      }
+
+      [data-theme='dark'] .virtual-empty__title {
+        color: #f1f5f9;
+      }
+
+      [data-theme='dark'] .virtual-empty__text {
+        color: #94a3b8;
+      }
+
+      .virtual-empty__icon i {
+        font-size: 3rem;
+        background: -webkit-linear-gradient(45deg, #6366f1, #8b5cf6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+      }
+    </style>
+</head>
+
+<body class="perfil-body">
+  <%- include('../partials/navbar') %>
+
+    <div class="perfil-wrapper">
+      <!-- Header Unificado -->
+      <header class="perfil-hero" data-aos="fade-down">
+        <div class="perfil-hero__left">
+          <div class="perfil-hero__badge">
+            <i class="fas fa-cloud"></i>
+            <span>Biblioteca Digital</span>
+          </div>
+          <div class="perfil-hero__title">
+            <h1>Libros Virtuales</h1>
+            <p>Explora, busca y lee miles de libros digitales desde cualquier dispositivo.</p>
+          </div>
+        </div>
+      </header>
+
+      <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+        <article class="card card--elevated" style="grid-column: 1 / -1;">
+          <div class="card__body" style="padding: 1.5rem;">
+
+            <!-- Buscador -->
+            <div class="virtual-search__container" style="margin-bottom: 2rem;">
+              <form id="form-busqueda-virtual" class="virtual-search__form" style="position: relative;">
+                <i class="fa-solid fa-search virtual-search__icon"
+                  style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                <input type="text" id="busqueda-virtual" class="virtual-search__input"
+                  placeholder="Buscar por título, autor, tema o ISBN..." autocomplete="off">
+                <button type="submit" class="virtual-search__button btn-modern"
+                  style="position: absolute; right: 0.5rem; top: 0.5rem; bottom: 0.5rem; padding: 0 1.5rem; background: #6366f1; color: white; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">
+                  <span>Buscar</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Resultados -->
+            <div class="virtual-results">
+              <div class="virtual-results__header" style="margin-bottom: 1.5rem;">
+                <h2 class="virtual-results__title" style="display: flex; align-items: center; gap: 0.5rem;">
+                  <i class="fa-solid fa-list" style="color: #6366f1;"></i>
+                  <span>Resultados</span>
+                  <span id="resultados-count" class="virtual-results__count badge-modern badge-modern--info"
+                    style="display: none; font-size: 0.8rem; vertical-align: middle;"></span>
+                </h2>
+              </div>
+
+              <div id="resultados-virtuales" class="virtual-results__grid"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.5rem;">
+                <!-- Tarjetas generadas por JS -->
+                <div class="virtual-empty" style="grid-column: 1 / -1;">
+                  <div class="virtual-empty__icon">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                  </div>
+                  <h3 class="virtual-empty__title">Comienza tu búsqueda</h3>
+                  <p class="virtual-empty__text">
+                    Utiliza el buscador superior para encontrar libros virtuales.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </article>
+      </section>
+    </div>
+
+    <%- include('../partials/footer') %>
+      <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+      <script>
+        AOS.init({ duration: 800, once: true });
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="/js/libros_virtual.js"></script>
+
+      <!-- Fix for Card Styles in JS (Adding styles dynamically) -->
+      <style>
+        /* Card Styles for JS injected content */
+        .v-book-card {
+          background: white;
+          border-radius: 12px;
+          overflow: hidden;
+          border: 1px solid #e2e8f0;
+          transition: all 0.3s;
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+        }
+
+        [data-theme='dark'] .v-book-card {
+          background: #1e293b;
+          border-color: #334155;
+        }
+
+        .v-book-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .v-book-cover {
+          width: 100%;
+          height: 280px;
+          object-fit: cover;
+          background: #f1f5f9;
+        }
+
+        .v-book-info {
+          padding: 1rem;
+          flex-grow: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .v-book-title {
+          font-weight: 700;
+          color: #1e293b;
+          margin-bottom: 0.25rem;
+          line-height: 1.2;
+          font-size: 1rem;
+        }
+
+        [data-theme='dark'] .v-book-title {
+          color: #f1f5f9;
+        }
+
+        .v-book-author {
+          font-size: 0.85rem;
+          color: #64748b;
+          margin-bottom: 1rem;
+        }
+
+        [data-theme='dark'] .v-book-author {
+          color: #94a3b8;
+        }
+
+        .v-btn-read {
+          margin-top: auto;
+          width: 100%;
+          padding: 0.75rem;
+          background: #6366f1;
+          color: white;
+          text-align: center;
+          border-radius: 8px;
+          text-decoration: none;
+          font-weight: 600;
+          border: none;
+          cursor: pointer;
+        }
+
+        .v-btn-read:hover {
+          background: #4f46e5;
+        }
+      </style>
+</body>
+
+</html>

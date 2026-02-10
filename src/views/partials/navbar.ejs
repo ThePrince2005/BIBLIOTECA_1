@@ -1,0 +1,352 @@
+<% const uiNav={ ...(typeof navActive !=='undefined' ? navActive : {}), ...((typeof nav !=='undefined' ) ? nav : {}) };
+  %>
+  <link rel="stylesheet" href="/css/partials.css?v=4">
+  <link rel="stylesheet" href="/css/custom-dropdown.css">
+
+  <nav class="global-nav shadow-lg">
+    <div class="nav-container">
+      <div class="nav-inner">
+        <div class="nav-brand">
+          <a href="/" class="brand-link">
+            <img src="/img/logo.png" alt="Logo" class="brand-logo">
+            BIBLIOTECA
+          </a>
+        </div>
+
+        <div class="nav-links nav-desktop">
+          <a href="/dashboard" class="nav-link <%= uiNav.dashboard ? 'nav-link--active' : '' %>">
+            Dashboard
+          </a>
+
+
+          <!-- Menú Desplegable Libros (Custom Implementation) - SOLO PARA NO ADMINS -->
+          <% if (!user || user.rol !=='admin' ) { %>
+            <div class="nav-item-dropdown group">
+              <button class="nav-link <%= uiNav.librosGroup ? 'nav-link--active' : '' %> nav-dropdown-trigger">
+                Libros
+                <i
+                  class="fas fa-chevron-down text-[10px] transition-transform duration-200 group-hover:rotate-180 opacity-70"></i>
+              </button>
+
+              <!-- Dropdown content -->
+              <div class="nav-dropdown-menu">
+                <div class="nav-dropdown-header">
+                  Biblioteca
+                </div>
+
+                <div class="nav-dropdown-content">
+                  <a href="/libros" class="nav-dropdown-link hover-blue <%= uiNav.libros ? 'bg-blue-50' : '' %>">
+                    <div class="nav-dropdown-icon blue">
+                      <i class="fas fa-book"></i>
+                    </div>
+                    <div class="nav-dropdown-text">
+                      <span class="nav-dropdown-title">Libros Físicos</span>
+                      <span class="nav-dropdown-subtitle">Catálogo de biblioteca</span>
+                    </div>
+                  </a>
+
+                  <% if (user && (user.rol==='estudiante' || user.rol==='docente' )) { %>
+                    <a href="/libros-virtuales"
+                      class="nav-dropdown-link hover-purple <%= uiNav.librosVirtuales ? 'bg-purple-50' : '' %>">
+                      <div class="nav-dropdown-icon purple">
+                        <i class="fas fa-tablet-alt"></i>
+                      </div>
+                      <div class="nav-dropdown-text">
+                        <span class="nav-dropdown-title">Libros Virtuales</span>
+                        <span class="nav-dropdown-subtitle">Biblioteca digital</span>
+                      </div>
+                    </a>
+                    <% } %>
+
+                      <% if (user && user.rol !=='admin' ) { %>
+                        <a href="/libros-leidos"
+                          class="nav-dropdown-link hover-green <%= uiNav.librosLeidos ? 'bg-green-100' : '' %>">
+                          <div class="nav-dropdown-icon green">
+                            <i class="fas fa-check-circle"></i>
+                          </div>
+                          <div class="nav-dropdown-text">
+                            <span class="nav-dropdown-title">Libros Leídos</span>
+                            <span class="nav-dropdown-subtitle">Historial de lectura</span>
+                          </div>
+                        </a>
+                        <% } %>
+                </div>
+              </div>
+            </div>
+            <% } else { %>
+              <!-- Opción directa para ADMIN -->
+              <a href="/libros" class="nav-link <%= uiNav.libros ? 'nav-link--active' : '' %>">
+                Gestionar Libros
+              </a>
+              <% } %>
+
+                <!-- Material de Estudio para estudiantes y docentes -->
+                <% if (user && (user.rol==='estudiante' || user.rol==='docente' )) { %>
+                  <a href="/admin/material" class="nav-link <%= uiNav.material ? 'nav-link--active' : '' %>">
+                    Recursos
+                  </a>
+                  <% } %>
+
+                    <% if (user && user.rol==='docente' ) { %>
+                      <a href="/usuario/docente/alumnos"
+                        class="nav-link <%= uiNav.alumnos ? 'nav-link--active' : '' %>">
+                        Alumnos
+                      </a>
+                      <% } %>
+
+                        <% if (!user || user.rol==='estudiante' || user.rol==='docente' ) { %>
+                          <a href="/prestamos" class="nav-link <%= uiNav.prestamos ? 'nav-link--active' : '' %>">
+                            Préstamos
+                          </a>
+                          <% } %>
+
+                            <% if (!user || user.rol==='estudiante' || user.rol==='docente' ) { %>
+                              <a href="/favoritos" class="nav-link <%= uiNav.favoritos ? 'nav-link--active' : '' %>">
+                                Favoritos
+                              </a>
+                              <% } %>
+
+                                <% /* Enlace a reseñas removido según requerimiento */ %>
+
+                                  <!-- Opciones SOLO para admin -->
+                                  <% if (user && user.rol==='admin' ) { %>
+                                    <a href="/prestamos/admin"
+                                      class="nav-link <%= uiNav.gestionPrestamos ? 'nav-link--active' : '' %>">
+                                      Gestionar Préstamos
+                                    </a>
+                                    <a href="/usuario/admin/alumnos"
+                                      class="nav-link <%= uiNav.gestionUsuarios ? 'nav-link--active' : '' %>">
+                                      Gestionar Usuarios
+                                    </a>
+                                    <a href="/admin/documentos"
+                                      class="nav-link <%= uiNav.gestionDocumentos ? 'nav-link--active' : '' %>">
+                                      Gestionar Documentos
+                                    </a>
+                                    <a href="/admin/resenas"
+                                      class="nav-link <%= uiNav.gestionResenas ? 'nav-link--active' : '' %>">
+                                      Gestionar Reseñas
+                                    </a>
+                                    <% } %>
+
+                                      <a href="/configuracion"
+                                        class="nav-link px-3 <%= uiNav.configuracion ? 'nav-link--active' : '' %>"
+                                        title="Configuración">
+                                        <i class="fa-solid fa-gear fa-lg"></i>
+                                      </a>
+        </div>
+
+        <div class="nav-user nav-desktop">
+          <% if (user) { %>
+            <!-- Botón de cambio de tema -->
+            <div data-theme-toggle-container style="margin-right: 1rem;"></div>
+
+            <a href="/perfil" class="flex items-center space-x-3 hover:opacity-90">
+              <% if (user.foto_url) { %>
+                <img src="<%= user.foto_url %>" alt="avatar" class="w-8 h-8 rounded-full object-cover">
+                <% } else { %>
+                  <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                    <i class="fas text-sm <%= 
+                  user.rol === 'docente' ? 'fa-chalkboard-teacher text-blue-600' : 
+                  user.rol === 'admin' ? 'fa-user-shield text-blue-600' : 
+                  'fa-user-graduate text-blue-600' 
+                %>"></i>
+                  </div>
+                  <% } %>
+                    <span class="text-gray-700">
+                      <%= user.nombre %>
+                    </span>
+            </a>
+
+            <form action="/auth/logout" method="POST">
+              <button type="submit" class="logout-btn">
+                Cerrar Sesión
+              </button>
+            </form>
+            <% } else { %>
+              <!-- Botón de cambio de tema para no autenticados -->
+              <div data-theme-toggle-container style="margin-right: 1rem;"></div>
+
+              <a href="/auth/login" class="text-sm font-medium text-gray-500 hover:text-gray-900">
+                Iniciar Sesión
+              </a>
+              <% } %>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <button class="nav-fab nav-mobile" type="button" aria-label="Abrir menú" aria-expanded="false"
+    aria-controls="mobileNav">
+    <span class="nav-fab__label">Menú</span>
+  </button>
+
+  <a href="/configuracion" class="nav-config-quick nav-mobile" aria-label="Ir a configuración">
+    <i class="fa-solid fa-sliders"></i>
+  </a>
+
+  <div id="mobileNavOverlay" class="mobile-nav-overlay" hidden></div>
+
+  <aside id="mobileNav" class="mobile-nav-panel" hidden aria-hidden="true">
+    <div class="mobile-nav-panel__header">
+      <h3>Menú</h3>
+      <div data-theme-toggle-container></div>
+      <button class="mobile-nav-panel__close" type="button" data-nav-close aria-label="Cerrar menú">×</button>
+    </div>
+
+    <div class="mobile-nav-section">
+      <a href="/dashboard" class="nav-link <%= uiNav.dashboard ? 'nav-link--active' : '' %>">
+        Dashboard
+      </a>
+
+      <!-- Sección Libros Mobile -->
+      <!-- Sección Libros Mobile Mejorada -->
+      <!-- Sección Libros Mobile Unified -->
+      <!-- Sección Libros Mobile -->
+      <% if (!user || user.rol !=='admin' ) { %>
+        <div class="mobile-books-container">
+          <div class="mobile-books-header">
+            <i class="fas fa-book-open text-xs"></i>
+            <span>Biblioteca</span>
+          </div>
+
+          <div>
+            <a href="/libros" class="nav-link-mobile-sub <%= uiNav.libros ? 'active-blue' : '' %>">
+              <i class="fas fa-book <%= uiNav.libros ? '' : 'text-blue-flashy' %>"></i>
+              <span>Libros Físicos</span>
+            </a>
+
+            <% if (user && (user.rol==='estudiante' || user.rol==='docente' )) { %>
+              <a href="/libros-virtuales"
+                class="nav-link-mobile-sub <%= uiNav.librosVirtuales ? 'active-purple' : '' %>">
+                <i class="fas fa-tablet-alt <%= uiNav.librosVirtuales ? '' : 'text-purple-flashy' %>"></i>
+                <span>Libros Virtuales</span>
+              </a>
+              <% } %>
+
+                <% if (user && user.rol !=='admin' ) { %>
+                  <a href="/libros-leidos" class="nav-link-mobile-sub <%= uiNav.librosLeidos ? 'active-green' : '' %>">
+                    <i class="fas fa-check-circle <%= uiNav.librosLeidos ? '' : 'text-green-flashy' %>"></i>
+                    <span>Libros Leídos</span>
+                  </a>
+                  <% } %>
+          </div>
+        </div>
+        <% } else { %>
+          <a href="/libros" class="nav-link <%= uiNav.libros ? 'nav-link--active' : '' %>">
+            Gestionar Libros
+          </a>
+          <% } %>
+
+
+            <% if (!user || user.rol==='estudiante' || user.rol==='docente' ) { %>
+              <a href="/prestamos" class="nav-link <%= uiNav.prestamos ? 'nav-link--active' : '' %>">
+                Préstamos
+              </a>
+              <% } %>
+
+                <% if (!user || user.rol==='estudiante' || user.rol==='docente' ) { %>
+                  <a href="/favoritos" class="nav-link <%= uiNav.favoritos ? 'nav-link--active' : '' %>">
+                    Favoritos
+                  </a>
+                  <% } %>
+
+                    <% /* Enlace a reseñas removido según requerimiento */ %>
+
+                      <!-- Alumnos SOLO admin (móvil) -->
+                      <% if (user && user.rol==='admin' ) { %>
+                        <a href="/prestamos/admin" class="nav-link">
+                          Gestión de Préstamos
+                        </a>
+                        <a href="/usuario/admin/alumnos" class="nav-link">
+                          Gestión de Usuarios
+                        </a>
+                        <a href="/admin/resenas" class="nav-link">
+                          Gestión de Reseñas
+                        </a>
+                        <% } %>
+
+                          <a href="/configuracion"
+                            class="nav-link <%= uiNav.configuracion ? 'nav-link--active' : '' %>">
+                            <i class="fa-solid fa-sliders"></i>
+                            Configuración
+                          </a>
+    </div>
+
+    <div class="mobile-nav-section">
+      <% if (user) { %>
+        <a href="/perfil" class="nav-link flex items-center gap-3">
+          <% if (user.foto_url) { %>
+            <img src="<%= user.foto_url %>" alt="avatar" class="w-8 h-8 rounded-full object-cover">
+            <% } else { %>
+              <img src="/img/default-profile.svg" alt="avatar" class="w-8 h-8 rounded-full object-cover">
+              <% } %>
+                <span class="text-gray-700">
+                  <%= user.nombre %>
+                </span>
+        </a>
+        <form action="/auth/logout" method="POST">
+          <button type="submit" class="mobile-logout-btn" data-nav-close>
+            Cerrar Sesión
+          </button>
+        </form>
+        <% } else { %>
+          <a href="/auth/login" class="text-sm font-medium text-gray-500 hover:text-gray-900" data-nav-close>
+            Iniciar Sesión
+          </a>
+          <% } %>
+    </div>
+  </aside>
+
+  <script>
+    (function () {
+      const fab = document.querySelector('.nav-fab');
+      const panel = document.getElementById('mobileNav');
+      const overlay = document.getElementById('mobileNavOverlay');
+      if (!fab || !panel || !overlay) return;
+
+      const openPanel = () => {
+        fab.setAttribute('aria-expanded', 'true');
+        panel.hidden = false;
+        overlay.hidden = false;
+        panel.classList.add('is-open');
+        overlay.classList.add('is-active');
+        panel.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('nav-open');
+      };
+
+      const closePanel = () => {
+        fab.setAttribute('aria-expanded', 'false');
+        panel.classList.remove('is-open');
+        overlay.classList.remove('is-active');
+        panel.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('nav-open');
+        window.setTimeout(() => {
+          if (panel.getAttribute('aria-hidden') === 'true') {
+            panel.hidden = true;
+            overlay.hidden = true;
+            panel.classList.remove('open'); // Ensure removal of any other state classes
+          }
+        }, 250);
+      };
+
+      fab.addEventListener('click', () => {
+        const expanded = fab.getAttribute('aria-expanded') === 'true';
+        expanded ? closePanel() : openPanel();
+      });
+
+      overlay.addEventListener('click', closePanel);
+
+      panel.addEventListener('click', (event) => {
+        const shouldClose = event.target.closest('[data-nav-close]') || event.target.closest('a');
+        if (shouldClose) {
+          closePanel();
+        }
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && fab.getAttribute('aria-expanded') === 'true') {
+          closePanel();
+        }
+      });
+    })();
+  </script>

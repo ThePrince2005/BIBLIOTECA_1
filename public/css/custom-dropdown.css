@@ -1,0 +1,363 @@
+/* ==========================================================================
+   DROPDOWN MENU (Custom Implementation)
+   ========================================================================== */
+
+/* Variables locales si no están disponibles globalmente */
+:root {
+    --dropdown-bg: rgba(255, 255, 255, 0.95);
+    --dropdown-border: rgba(148, 224, 239, 0.5);
+    --dropdown-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
+    --dropdown-blur: 20px;
+}
+
+.nav-item-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.nav-dropdown-trigger {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 260px;
+    background: #ffffff;
+    /* Fallback */
+    background: var(--dropdown-bg);
+    border: 1px solid var(--dropdown-border);
+    border-radius: 16px;
+    box-shadow: var(--dropdown-shadow);
+    backdrop-filter: blur(var(--dropdown-blur));
+    -webkit-backdrop-filter: blur(var(--dropdown-blur));
+
+    /* Estado inicial: oculto */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    z-index: 9999;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+/* Mostrar al hacer hover en el contenedor padre */
+.nav-item-dropdown:hover .nav-dropdown-menu,
+.nav-dropdown-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Puente invisible para mejorar UX */
+.nav-item-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 1rem;
+    background: transparent;
+}
+
+.nav-dropdown-header {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    background: rgba(241, 245, 249, 0.5);
+    border-bottom: 1px solid var(--dropdown-border);
+}
+
+.nav-dropdown-content {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.nav-dropdown-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: #1e293b;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+}
+
+.nav-dropdown-link:hover {
+    background: rgba(0, 180, 216, 0.08);
+    transform: translateX(4px);
+}
+
+/* Variantes de color para hover */
+.nav-dropdown-link.hover-blue:hover {
+    background: rgba(0, 180, 216, 0.08);
+    /* light blue */
+}
+
+.nav-dropdown-link.hover-blue:hover .nav-dropdown-title {
+    color: #0077b6;
+}
+
+.nav-dropdown-link.hover-purple:hover {
+    background: rgba(124, 58, 237, 0.08);
+    /* purple */
+}
+
+.nav-dropdown-link.hover-purple:hover .nav-dropdown-title {
+    color: #7c3aed;
+}
+
+.nav-dropdown-link.hover-green:hover {
+    background: rgba(16, 185, 129, 0.08);
+    /* green */
+}
+
+.nav-dropdown-link.hover-green:hover .nav-dropdown-title {
+    color: #059669;
+}
+
+.nav-dropdown-icon {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: #f8fafc;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.nav-dropdown-link:hover .nav-dropdown-icon {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.nav-dropdown-icon.blue {
+    color: #0077b6;
+    background: rgba(0, 119, 182, 0.1);
+}
+
+.nav-dropdown-icon.purple {
+    color: #7c3aed;
+    background: rgba(124, 58, 237, 0.1);
+}
+
+.nav-dropdown-icon.green {
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+}
+
+/* Textos */
+.nav-dropdown-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-dropdown-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    transition: color 0.2s;
+}
+
+.nav-dropdown-subtitle {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* ==========================================================================
+   MOBILE STYLES (Unified & Flashy)
+   ========================================================================== */
+
+/* Remove the card background but keep structure */
+.mobile-books-container {
+    margin: 0.5rem 0 1rem 0;
+    padding-left: 0.5rem;
+    border-left: 2px solid rgba(148, 224, 239, 0.4);
+}
+
+.mobile-books-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    color: #64748b;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Sub-links that look like main links but indent/styled */
+.nav-link-mobile-sub {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.95rem;
+    color: #475569;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+}
+
+.nav-link-mobile-sub i {
+    width: 24px;
+    text-align: center;
+    font-size: 1rem;
+    transition: transform 0.2s;
+}
+
+.nav-link-mobile-sub:hover {
+    color: #0f172a;
+    background: rgba(255, 255, 255, 0.8);
+    transform: translateX(4px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.nav-link-mobile-sub:hover i {
+    transform: scale(1.1);
+}
+
+/* Active States for Mobile */
+.nav-link-mobile-sub.active-blue {
+    background: rgba(0, 180, 216, 0.12);
+    color: #0077b6;
+    font-weight: 500;
+}
+
+.nav-link-mobile-sub.active-blue i {
+    color: #0077b6;
+}
+
+.nav-link-mobile-sub.active-purple {
+    background: rgba(124, 58, 237, 0.12);
+    color: #7c3aed;
+    font-weight: 500;
+}
+
+.nav-link-mobile-sub.active-purple i {
+    color: #7c3aed;
+}
+
+.nav-link-mobile-sub.active-green {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+    font-weight: 500;
+}
+
+.nav-link-mobile-sub.active-green i {
+    color: #059669;
+}
+
+/* Icon Colors (always visible) */
+.text-blue-flashy {
+    color: #0096c7;
+}
+
+.text-purple-flashy {
+    color: #8b5cf6;
+}
+
+.text-green-flashy {
+    color: #10b981;
+}
+
+/* ==========================================================================
+   DARK MODE OVERRIDES
+   ========================================================================== */
+
+[data-theme='dark'] {
+    /* Variables Override for Dark Mode */
+    --dropdown-bg: rgba(30, 41, 59, 0.95);
+    /* Slate 800 */
+    --dropdown-border: rgba(51, 65, 85, 0.5);
+    /* Slate 700 */
+}
+
+[data-theme='dark'] .nav-dropdown-menu {
+    background: var(--dropdown-bg) !important;
+    border-color: var(--dropdown-border) !important;
+}
+
+[data-theme='dark'] .nav-dropdown-header {
+    background: rgba(15, 23, 42, 0.5);
+    /* Slate 900, semi-transparent */
+    color: #94a3b8;
+    /* Slate 400 */
+    border-bottom-color: var(--dropdown-border);
+}
+
+[data-theme='dark'] .nav-dropdown-link {
+    color: #e2e8f0;
+    /* Slate 200 */
+}
+
+[data-theme='dark'] .nav-dropdown-link:hover {
+    background: rgba(56, 189, 248, 0.15);
+    /* Sky 500, low opacity */
+}
+
+/* Dark Mode Icon Backgrounds/Colors */
+[data-theme='dark'] .nav-dropdown-icon {
+    background: #0f172a;
+    /* Slate 900 */
+    box-shadow: none;
+}
+
+[data-theme='dark'] .nav-dropdown-link:hover .nav-dropdown-icon {
+    background: #1e293b;
+    /* Slate 800 */
+}
+
+[data-theme='dark'] .nav-dropdown-title {
+    color: #f1f5f9;
+    /* Slate 100 */
+}
+
+[data-theme='dark'] .nav-dropdown-subtitle {
+    color: #94a3b8;
+    /* Slate 400 */
+}
+
+/* Mobile Dark Mode */
+[data-theme='dark'] .mobile-books-container {
+    border-left-color: rgba(51, 65, 85, 0.8);
+}
+
+[data-theme='dark'] .mobile-books-header {
+    color: #94a3b8;
+}
+
+[data-theme='dark'] .nav-link-mobile-sub {
+    color: #cbd5e1;
+    /* Slate 300 */
+}
+
+[data-theme='dark'] .nav-link-mobile-sub:hover {
+    color: #f1f5f9;
+    background: rgba(51, 65, 85, 0.5);
+}

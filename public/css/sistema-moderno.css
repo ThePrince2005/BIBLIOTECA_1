@@ -1,0 +1,664 @@
+/* ========================================================================
+   SISTEMA DE DISEÑO MODERNO - MEJORAS GLOBALES
+   ======================================================================== */
+
+:root {
+    /* Colores del sistema mejorados */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-blue: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --gradient-warning: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+
+    /* Sombras mejoradas */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.16);
+    --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.2);
+    --shadow-hover: 0 12px 40px rgba(99, 102, 241, 0.25);
+
+    /* Transiciones */
+    --transition-fast: 0.2s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+    /* Semantic Backgrounds (Light Default) */
+    --bg-surface: #ffffff;
+    --bg-subtle: #f8fafc;
+    --bg-input: #ffffff;
+    --text-on-surface: #1e293b;
+    --border-surface: #e2e8f0;
+}
+
+/* ========================================================================
+   BOTONES MEJORADOS
+   ======================================================================== */
+
+.btn-modern {
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+}
+
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-modern:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-modern--primary {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn-modern--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.btn-modern--secondary {
+    background: var(--bg-surface);
+    color: var(--accent-blue-dark);
+    border: 2px solid var(--accent-blue);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-modern--secondary:hover {
+    background: var(--accent-blue);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-modern--success {
+    background: var(--gradient-success);
+    color: white;
+    box-shadow: 0 4px 15px rgba(17, 153, 142, 0.3);
+}
+
+.btn-modern--success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(17, 153, 142, 0.4);
+}
+
+.btn-modern--danger {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.btn-modern--danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+
+.btn-modern--neutral {
+    background: var(--bg-surface);
+    color: var(--dash-text);
+    border: 1px solid var(--border-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-modern--neutral:hover {
+    background: var(--bg-subtle);
+    color: var(--dash-text);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme='dark'] .btn-modern--neutral:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* ========================================================================
+   CARDS MEJORADOS
+   ======================================================================== */
+
+.card-modern {
+    background: var(--dash-card);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--dash-card-border);
+    transition: all var(--transition-base);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transition-base);
+}
+
+.card-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-modern:hover::before {
+    transform: scaleX(1);
+}
+
+.card-modern__footer {
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--dash-card-border);
+    border-bottom-left-radius: 24px;
+    border-bottom-right-radius: 24px;
+    margin: 0 -2rem -2rem -2rem;
+    /* Negate padding of card */
+}
+
+.card-modern__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--dash-card-border);
+}
+
+.card-modern__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.card-modern__title i {
+    color: var(--accent-blue);
+}
+
+/* ========================================================================
+   INPUTS MEJORADOS
+   ======================================================================== */
+
+.input-modern {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--dash-card-border);
+    border-radius: 12px;
+    font-size: 1rem;
+    background: var(--bg-input);
+    color: var(--dash-text);
+    transition: all var(--transition-base);
+    font-family: var(--font-family);
+}
+
+.input-modern:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.1);
+    background: white;
+}
+
+.input-modern::placeholder {
+    color: var(--dash-muted);
+}
+
+.input-wrapper-modern {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper-modern i {
+    position: absolute;
+    left: 1rem;
+    color: var(--accent-blue);
+    font-size: 1.1rem;
+    z-index: 1;
+}
+
+.input-wrapper-modern .input-modern {
+    padding-left: 3rem;
+}
+
+/* ========================================================================
+   BADGES Y CHIPS MEJORADOS
+   ======================================================================== */
+
+.badge-modern {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: all var(--transition-fast);
+}
+
+.badge-modern--primary {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--virtual-primary);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.badge-modern--success {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-modern--warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #d97706;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-modern--danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ========================================================================
+   TABLAS MEJORADAS
+   ======================================================================== */
+
+.table-modern-enhanced {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--dash-card);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.table-modern-enhanced thead {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.table-modern-enhanced thead th {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.table-modern-enhanced tbody tr {
+    transition: all var(--transition-fast);
+    border-bottom: 1px solid var(--dash-card-border);
+}
+
+.table-modern-enhanced tbody tr:last-child {
+    border-bottom: none;
+}
+
+.table-modern-enhanced tbody tr:hover {
+    background: rgba(99, 102, 241, 0.05);
+    transform: scale(1.01);
+}
+
+.table-modern-enhanced tbody td {
+    padding: 1.25rem 1.5rem;
+    color: var(--dash-text);
+}
+
+/* ========================================================================
+   HERO SECTIONS MEJORADOS
+   ======================================================================== */
+
+.hero-modern {
+    position: relative;
+    padding: 4rem 0;
+    background: var(--gradient-primary);
+    border-radius: 32px;
+    overflow: hidden;
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow-xl);
+}
+
+.hero-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+    opacity: 0.3;
+}
+
+.hero-modern__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.hero-modern__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hero-modern__title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.hero-modern__subtitle {
+    font-size: 1.25rem;
+    opacity: 0.95;
+    line-height: 1.6;
+}
+
+/* ========================================================================
+   FILTROS MEJORADOS
+   ======================================================================== */
+
+.filters-modern {
+    background: var(--dash-card);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--dash-card-border);
+    margin-bottom: 2rem;
+}
+
+.filters-modern__header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--dash-card-border);
+}
+
+.filters-modern__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filters-modern__title i {
+    color: var(--accent-blue);
+}
+
+.filters-modern__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+/* ========================================================================
+   LOADING STATES
+   ======================================================================== */
+
+.loading-modern {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 1.5rem;
+}
+
+.loading-modern__spinner {
+    width: 60px;
+    height: 60px;
+    border: 4px solid rgba(99, 102, 241, 0.1);
+    border-top-color: var(--virtual-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-modern__text {
+    font-size: 1.1rem;
+    color: var(--dash-subtext);
+    font-weight: 500;
+}
+
+/* ========================================================================
+   EMPTY STATES
+   ======================================================================== */
+
+.empty-modern {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-modern__icon {
+    font-size: 5rem;
+    color: var(--dash-muted);
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-modern__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dash-text);
+    margin-bottom: 0.5rem;
+}
+
+.empty-modern__text {
+    font-size: 1rem;
+    color: var(--dash-subtext);
+    max-width: 500px;
+    margin: 0 auto 2rem;
+}
+
+/* ========================================================================
+   ANIMACIONES
+   ======================================================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out backwards;
+}
+
+/* ========================================================================
+   RESPONSIVE
+   ======================================================================== */
+
+@media (max-width: 768px) {
+    .filters-modern__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .card-modern {
+        padding: 1.5rem;
+    }
+
+    .hero-modern {
+        padding: 2.5rem 1.5rem;
+        border-radius: 24px;
+    }
+}
+
+/* ========================================================================
+   DARK MODE
+   ======================================================================== */
+
+.dashboard-body.theme-dark .card-modern,
+:root[data-theme="dark"] .card-modern {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 224, 239, 0.25);
+}
+
+.dashboard-body.theme-dark .input-modern,
+:root[data-theme="dark"] .input-modern {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 224, 239, 0.25);
+    color: #f8fafc;
+}
+
+.dashboard-body.theme-dark .table-modern-enhanced tbody tr:hover,
+:root[data-theme="dark"] .table-modern-enhanced tbody tr:hover {
+    background: rgba(99, 102, 241, 0.15);
+}
+
+/* ========================================================================
+   DARK MODE VARIABLES & OVERRIDES
+   ======================================================================== */
+
+:root[data-theme="dark"] {
+    --bg-surface: #1e293b;
+    --bg-subtle: #0f172a;
+    --bg-input: rgba(15, 23, 42, 0.6);
+    --text-on-surface: #f8fafc;
+    --border-surface: rgba(148, 224, 239, 0.2);
+
+    /* Update existing vars if needed for compatibility */
+    --dash-card: rgba(30, 41, 59, 0.7);
+    --dash-card-border: rgba(148, 224, 239, 0.2);
+}
+
+[data-theme="dark"] .btn-modern--secondary {
+    background: transparent;
+    color: #94e0ef;
+    border-color: #94e0ef;
+}
+
+[data-theme="dark"] .btn-modern--secondary:hover {
+    background: rgba(148, 224, 239, 0.1);
+    color: #ffffff;
+}
+
+[data-theme="dark"] .card-modern__footer {
+    background: rgba(15, 23, 42, 0.95);
+    border-top-color: var(--dash-card-border);
+}
+
+[data-theme="dark"] .detail-modern-item {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-color: rgba(148, 224, 239, 0.2) !important;
+}
+
+[data-theme="dark"] .detail-modern-item:hover {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border-color: #94e0ef !important;
+}
+
+[data-theme="dark"] .detail-value {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .detail-label {
+    color: #94a3b8 !important;
+}
+
+[data-theme="dark"] .review-summary-grid {
+    background: rgba(15, 23, 42, 0.6) !important;
+}
+
+[data-theme="dark"] .big-rating-num {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .review-row {
+    background: transparent !important;
+    border-bottom-color: rgba(148, 224, 239, 0.1) !important;
+}
+
+[data-theme="dark"] .review-row:hover {
+    background: rgba(30, 41, 59, 0.5) !important;
+}
+
+[data-theme="dark"] .review-author {
+    color: #e2e8f0 !important;
+}
+
+[data-theme="dark"] .review-text {
+    color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] .fav-card {
+    background: rgba(30, 41, 59, 0.8) !important;
+    border-color: rgba(148, 224, 239, 0.2) !important;
+}
+
+[data-theme="dark"] .fav-card__title {
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .fav-card__footer {
+    border-top-color: rgba(148, 224, 239, 0.1) !important;
+}
+
+[data-theme="dark"] .empty-favorites {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border-color: rgba(148, 224, 239, 0.2) !important;
+}
+
+[data-theme="dark"] .empty-favorites h3 {
+    color: #e2e8f0 !important;
+}

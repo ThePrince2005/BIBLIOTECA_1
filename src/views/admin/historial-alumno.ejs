@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <%- include('../partials/head', { title: 'Historial de Usuario | Biblioteca' }) %>
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/sistema-moderno.css">
+    <link rel="stylesheet" href="/css/componentes-mejorados.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+      .user-avatar-hero {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: var(--bg-surface);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--color-primary);
+        border: 2px solid var(--border-surface);
+        box-shadow: var(--shadow-md);
+      }
+
+      .user-info-hero {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .user-badges {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .hero-badge {
+        background: var(--bg-subtle);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: var(--text-main);
+        border: 1px solid var(--border-surface);
+        font-weight: 500;
+      }
+
+      /* Export Dropdown in Filters */
+      .export-wrapper {
+        position: relative;
+      }
+
+      .export-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 0.5rem;
+        background: var(--bg-surface);
+        border: 1px solid var(--border-surface);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        min-width: 180px;
+        z-index: 50;
+        display: none;
+        overflow: hidden;
+      }
+
+      .export-dropdown-menu.show {
+        display: grid;
+      }
+
+      .export-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--text-main);
+        text-decoration: none;
+        transition: background 0.15s ease;
+      }
+
+      .export-item:hover {
+        background: var(--bg-subtle);
+      }
+    </style>
+</head>
+
+<body class="perfil-body">
+  <%- include('../partials/navbar') %>
+
+    <div class="perfil-wrapper">
+      <!-- Modern Hero Section -->
+      <header class="perfil-hero" data-aos="fade-down">
+        <div class="perfil-hero__left"
+          style="grid-column: 1 / -1; justify-content: center; align-items: center; text-align: center;">
+          <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
+            <div class="user-avatar-hero">
+              <% if (usuario.foto_url) { %>
+                <img src="<%= usuario.foto_url %>" alt="<%= usuario.nombre %>"
+                  style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+                <% } else { %>
+                  <span>
+                    <%= usuario.nombre.charAt(0).toUpperCase() %>
+                  </span>
+                  <% } %>
+            </div>
+            <div class="user-info-hero" style="align-items: center;">
+              <div class="perfil-hero__badge mb-2">
+                <i class="fas fa-history"></i>
+                <span>Historial de Lectura</span>
+              </div>
+              <h1 class="mb-1">
+                <%= usuario.nombre %>
+              </h1>
+              <p class="mb-2 opacity-75"><i class="fas fa-envelope me-1"></i>
+                <%= usuario.correo %>
+              </p>
+
+              <div class="user-badges justify-content-center">
+                <span class="hero-badge"><i class="fas fa-user-tag me-1 text-primary"></i>
+                  <%= usuario.rol.charAt(0).toUpperCase() + usuario.rol.slice(1) %>
+                </span>
+                <% if (usuario.rol==='estudiante' ) { %>
+                  <span class="hero-badge"><i class="fas fa-graduation-cap me-1 text-info"></i>
+                    <%= usuario.grado || '-' %>° "<%= usuario.seccion || '-' %>"
+                  </span>
+                  <% } else if (usuario.area_docente) { %>
+                    <span class="hero-badge"><i class="fas fa-chalkboard-teacher me-1 text-info"></i>
+                      <%= usuario.area_docente %>
+                    </span>
+                    <% } %>
+                      <% if (usuario.dni) { %>
+                        <span class="hero-badge"><i class="fas fa-id-card me-1 text-muted"></i>
+                          <%= usuario.dni %>
+                        </span>
+                        <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Stats Section -->
+      <section class="perfil-grid mb-4" data-aos="fade-up" data-aos-delay="100">
+        <article class="stat-card" style="background: var(--bg-surface); color: var(--text-main);">
+          <div class="stat-card__icon"
+            style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: white; font-size: 1.25rem;">
+            <i class="fa-solid fa-book"></i>
+          </div>
+          <div class="stat-card__info">
+            <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.25rem;">Libros Físicos</h3>
+            <div class="stat-card__value" style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">
+              <%= prestamos ? prestamos.length : 0 %>
+            </div>
+          </div>
+        </article>
+
+        <article class="stat-card" style="background: var(--bg-surface); color: var(--text-main);">
+          <div class="stat-card__icon"
+            style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: white; font-size: 1.25rem;">
+            <i class="fa-solid fa-tablet-alt"></i>
+          </div>
+          <div class="stat-card__info">
+            <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.25rem;">Libros Virtuales</h3>
+            <div class="stat-card__value" style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">
+              <%= virtuales ? virtuales.length : 0 %>
+            </div>
+          </div>
+        </article>
+
+        <article class="stat-card" style="background: var(--bg-surface); color: var(--text-main);">
+          <div class="stat-card__icon"
+            style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; color: white; font-size: 1.25rem;">
+            <i class="fa-solid fa-check-circle"></i>
+          </div>
+          <div class="stat-card__info">
+            <h3 style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.25rem;">Total Lecturas</h3>
+            <div class="stat-card__value" style="font-size: 1.5rem; font-weight: 700; color: var(--text-main);">
+              <%= (prestamos ? prestamos.length : 0) + (virtuales ? virtuales.length : 0) %>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Filtros y Contenido -->
+      <section class="perfil-grid" data-aos="fade-up" data-aos-delay="200" style="grid-template-columns: 1fr;">
+        <!-- Filtros -->
+        <div class="filters-modern"
+          style="background: var(--bg-surface); border: 1px solid var(--border-surface); padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem;">
+          <div class="filters-modern__grid" style="display: flex; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+            <div class="form-group mb-0" style="flex: 1; min-width: 200px;">
+              <label class="form-label mb-2" style="font-weight: 600; color: var(--text-main);">Filtrar por
+                período</label>
+              <select class="input-modern" id="filtroPeriodo" onchange="filtrarHistorial()" style="width: 100%;">
+                <option value="historico" <%=periodo==='historico' || !periodo ? 'selected' : '' %>>Todo el tiempo
+                </option>
+                <option value="anio_actual" <%=periodo==='anio_actual' ? 'selected' : '' %>>Este Año</option>
+                <option value="mes_actual" <%=periodo==='mes_actual' ? 'selected' : '' %>>Este Mes</option>
+                <option value="trimestre" <%=periodo==='trimestre' ? 'selected' : '' %>>Último Trimestre</option>
+              </select>
+            </div>
+            <!-- Moved Export Button Here -->
+            <div class="export-wrapper">
+              <button class="btn-modern btn-modern--secondary" type="button" id="exportBtn"
+                style="height: 48px; background: var(--bg-surface);">
+                <i class="fas fa-download me-2"></i> Exportar <i class="fas fa-chevron-down ms-2"></i>
+              </button>
+              <div class="export-dropdown-menu" id="exportDropdown">
+                <a href="#" onclick="exportarHistorial('pdf'); return false;" class="export-item">
+                  <i class="fas fa-file-pdf text-danger"></i> PDF
+                </a>
+                <a href="#" onclick="exportarHistorial('excel'); return false;" class="export-item">
+                  <i class="fas fa-file-excel text-success"></i> Excel
+                </a>
+                <a href="#" onclick="exportarHistorial('word'); return false;" class="export-item">
+                  <i class="fas fa-file-word text-primary"></i> Word
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tablas de Historial -->
+        <article class="card-modern">
+          <div class="card-modern__header">
+            <div class="card-modern__title">
+              <i class="fas fa-book"></i> Préstamos Físicos
+            </div>
+          </div>
+
+          <div class="table-container-modern">
+            <table class="table-modern-enhanced">
+              <thead>
+                <tr>
+                  <th>Libro</th>
+                  <th>Detalles</th>
+                  <th>Fechas</th>
+                  <th>Estado</th>
+                  <th class="text-end">Validación</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!prestamos || !prestamos.length) { %>
+                  <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                      <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <div
+                          style="width: 60px; height: 60px; background: var(--bg-subtle); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--text-muted);">
+                          <i class="fas fa-inbox"></i>
+                        </div>
+                        <p class="mb-0">No hay préstamos físicos registrados en este periodo.</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <% } else { %>
+                    <% prestamos.forEach(p=> { %>
+                      <tr>
+                        <td data-label="Libro">
+                          <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: 600; color: var(--text-main);">
+                              <%= p.titulo %>
+                            </span>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">
+                              <%= p.autor %>
+                            </span>
+                          </div>
+                        </td>
+                        <td data-label="Detalles">
+                          <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                            <span class="badge-modern badge-modern--neutral" style="width: fit-content;">
+                              <%= p.editorial || 'Sin editorial' %>
+                            </span>
+                            <% if (p.isbn) { %><span
+                                style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;">ISBN: <%=
+                                  p.isbn %></span>
+                              <% } %>
+                          </div>
+                        </td>
+                        <td data-label="Fechas">
+                          <div style="display: flex; flex-direction: column; font-size: 0.9rem;">
+                            <span style="color: var(--text-main);"><i class="fas fa-arrow-right text-primary me-2"></i>
+                              <%= new Date(p.fecha_prestamo).toLocaleDateString('es-PE') %>
+                            </span>
+                            <% if (p.fecha_devolucion_real) { %>
+                              <span style="color: var(--success-color);"><i class="fas fa-check me-2"></i>
+                                <%= new Date(p.fecha_devolucion_real).toLocaleDateString('es-PE') %>
+                              </span>
+                              <% } else if (p.fecha_devolucion_esperada) { %>
+                                <span style="color: var(--text-muted);"><i class="fas fa-clock me-2"></i>
+                                  <%= new Date(p.fecha_devolucion_esperada).toLocaleDateString('es-PE') %>
+                                </span>
+                                <% } %>
+                          </div>
+                        </td>
+                        <td data-label="Estado">
+                          <% let badgeClass='badge-modern--neutral' ; let icon='fa-circle' ; if(p.estado==='activo' ) {
+                            badgeClass='badge-modern--primary' ; icon='fa-book-reader' ; } else if(p.estado==='vencido'
+                            ) { badgeClass='badge-modern--danger' ; icon='fa-exclamation-circle' ; } else
+                            if(p.estado==='devuelto' ) { badgeClass='badge-modern--success' ; icon='fa-check' ; } else
+                            if(p.estado==='pendiente' ) { badgeClass='badge-modern--warning' ; icon='fa-clock' ; } %>
+                            <span class="badge-modern <%= badgeClass %>">
+                              <i class="fas <%= icon %> me-1"></i>
+                              <%= p.estado.charAt(0).toUpperCase() + p.estado.slice(1) %>
+                            </span>
+                        </td>
+                        <td data-label="Validación" class="text-end">
+                          <% if (p.validado) { %>
+                            <button type="button" class="btn-modern btn-modern--secondary btn-sm"
+                              onclick="verResultado('fisico', '<%= p.id %>', '<%= p.opinion_libro %>', '<%= p.resumen_libro %>', '<%= p.personajes_principales %>', '<%= p.tema_principal %>', '<%= p.lecciones_aprendidas %>')">
+                              <i class="fas fa-file-alt text-primary"></i> Ver Ficha
+                            </button>
+                            <% } else { %>
+                              <span style="color: var(--text-muted); font-size: 0.9rem;">-</span>
+                              <% } %>
+                        </td>
+                      </tr>
+                      <% }) %>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <!-- Virtuales seccion simplificada -->
+        <article class="card-modern mt-4">
+          <div class="card-modern__header">
+            <div class="card-modern__title">
+              <i class="fas fa-tablet-alt"></i> Libros Virtuales
+            </div>
+          </div>
+          <div class="table-container-modern">
+            <table class="table-modern-enhanced">
+              <thead>
+                <tr>
+                  <th>Libro</th>
+                  <th>Categoría</th>
+                  <th>Fecha Lectura</th>
+                  <th class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (!virtuales || !virtuales.length) { %>
+                  <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">
+                      <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                        <div
+                          style="width: 60px; height: 60px; background: var(--bg-subtle); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--text-muted);">
+                          <i class="fas fa-inbox"></i>
+                        </div>
+                        <p class="mb-0">No hay lecturas virtuales registradas.</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <% } else { %>
+                    <% virtuales.forEach(v=> { %>
+                      <tr>
+                        <td data-label="Libro">
+                          <div style="display: flex; flex-direction: column;">
+                            <span style="font-weight: 600; color: var(--text-main);">
+                              <%= v.titulo %>
+                            </span>
+                            <span style="font-size: 0.85rem; color: var(--text-muted);">
+                              <%= v.autor %>
+                            </span>
+                          </div>
+                        </td>
+                        <td data-label="Categoría">
+                          <span class="badge-modern badge-modern--info">
+                            <%= v.categoria || 'General' %>
+                          </span>
+                        </td>
+                        <td data-label="Fecha">
+                          <span style="color: var(--text-main);"><i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <%= v.fecha_lectura ? new Date(v.fecha_lectura).toLocaleDateString('es-PE') : '-' %>
+                          </span>
+                        </td>
+                        <td data-label="Acciones" class="text-end">
+                          <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
+                            <% if (v.preview_link) { %>
+                              <a href="<%= v.preview_link %>" target="_blank"
+                                class="btn-modern btn-modern--secondary btn-sm" title="Ver Libro">
+                                <i class="fas fa-external-link-alt"></i>
+                              </a>
+                              <% } %>
+                                <% if (v.validado) { %>
+                                  <button type="button" class="btn-modern btn-modern--secondary btn-sm"
+                                    title="Ver Ficha"
+                                    onclick="verResultado('virtual', '<%= v.id %>', '<%= v.opinion_libro %>', '<%= v.resumen_libro %>', '<%= v.personajes_principales %>', '<%= v.tema_principal %>', '<%= v.lecciones_aprendidas %>')">
+                                    <i class="fas fa-file-alt text-success"></i>
+                                  </button>
+                                  <% } %>
+                          </div>
+                        </td>
+                      </tr>
+                      <% }) %>
+                        <% } %>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+      </section>
+    </div>
+
+    <%- include('../partials/footer') %>
+      <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <script>
+        AOS.init({ duration: 800, once: true });
+
+        // Dropdown Logic
+        const dropdownBtn = document.getElementById('exportBtn');
+        const dropdownMenu = document.getElementById('exportDropdown');
+
+        if (dropdownBtn && dropdownMenu) {
+          dropdownBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+          });
+
+          window.addEventListener('click', () => {
+            dropdownMenu.classList.remove('show');
+          });
+        }
+
+        // Filter Logic
+        function filtrarHistorial() {
+          const periodo = document.getElementById('filtroPeriodo').value;
+          const url = new URL(window.location.href);
+          url.searchParams.set('periodo', periodo);
+          window.location.href = url.toString();
+        }
+
+        // Export Logic
+        function exportarHistorial(formato) {
+          const periodo = document.getElementById('filtroPeriodo').value;
+          const url = window.location.pathname.replace('/historial', '/historial/exportar');
+          const params = new URLSearchParams({
+            formato: formato,
+            periodo: periodo
+          });
+          window.location.href = `${url}?${params.toString()}`;
+        }
+
+        // View Details Logic (SweetAlert)
+        function verResultado(tipo, id, opinion, resumen, personajes, tema, lecciones) {
+          Swal.fire({
+            title: 'Ficha de Lectura',
+            html: `
+                    <div style="text-align: left; display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="result-box">
+                            <strong style="display: block; color: var(--primary-color); margin-bottom: 0.25rem;">Opinión</strong>
+                            <p style="margin: 0; font-size: 0.95rem;">${opinion}</p>
+                        </div>
+                        <div class="result-box">
+                            <strong style="display: block; color: var(--primary-color); margin-bottom: 0.25rem;">Resumen</strong>
+                            <p style="margin: 0; font-size: 0.95rem;">${resumen}</p>
+                        </div>
+                         <div class="result-box">
+                            <strong style="display: block; color: var(--primary-color); margin-bottom: 0.25rem;">Personajes Principales</strong>
+                            <p style="margin: 0; font-size: 0.95rem;">${personajes}</p>
+                        </div>
+                         <div class="result-box">
+                            <strong style="display: block; color: var(--primary-color); margin-bottom: 0.25rem;">Tema Principal</strong>
+                            <p style="margin: 0; font-size: 0.95rem;">${tema}</p>
+                        </div>
+                        <div class="result-box">
+                            <strong style="display: block; color: var(--primary-color); margin-bottom: 0.25rem;">Lecciones Aprendidas</strong>
+                            <p style="margin: 0; font-size: 0.95rem;">${lecciones}</p>
+                        </div>
+                    </div>
+                `,
+            width: '600px',
+            confirmButtonColor: '#3b82f6',
+            confirmButtonText: 'Cerrar',
+            customClass: {
+              popup: 'swal-modern-popup'
+            }
+          });
+        }
+      </script>
+</body>
+
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Registro - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/auth-shared.css">
+</head>
+
+<body class="auth-body">
+    <div class="auth-wrapper auth-wrapper--wide">
+        <div class="auth-card">
+            <!-- Header -->
+            <!-- Header -->
+            <div class="auth-header">
+                <img src="/img/logo.png" alt="Logo Colegio Daniel Hernández" class="auth-logo">
+                <h2 class="auth-institution">INSTITUCIÓN EDUCATIVA “DANIEL HERNÁNDEZ”</h2>
+                <h1 class="auth-title">Registro de Usuario</h1>
+                <p class="auth-subtitle">Completa tus datos para crear tu cuenta</p>
+            </div>
+
+            <!-- Formulario -->
+            <form class="auth-form" id="registroForm" method="POST" novalidate>
+                <!-- Información Personal -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre" class="form-label">Nombre completo</label>
+                        <input type="text" id="nombre" name="nombre" class="form-input" placeholder="Juan Pérez García"
+                            required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dni" class="form-label">DNI</label>
+                        <input type="text" id="dni" name="dni" class="form-input" placeholder="12345678" required
+                            maxlength="8" pattern="[0-9]{8}" autocomplete="off">
+                    </div>
+                </div>
+
+                <!-- Credenciales -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="correo" class="form-label">Correo electrónico</label>
+                        <input type="email" id="correo" name="correo" class="form-input"
+                            placeholder="tu.correo@ejemplo.com" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contrasena" class="form-label">Contraseña</label>
+                        <div class="form-input-wrapper">
+                            <input type="password" id="contrasena" name="contrasena" class="form-input"
+                                placeholder="••••••••" required autocomplete="new-password">
+                            <button type="button" id="togglePassword" class="form-input-icon">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                        <div id="password-strength" class="password-hint">
+                            <ul>
+                                <li id="length" class="requirement">Al menos 8 caracteres</li>
+                                <li id="uppercase" class="requirement">Una letra mayúscula</li>
+                                <li id="lowercase" class="requirement">Una letra minúscula</li>
+                                <li id="number" class="requirement">Un número</li>
+                                <li id="special" class="requirement">Un carácter especial (@, $, !, %, *, ?, &)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tipo de Usuario -->
+                <div class="form-group">
+                    <label for="rol" class="form-label">Selecciona</label>
+                    <select id="rol" name="rol" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                        <option value="estudiante" <%=selectedRole==='estudiante' ? 'selected' : '' %>>Estudiante
+                        </option>
+                        <option value="docente" <%=selectedRole==='docente' ? 'selected' : '' %>>Docente</option>
+                        <option value="admin" <%=selectedRole==='admin' ? 'selected' : '' %>>Administrador</option>
+                    </select>
+                </div>
+
+                <!-- Campos específicos para estudiantes -->
+                <div id="camposEstudiante" class="hidden">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="grado" class="form-label">Grado</label>
+                            <select id="grado" name="grado" class="form-select">
+                                <% for(let i=1; i <=5; i++) { %>
+                                    <option value="<%= i %>">
+                                        <%= i %>° grado
+                                    </option>
+                                    <% } %>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="seccion" class="form-label">Sección</label>
+                            <select id="seccion" name="seccion" class="form-select">
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                    </div>
+                    <input type="hidden" id="anio_ingreso" name="anio_ingreso" value="<%= new Date().getFullYear() %>">
+                </div>
+
+                <!-- Campos específicos para docentes -->
+                <div id="camposDocente" class="hidden">
+                    <div class="form-group">
+                        <label for="area_docente" class="form-label">Área/Especialidad</label>
+                        <select id="area_docente" name="area_docente" class="form-select">
+                            <option value="Matemática">Matemática</option>
+                            <option value="Comunicación">Comunicación</option>
+                            <option value="Ciencias">Ciencias</option>
+                            <option value="Historia">Historia</option>
+                            <option value="Inglés">Inglés</option>
+                            <option value="Arte">Arte</option>
+                            <option value="Educación Física">Educación Física</option>
+                            <option value="Biblioteca">Biblioteca</option>
+                            <option value="Administrativo">Administrativo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-unified mt-3">
+                    <span>Registrarse</span>
+                    <i class="fa-solid fa-user-plus"></i>
+                </button>
+            </form>
+
+            <!-- Enlaces -->
+            <div class="auth-footer">
+                <a href="<%= isAdmin ? '/usuario/admin/alumnos' : '/perfil' %>" class="btn"
+                    style="background: #6B7280; color: white; width: 100%; text-decoration: none; justify-content: center;">
+                    Cancelar registro
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/auth-shared.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rolSelect = document.getElementById('rol');
+            const camposEstudiante = document.getElementById('camposEstudiante');
+            const camposDocente = document.getElementById('camposDocente');
+            const gradoSelect = document.getElementById('grado');
+            const seccionSelect = document.getElementById('seccion');
+            const areaDocenteSelect = document.getElementById('area_docente');
+            const registroForm = document.getElementById('registroForm');
+            const contrasenaInput = document.getElementById('contrasena');
+            const passwordStrength = document.getElementById('password-strength');
+
+            // Inicializar toggle de contraseña
+            initPasswordToggle('contrasena', 'togglePassword');
+
+            // Función para alternar campos según rol
+            function toggleFields() {
+                const rol = rolSelect.value;
+
+                camposEstudiante.classList.add('hidden');
+                camposDocente.classList.add('hidden');
+
+                gradoSelect.required = false;
+                seccionSelect.required = false;
+                areaDocenteSelect.required = false;
+
+                if (rol === 'estudiante') {
+                    camposEstudiante.classList.remove('hidden');
+                    gradoSelect.required = true;
+                    seccionSelect.required = true;
+                } else if (rol === 'docente') {
+                    camposDocente.classList.remove('hidden');
+                    areaDocenteSelect.required = true;
+                }
+            }
+
+            rolSelect.addEventListener('change', toggleFields);
+            toggleFields(); // Llamada inicial
+
+            // Validación de contraseña en tiempo real
+            const requirements = {
+                length: document.getElementById('length'),
+                uppercase: document.getElementById('uppercase'),
+                lowercase: document.getElementById('lowercase'),
+                number: document.getElementById('number'),
+                special: document.getElementById('special')
+            };
+
+            function updateRequirement(element, met) {
+                if (met) {
+                    element.classList.add('met');
+                    element.classList.remove('unmet');
+                } else {
+                    element.classList.add('unmet');
+                    element.classList.remove('met');
+                }
+            }
+
+            contrasenaInput.addEventListener('input', () => {
+                const value = contrasenaInput.value;
+
+                if (value) {
+                    passwordStrength.classList.add('show');
+                } else {
+                    passwordStrength.classList.remove('show');
+                }
+
+                const hasLength = value.length >= 8;
+                const hasUppercase = /[A-Z]/.test(value);
+                const hasLowercase = /[a-z]/.test(value);
+                const hasNumber = /[0-9]/.test(value);
+                const hasSpecial = /[@$!%*?&]/.test(value);
+
+                updateRequirement(requirements.length, hasLength);
+                updateRequirement(requirements.uppercase, hasUppercase);
+                updateRequirement(requirements.lowercase, hasLowercase);
+                updateRequirement(requirements.number, hasNumber);
+                updateRequirement(requirements.special, hasSpecial);
+            });
+
+            // Envío del formulario
+            registroForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+
+                // Validar contraseña
+                const pwdValidation = validatePassword(contrasenaInput.value);
+                if (!pwdValidation.valid) {
+                    showToast(pwdValidation.errors[0], 'error');
+                    return;
+                }
+
+                const formData = new FormData(this);
+                const data = Object.fromEntries(formData.entries());
+
+                try {
+                    const response = await fetch('/auth/registro', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const result = await handleFetchError(response);
+
+                    showToast('Registro exitoso. Redirigiendo...', 'success');
+                    setTimeout(() => {
+                        window.location.href = result.redirect;
+                    }, 1500);
+                } catch (error) {
+                    showToast(error.message || 'Error en el registro', 'error');
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .password-hint {
+            margin-top: 0.75rem;
+            padding: 0.875rem 1rem;
+            background: rgba(0, 180, 216, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 216, 0.15);
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .password-hint.show {
+            opacity: 1;
+            max-height: 300px;
+        }
+
+        .password-hint ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .password-hint li {
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding-left: 1.5rem;
+            position: relative;
+            transition: all 0.3s ease;
+            color: var(--subtitle-gray);
+        }
+
+        .password-hint li::before {
+            content: '✕';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: var(--error-red);
+            transition: all 0.3s ease;
+        }
+
+        .password-hint li.met {
+            color: var(--success-green-dark);
+        }
+
+        .password-hint li.met::before {
+            content: '✓';
+            color: var(--success-green);
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+
+</html>

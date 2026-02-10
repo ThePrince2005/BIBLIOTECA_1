@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Reporte de Estudiantes - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/components/export-dropdown.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reportes</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Actividad de Estudiantes</h1>
+                        <p>Visualiza el ranking de lectores y estadísticas de lectura por grado.</p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right">
+                    <div class="export-dropdown">
+                        <button class="btn btn--secondary btn--sm export-dropdown__trigger">
+                            <i class="fas fa-download"></i>
+                            Exportar Listado
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="export-dropdown__menu">
+                            <a href="/reportes/estudiantes?format=pdf" class="export-dropdown__item">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                            <a href="/reportes/estudiantes?format=word" class="export-dropdown__item">
+                                <i class="fas fa-file-word"></i> Word
+                            </a>
+                            <a href="/reportes/estudiantes?format=excel" class="export-dropdown__item">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="perfil-grid perfil-grid--two" data-aos="fade-up" data-aos-delay="100">
+                <!-- Ranking de Lectores -->
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-trophy"></i>
+                                <span>Top <%= rankingLectores.length %></span>
+                            </p>
+                            <h2 class="card__title">Ranking de Lectores</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="table-container-modern">
+                            <table class="table-modern">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Estudiante</th>
+                                        <th>Grado</th>
+                                        <th>Libros Leídos</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% rankingLectores.forEach((lector, index)=> { %>
+                                        <tr>
+                                            <td data-label="#">
+                                                <span
+                                                    class="ranking-position <%= index < 3 ? 'ranking-position--top' : '' %>">
+                                                    <%= index + 1 %>
+                                                </span>
+                                            </td>
+                                            <td data-label="Estudiante">
+                                                <div class="libro-info__title">
+                                                    <%= lector.nombre %>
+                                                </div>
+                                            </td>
+                                            <td data-label="Grado">
+                                                <%= lector.grado %>°
+                                            </td>
+                                            <td data-label="Libros Leídos">
+                                                <span class="badge badge--primary">
+                                                    <%= lector.libros_leidos %> libros
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Lecturas por Grado -->
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-chart-pie"></i>
+                                <span>Estadísticas</span>
+                            </p>
+                            <h2 class="card__title">Lecturas por Grado</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <canvas id="lecturasPorGradoChart"></canvas>
+                    </div>
+                </article>
+            </div>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script src="/js/export-dropdown.js"></script>
+        <script>
+            AOS.init({ duration: 800, once: true });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const ctx = document.getElementById('lecturasPorGradoChart').getContext('2d');
+
+                const labels = <% - JSON.stringify(lecturasPorGrado.map(g => g.grado + '° Grado')) %>;
+                const data = <% - JSON.stringify(lecturasPorGrado.map(g => g.total_libros)) %>;
+
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Libros Leídos',
+                            data: data,
+                            backgroundColor: [
+                                'rgba(0, 180, 216, 0.6)',
+                                'rgba(0, 119, 182, 0.6)',
+                                'rgba(3, 4, 94, 0.6)',
+                                'rgba(2, 62, 138, 0.6)',
+                                'rgba(0, 150, 199, 0.6)',
+                                'rgba(72, 202, 228, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgba(0, 180, 216, 1)',
+                                'rgba(0, 119, 182, 1)',
+                                'rgba(3, 4, 94, 1)',
+                                'rgba(2, 62, 138, 1)',
+                                'rgba(0, 150, 199, 1)',
+                                'rgba(72, 202, 228, 1)'
+                            ],
+                            borderWidth: 2,
+                            borderRadius: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1,
+                                    font: {
+                                        family: "'Inter', sans-serif"
+                                    }
+                                },
+                                grid: {
+                                    color: 'rgba(148, 224, 239, 0.1)'
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        family: "'Inter', sans-serif"
+                                    }
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                padding: 12,
+                                borderRadius: 8,
+                                titleFont: {
+                                    family: "'Inter', sans-serif",
+                                    size: 14
+                                },
+                                bodyFont: {
+                                    family: "'Inter', sans-serif",
+                                    size: 13
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

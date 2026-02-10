@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <%- include('../partials/head', { title: 'Detalles del Préstamo - Biblioteca Escolar' }) %>
+    <link rel="stylesheet" href="/css/perfil.css">
+    <link rel="stylesheet" href="/css/prestamos.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+    <main class="perfil-wrapper">
+        <% if (session && session.flash) { %>
+            <div data-flash-message
+                 data-flash-type="<%= session.flash.tipo %>"
+                 class="d-none">
+                <%= session.flash.mensaje %>
+            </div>
+            <% session.flash = null; %>
+        <% } %>
+
+        <!-- Hero Section -->
+        <header class="perfil-hero" data-aos="fade-down">
+            <div class="perfil-hero__left">
+                <div class="perfil-hero__badge">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Detalles del préstamo</span>
+                </div>
+                <div class="perfil-hero__title">
+                    <h1>Información del Préstamo</h1>
+                    <p>Detalles completos del préstamo y opciones de gestión.</p>
+                </div>
+            </div>
+            <div class="perfil-hero__right">
+                <a href="/dashboard/admin" class="btn btn--ghost">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver al Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Alerta de Préstamo Vencido -->
+        <% if (prestamo.estado === 'vencido' && prestamo.dias_vencido > 0) { %>
+        <section class="perfil-grid" data-aos="fade-up">
+            <article class="card card--elevated" style="border-left: 5px solid #dc2626; background: linear-gradient(135deg, #fef2f2 0%, #ffffff 100%);">
+                <div class="card__body">
+                    <div style="display: flex; align-items: center; gap: 20px; padding: 20px;">
+                        <div style="flex-shrink: 0;">
+                            <div style="width: 60px; height: 60px; border-radius: 50%; background: #dc2626; display: flex; align-items: center; justify-content: center; color: white; font-size: 28px;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                        <div style="flex-grow: 1;">
+                            <h3 style="margin: 0 0 10px 0; color: #dc2626; font-size: 24px; font-weight: 700;">
+                                ⚠️ Préstamo Vencido - Acción Requerida
+                            </h3>
+                            <p style="margin: 0; color: #7f1d1d; font-size: 16px; line-height: 1.6;">
+                                Este préstamo está <strong>vencido desde hace <%= prestamo.dias_vencido %> día<%= prestamo.dias_vencido !== 1 ? 's' : '' %></strong>. 
+                                Se recomienda enviar un recordatorio al usuario para que devuelva el libro lo antes posible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+        <% } %>
+
+        <!-- Información del Usuario -->
+        <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+            <article class="card card--elevated">
+                <div class="card__header">
+                    <div>
+                        <p class="card__eyebrow">
+                            <i class="fas fa-user"></i>
+                            <span>Información del Usuario</span>
+                        </p>
+                        <h2 class="card__title">Datos Completos del Prestatario</h2>
+                    </div>
+                </div>
+                <div class="card__body">
+                    <div class="row">
+                        <!-- Información Básica -->
+                        <div class="col-12 mb-4">
+                            <h5 class="text-muted mb-3" style="border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                <i class="fas fa-id-card"></i> Información Básica
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-user"></i> Nombre Completo
+                            </label>
+                            <p class="form-control-plaintext fw-bold fs-5"><%= prestamo.usuario_nombre %></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-envelope"></i> Correo Electrónico
+                            </label>
+                            <p class="form-control-plaintext">
+                                <a href="mailto:<%= prestamo.usuario_correo %>" class="text-decoration-none">
+                                    <%= prestamo.usuario_correo %>
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-id-card"></i> DNI
+                            </label>
+                            <p class="form-control-plaintext fw-semibold"><%= prestamo.usuario_dni || 'No registrado' %></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-user-tag"></i> Rol
+                            </label>
+                            <p class="form-control-plaintext">
+                                <span class="badge bg-soft-info text-info text-uppercase fs-6 px-3 py-2">
+                                    <i class="fas fa-<%= prestamo.usuario_rol === 'estudiante' ? 'graduation-cap' : prestamo.usuario_rol === 'docente' ? 'chalkboard-teacher' : 'user-shield' %>"></i>
+                                    <%= prestamo.usuario_rol %>
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Información Académica/Profesional -->
+                        <% if (prestamo.usuario_rol === 'estudiante') { %>
+                            <div class="col-12 mb-4 mt-3">
+                                <h5 class="text-muted mb-3" style="border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                    <i class="fas fa-graduation-cap"></i> Información Académica
+                                </h5>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">
+                                    <i class="fas fa-layer-group"></i> Grado
+                                </label>
+                                <p class="form-control-plaintext fw-semibold fs-5">
+                                    <%= prestamo.grado ? prestamo.grado + '° Grado' : 'No especificado' %>
+                                </p>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">
+                                    <i class="fas fa-users"></i> Sección
+                                </label>
+                                <p class="form-control-plaintext fw-semibold fs-5">
+                                    <%= prestamo.seccion || 'No especificada' %>
+                                </p>
+                            </div>
+                            <% if (prestamo.anio_ingreso) { %>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label text-muted">
+                                        <i class="fas fa-calendar-alt"></i> Año de Ingreso
+                                    </label>
+                                    <p class="form-control-plaintext fw-semibold"><%= prestamo.anio_ingreso %></p>
+                                </div>
+                            <% } %>
+                        <% } else if (prestamo.usuario_rol === 'docente') { %>
+                            <div class="col-12 mb-4 mt-3">
+                                <h5 class="text-muted mb-3" style="border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                    <i class="fas fa-chalkboard-teacher"></i> Información Profesional
+                                </h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">
+                                    <i class="fas fa-book-open"></i> Área de Enseñanza
+                                </label>
+                                <p class="form-control-plaintext fw-semibold fs-5">
+                                    <%= prestamo.area_docente || 'No especificada' %>
+                                </p>
+                            </div>
+                            <% if (prestamo.anio_ingreso) { %>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label text-muted">
+                                        <i class="fas fa-calendar-alt"></i> Año de Ingreso
+                                    </label>
+                                    <p class="form-control-plaintext fw-semibold"><%= prestamo.anio_ingreso %></p>
+                                </div>
+                            <% } %>
+                        <% } %>
+
+                        <!-- Información del Sistema -->
+                        <div class="col-12 mb-4 mt-3">
+                            <h5 class="text-muted mb-3" style="border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                <i class="fas fa-info-circle"></i> Información del Sistema
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-calendar-plus"></i> Fecha de Registro
+                            </label>
+                            <p class="form-control-plaintext">
+                                <%= prestamo.usuario_created_at ? new Date(prestamo.usuario_created_at).toLocaleDateString('es-PE', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'No disponible' %>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-calendar-check"></i> Última Actualización
+                            </label>
+                            <p class="form-control-plaintext">
+                                <%= prestamo.usuario_updated_at ? new Date(prestamo.usuario_updated_at).toLocaleDateString('es-PE', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'No disponible' %>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-fingerprint"></i> ID de Usuario
+                            </label>
+                            <p class="form-control-plaintext text-muted font-monospace"><%= prestamo.usuario_id %></p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- Información del Libro -->
+        <section class="perfil-grid" data-aos="fade-up" data-aos-delay="150">
+            <article class="card card--elevated">
+                <div class="card__header">
+                    <div>
+                        <p class="card__eyebrow">
+                            <i class="fas fa-book"></i>
+                            <span>Información del Libro</span>
+                        </p>
+                        <h2 class="card__title">Detalles Completos del Libro Prestado</h2>
+                    </div>
+                </div>
+                <div class="card__body">
+                    <div class="row">
+                        <!-- Información Principal -->
+                        <div class="col-12 mb-4">
+                            <h5 class="text-muted mb-3" style="border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                <i class="fas fa-info-circle"></i> Información Principal
+                            </h5>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-book"></i> Título
+                            </label>
+                            <p class="form-control-plaintext fw-bold fs-5"><%= prestamo.libro_titulo %></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-user-edit"></i> Autor
+                            </label>
+                            <p class="form-control-plaintext"><%= prestamo.libro_autor || 'No especificado' %></p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-building"></i> Editorial
+                            </label>
+                            <p class="form-control-plaintext"><%= prestamo.libro_editorial || 'No especificada' %></p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-barcode"></i> ISBN
+                            </label>
+                            <p class="form-control-plaintext font-monospace"><%= prestamo.libro_isbn || 'No disponible' %></p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-layer-group"></i> Área
+                            </label>
+                            <p class="form-control-plaintext">
+                                <span class="badge bg-soft-info text-info fs-6 px-3 py-2">
+                                    <%= prestamo.libro_area || 'No especificada' %>
+                                </span>
+                            </p>
+                        </div>
+                        <% if (prestamo.libro_anio) { %>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">
+                                    <i class="fas fa-calendar"></i> Año de Publicación
+                                </label>
+                                <p class="form-control-plaintext fw-semibold"><%= prestamo.libro_anio %></p>
+                            </div>
+                        <% } %>
+                        <% if (prestamo.libro_grado_recomendado) { %>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">
+                                    <i class="fas fa-graduation-cap"></i> Grado Recomendado
+                                </label>
+                                <p class="form-control-plaintext fw-semibold"><%= prestamo.libro_grado_recomendado %>° Grado</p>
+                            </div>
+                        <% } %>
+                        <% if (prestamo.libro_ubicacion) { %>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">
+                                    <i class="fas fa-map-marker-alt"></i> Ubicación
+                                </label>
+                                <p class="form-control-plaintext"><%= prestamo.libro_ubicacion %></p>
+                            </div>
+                        <% } %>
+
+                        <!-- Información de Ejemplares -->
+                        <% if (prestamo.ejemplares_totales !== null && prestamo.ejemplares_totales !== undefined) { %>
+                            <div class="col-12 mb-4 mt-3">
+                                <h5 class="text-muted mb-3" style="border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                    <i class="fas fa-copy"></i> Información de Ejemplares
+                                </h5>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">
+                                    <i class="fas fa-book-open"></i> Ejemplares Totales
+                                </label>
+                                <p class="form-control-plaintext fw-semibold"><%= prestamo.ejemplares_totales %></p>
+                            </div>
+                            <% if (prestamo.ejemplares_disponibles !== null && prestamo.ejemplares_disponibles !== undefined) { %>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label text-muted">
+                                        <i class="fas fa-check-circle"></i> Ejemplares Disponibles
+                                    </label>
+                                    <p class="form-control-plaintext fw-semibold text-success"><%= prestamo.ejemplares_disponibles %></p>
+                                </div>
+                            <% } %>
+                        <% } %>
+
+                        <!-- Descripción -->
+                        <% if (prestamo.libro_descripcion) { %>
+                            <div class="col-12 mb-3 mt-3">
+                                <h5 class="text-muted mb-3" style="border-bottom: 2px solid #e5e7eb; padding-bottom: 8px;">
+                                    <i class="fas fa-align-left"></i> Descripción
+                                </h5>
+                                <p class="form-control-plaintext" style="line-height: 1.8; text-align: justify;">
+                                    <%= prestamo.libro_descripcion %>
+                                </p>
+                            </div>
+                        <% } %>
+
+                        <!-- ID del Libro -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">
+                                <i class="fas fa-fingerprint"></i> ID del Libro
+                            </label>
+                            <p class="form-control-plaintext text-muted font-monospace"><%= prestamo.libro_id %></p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- Información del Préstamo -->
+        <section class="perfil-grid" data-aos="fade-up" data-aos-delay="200">
+            <article class="card card--elevated">
+                <div class="card__header">
+                    <div>
+                        <p class="card__eyebrow">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>Estado del Préstamo</span>
+                        </p>
+                        <h2 class="card__title">Detalles del Préstamo</h2>
+                    </div>
+                </div>
+                <div class="card__body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">Estado</label>
+                            <p class="form-control-plaintext">
+                                <% 
+                                    let estadoClass = 'bg-soft-secondary text-secondary';
+                                    let estadoTexto = prestamo.estado || 'pendiente';
+                                    if (prestamo.estado === 'devuelto') {
+                                        estadoClass = 'bg-soft-success text-success';
+                                    } else if (prestamo.estado === 'vencido') {
+                                        estadoClass = 'bg-soft-danger text-danger';
+                                    } else if (prestamo.estado === 'activo') {
+                                        estadoClass = 'bg-soft-primary text-primary';
+                                    } else if (prestamo.estado === 'pendiente') {
+                                        estadoClass = 'bg-soft-warning text-warning';
+                                    }
+                                %>
+                                <span class="badge <%= estadoClass %> text-uppercase">
+                                    <%= estadoTexto %>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">Tipo de Préstamo</label>
+                            <p class="form-control-plaintext">
+                                <span class="badge bg-soft-info text-info">
+                                    <%= prestamo.tipo_prestamo === 'dias' ? 'Por Días' : 'Por Horas' %>
+                                </span>
+                            </p>
+                        </div>
+                        <% if (prestamo.dias_vencido && prestamo.dias_vencido > 0) { %>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Días de Retraso</label>
+                                <p class="form-control-plaintext">
+                                    <span class="badge bg-danger text-white">
+                                        <%= prestamo.dias_vencido %> días
+                                    </span>
+                                </p>
+                            </div>
+                        <% } %>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">Fecha de Préstamo</label>
+                            <p class="form-control-plaintext fw-semibold">
+                                <%= new Date(prestamo.fecha_prestamo).toLocaleDateString('es-PE', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) %>
+                            </p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label text-muted">Fecha Límite de Devolución</label>
+                            <p class="form-control-plaintext fw-semibold">
+                                <%= new Date(prestamo.fecha_devolucion_esperada).toLocaleDateString('es-PE', { 
+                                    year: 'numeric', 
+                                    month: 'long', 
+                                    day: 'numeric'
+                                }) %>
+                            </p>
+                        </div>
+                        <% if (prestamo.fecha_devolucion_real) { %>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Fecha de Devolución Real</label>
+                                <p class="form-control-plaintext text-success fw-semibold">
+                                    <%= new Date(prestamo.fecha_devolucion_real).toLocaleDateString('es-PE', { 
+                                        year: 'numeric', 
+                                        month: 'long', 
+                                        day: 'numeric'
+                                    }) %>
+                                </p>
+                            </div>
+                        <% } %>
+                        <% if (prestamo.observaciones) { %>
+                            <div class="col-12 mb-3">
+                                <label class="form-label text-muted">Observaciones</label>
+                                <p class="form-control-plaintext"><%= prestamo.observaciones %></p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- Acciones Administrativas -->
+        <section class="perfil-grid" data-aos="fade-up" data-aos-delay="250">
+            <article class="card card--elevated">
+                <div class="card__header">
+                    <div>
+                        <p class="card__eyebrow">
+                            <i class="fas fa-cog"></i>
+                            <span>Acciones Administrativas</span>
+                        </p>
+                        <h2 class="card__title">Gestión del Préstamo</h2>
+                    </div>
+                </div>
+                <div class="card__body">
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                        <% if (prestamo.estado === 'vencido') { %>
+                            <button type="button" 
+                                    class="btn btn--primary" 
+                                    id="btnEnviarAlerta"
+                                    onclick="enviarAlerta()"
+                                    style="background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); border: none; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4); font-weight: 600; padding: 12px 24px; font-size: 16px;">
+                                <i class="fas fa-bell"></i>
+                                Enviar Recordatorio Urgente
+                            </button>
+                        <% } else { %>
+                            <button type="button" 
+                                    class="btn btn--primary" 
+                                    id="btnEnviarAlerta"
+                                    onclick="enviarAlerta()"
+                                    style="font-weight: 600; padding: 12px 24px; font-size: 16px;">
+                                <i class="fas fa-bell"></i>
+                                Enviar Recordatorio
+                            </button>
+                        <% } %>
+                        <% if (prestamo.estado !== 'devuelto') { %>
+                            <form action="/prestamos/<%= prestamo.id %>/devolucion" 
+                                  method="POST" 
+                                  class="d-inline"
+                                  onsubmit="return confirm('¿Estás seguro de registrar la devolución de este préstamo?');">
+                                <button type="submit" class="btn btn--success" style="font-weight: 600; padding: 12px 24px; font-size: 16px;">
+                                    <i class="fas fa-check-circle"></i>
+                                    Registrar Devolución
+                                </button>
+                            </form>
+                        <% } %>
+                        <a href="/prestamos/admin" class="btn btn--ghost" style="padding: 12px 24px; font-size: 16px;">
+                            <i class="fas fa-list"></i>
+                            Ver Todos los Préstamos
+                        </a>
+                    </div>
+                    <% if (prestamo.estado === 'vencido') { %>
+                        <div style="margin-top: 20px; padding: 15px; background: #fef2f2; border-left: 4px solid #dc2626; border-radius: 8px;">
+                            <p style="margin: 0; color: #7f1d1d; font-size: 14px; line-height: 1.6;">
+                                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                                <strong>Nota:</strong> Al enviar el recordatorio, se notificará al usuario por correo electrónico sobre el estado vencido de su préstamo y la necesidad de devolver el libro.
+                            </p>
+                        </div>
+                    <% } %>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+        // Función para enviar alerta
+        async function enviarAlerta() {
+            const btn = document.getElementById('btnEnviarAlerta');
+            const prestamoId = '<%= prestamo.id %>';
+            
+            if (!confirm('¿Estás seguro de enviar un recordatorio a <%= prestamo.usuario_nombre %>?')) {
+                return;
+            }
+
+            // Deshabilitar botón
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
+            try {
+                const response = await fetch(`/prestamos/${prestamoId}/enviar-alerta`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    window.showToast('success', 'Alerta enviada exitosamente a <%= prestamo.usuario_nombre %>.');
+                } else {
+                    window.showToast('error', data.mensaje || 'Error al enviar la alerta.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                window.showToast('error', 'Error al enviar la alerta. Por favor, intenta nuevamente.');
+            } finally {
+                // Restaurar botón
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bell"></i> Enviar Recordatorio';
+            }
+        }
+    </script>
+</body>
+</html>
+

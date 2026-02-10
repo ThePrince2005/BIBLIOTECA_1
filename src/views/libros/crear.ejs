@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: (typeof libro !=='undefined' && libro) ? 'Editar Libro'
+        : 'Registrar Nuevo Libro' + ' - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/libros.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body class="libros-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="libros-wrapper">
+            <div class="libros-card" style="max-width: 1100px; margin: 0 auto;">
+                <div class="libros-card__header" style="flex-direction: column; align-items: flex-start; gap: 0.5rem;">
+                    <div class="libros-hero__badge" style="margin-bottom: 0;">
+                        <i class="fa-solid fa-book-open"></i> Gestión de Libros
+                    </div>
+                    <div class="libros-card__title">
+                        <i
+                            class="fa-solid fa-<%= (typeof libro !== 'undefined' && libro) ? 'edit' : 'plus-circle' %>"></i>
+                        <%= (typeof libro !=='undefined' && libro) ? 'Editar Libro' : 'Registrar Nuevo Libro' %>
+                    </div>
+                </div>
+
+                <form id="libroForm">
+                    <div class="form-premium-grid">
+                        <!-- Título -->
+                        <div class="input-group">
+                            <label for="titulo">Título *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-heading"></i>
+                                <input class="input-control" id="titulo" name="titulo" type="text" required
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.titulo : '' %>"
+                                    placeholder="Título completo del libro">
+                            </div>
+                        </div>
+
+                        <!-- Autor -->
+                        <div class="input-group">
+                            <label for="autor">Autor *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-user-pen"></i>
+                                <input class="input-control" id="autor" name="autor" type="text" required
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.autor : '' %>"
+                                    placeholder="Nombre del autor">
+                            </div>
+                        </div>
+
+                        <!-- Editorial -->
+                        <div class="input-group">
+                            <label for="editorial">Editorial *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-building"></i>
+                                <input class="input-control" id="editorial" name="editorial" type="text" required
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.editorial : '' %>"
+                                    placeholder="Editorial">
+                            </div>
+                        </div>
+
+                        <!-- ISBN -->
+                        <div class="input-group">
+                            <label for="isbn">ISBN</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-barcode"></i>
+                                <input class="input-control" id="isbn" name="isbn" type="text"
+                                    pattern="^(?:\d{10}|\d{13})$" title="ISBN debe tener 10 o 13 dígitos"
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.isbn : '' %>"
+                                    placeholder="ISBN (10 o 13 dígitos)">
+                            </div>
+                        </div>
+
+                        <!-- Área -->
+                        <div class="input-group">
+                            <label for="area">Área *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-layer-group"></i>
+                                <select class="input-control" id="area" name="area" required>
+                                    <option value="">Seleccione un área...</option>
+                                    <% areas.forEach(area=> { %>
+                                        <option value="<%= area %>" <%=(typeof libro !=='undefined' && libro) &&
+                                            libro.area===area ? 'selected' : '' %>>
+                                            <%= area %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Grado recomendado -->
+                        <div class="input-group">
+                            <label for="grado_recomendado">Grado recomendado</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                                <select class="input-control" id="grado_recomendado" name="grado_recomendado">
+                                    <option value="">Sin grado específico</option>
+                                    <% for(let i=1; i <=5; i++) { %>
+                                        <option value="<%= i %>" <%=(typeof libro !=='undefined' && libro) &&
+                                            libro.grado_recomendado===i ? 'selected' : '' %>>
+                                            <%= i %>° grado
+                                        </option>
+                                        <% } %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Año de publicación -->
+                        <div class="input-group">
+                            <label for="anio_publicacion">Año de publicación</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-calendar-days"></i>
+                                <input class="input-control" id="anio_publicacion" name="anio_publicacion" type="number"
+                                    min="1800" max="<%= new Date().getFullYear() %>"
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.anio_publicacion : '' %>"
+                                    placeholder="Ej: 2023">
+                            </div>
+                        </div>
+
+                        <!-- Ejemplares -->
+                        <div class="input-group">
+                            <label for="ejemplares_totales">Número de ejemplares *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-copy"></i>
+                                <input class="input-control" id="ejemplares_totales" name="ejemplares_totales"
+                                    type="number" min="1" required
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.ejemplares_totales : '1' %>">
+                            </div>
+                        </div>
+
+                        <!-- Ubicación -->
+                        <div class="input-group">
+                            <label for="ubicacion">Ubicación *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                                <input class="input-control" id="ubicacion" name="ubicacion" type="text" required
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.ubicacion : '' %>"
+                                    placeholder="Ej: Estante A, Nivel 2">
+                            </div>
+                        </div>
+
+                        <!-- Palabras clave -->
+                        <div class="input-group">
+                            <label for="palabras_clave">Palabras clave</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-tags"></i>
+                                <input class="input-control" id="palabras_clave" name="palabras_clave" type="text"
+                                    placeholder="Separadas por comas (ej: historia, novela, clásico)"
+                                    value="<%= (typeof libro !== 'undefined' && libro) ? libro.palabras_clave : '' %>">
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="input-group form-full-width">
+                            <label for="descripcion">Descripción</label>
+                            <!-- Textarea doesn't support input-wrapper icon easily without absolute positioning adjustments, keeping simple for now or adding wrapper without icon -->
+                            <textarea class="input-control" id="descripcion" name="descripcion" rows="4"
+                                placeholder="Breve descripción del libro..."><%= (typeof libro !== 'undefined' && libro) ? libro.descripcion : '' %></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2.5rem; flex-wrap: wrap;">
+                        <a href="/libros" class="btn-modern btn-modern--secondary">
+                            <i class="fa-solid fa-times"></i>
+                            <span>Cancelar</span>
+                        </a>
+                        <button type="submit" class="btn-modern btn-modern--primary">
+                            <i class="fa-solid fa-save"></i>
+                            <span><%= (typeof libro !=='undefined' && libro) ? 'Actualizar Libro' : 'Guardar Libro' %></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </main>
+
+        <!-- Toast para mensajes -->
+        <div id="toast" class="fixed bottom-5 right-5 hidden bg-white border-l-4 py-2 px-3 shadow-md rounded-lg"></div>
+
+        <script src="/js/libros.js"></script>
+        <script src="/js/dashboard-shared.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            document.getElementById('libroForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData.entries());
+
+                // Convertir campos numéricos
+                ['grado_recomendado', 'anio_publicacion', 'ejemplares_totales'].forEach(field => {
+                    if (data[field]) {
+                        data[field] = parseInt(data[field]);
+                    }
+                });
+
+                try {
+                    const url = '<%= (typeof libro !== "undefined" && libro) ? `/libros/${libro.id}` : "/libros" %>';
+                    const method = '<%= (typeof libro !== "undefined" && libro) ? "PUT" : "POST" %>';
+
+                    const response = await fetch(url, {
+                        method: method,
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+
+                    const responseData = await response.json();
+
+                    if (response.ok) {
+                        // Cerrar modal si existe
+                        const modal = document.getElementById('modalLibro') || document.querySelector('.modal-overlay');
+                        if (modal) {
+                            modal.classList.remove('active');
+                            document.body.style.overflow = '';
+                        }
+
+                        // Mostrar SweetAlert de éxito y redirigir
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Guardado!',
+                            text: responseData.message || 'Libro creado exitosamente',
+                            confirmButtonColor: '#00B4D8'
+                        }).then(() => {
+                            window.location.href = '/libros';
+                        });
+                    } else {
+                        showToast(responseData.message || 'Error al procesar el formulario', 'error');
+                    }
+                } catch (error) {
+                    showToast('Error al conectar con el servidor', 'error');
+                }
+            });
+
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                toast.classList.remove('hidden', 'border-red-500', 'border-green-500');
+                toast.classList.add(type === 'success' ? 'border-green-500' : 'border-red-500');
+                toast.textContent = message;
+
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 3000);
+            }
+        </script>
+</body>
+
+</html>

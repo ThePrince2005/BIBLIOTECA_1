@@ -1,0 +1,67 @@
+<% const modalIdentifier=typeof modalId !=='undefined' ? modalId : 'resenaModal' ; const libroIdValue=typeof libroId
+    !=='undefined' ? libroId : null; const elegibles=Array.isArray(librosElegibles) ? librosElegibles : []; const
+    dynamicLibroEnabled=typeof dynamicLibro !=='undefined' ? dynamicLibro : false; const showLibroSelect=!libroIdValue
+    && !dynamicLibroEnabled; const submitLabelText=typeof submitLabel !=='undefined' ? submitLabel : 'Publicar reseña' ;
+    %>
+    <div class="resena-modal" id="<%= modalIdentifier %>" aria-hidden="true">
+        <div class="resena-modal__backdrop" data-resena-close></div>
+        <div class="resena-modal__dialog" role="dialog" aria-modal="true">
+            <div class="resena-modal__header">
+                <div>
+                    <h3 class="resena-modal__title" id="<%= modalIdentifier %>Title">Escribir reseña</h3>
+                    <p class="resena-modal__subtitle">Comparte tu experiencia con este libro.</p>
+                </div>
+                <button class="resena-modal__close" data-resena-close>
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+
+            <form id="<%= modalIdentifier %>Form" data-resena-form>
+                <div class="resena-modal__body">
+                    <input type="hidden" name="resena_id" id="resenaId">
+
+                    <% if (showLibroSelect) { %>
+                        <label class="resena-modal__label" for="resenaLibroSelect">Selecciona un libro</label>
+                        <select id="resenaLibroSelect" name="libro_id" class="input-control"
+                            style="width: 100%; padding: 0.8rem; border-radius: 12px; border: 2px solid #e2e8f0;">
+                            <option value="" disabled selected>Elige un libro leído</option>
+                            <% elegibles.forEach(libro=> { %>
+                                <option value="<%= libro.id %>">
+                                    <%= libro.titulo %>
+                                </option>
+                                <% }) %>
+                        </select>
+                        <% } else { %>
+                            <input type="hidden" name="libro_id" id="resenaLibroId" value="<%= libroIdValue %>">
+                            <% } %>
+
+                                <input type="hidden" name="prestamo_id" id="resenaPrestamoId">
+
+                                <label class="resena-modal__label">Calificación</label>
+                                <div class="resena-rating" data-resena-rating>
+                                    <% for (let star=1; star <=5; star++) { %>
+                                        <button type="button" data-rating-value="<%= star %>">
+                                            <i class="fa-solid fa-star"></i>
+                                        </button>
+                                        <% } %>
+                                </div>
+                                <input type="hidden" name="calificacion" id="resenaCalificacion" value="0">
+
+                                <label class="resena-modal__label" for="resenaComentario">Tu opinión</label>
+                                <textarea id="resenaComentario" name="comentario" minlength="10"
+                                    placeholder="¿Qué te pareció el libro? ¿Qué fue lo que más te gustó?"></textarea>
+                </div>
+
+                <div class="resena-modal__footer" style="display: flex; gap: 1rem; justify-content: flex-end; padding: 1.5rem 2rem; border-top: 1px solid var(--dash-card-border);">
+                    <button type="button" class="btn-modern btn-modern--secondary" data-resena-close>
+                        <i class="fa-solid fa-times"></i>
+                        <span>Cancelar</span>
+                    </button>
+                    <button type="submit" id="resenaSubmit" class="btn-modern btn-modern--primary">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span><%= submitLabelText %></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>

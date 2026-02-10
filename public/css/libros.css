@@ -1,0 +1,344 @@
+/* ================================================================
+   LIBRO INFO
+   ================================================================ */
+
+.libro-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.libro-info__title {
+    font-weight: 600;
+    color: var(--color-neutral-900);
+    font-size: 0.95rem;
+}
+
+.libro-info__author {
+    font-size: 0.8rem;
+    color: var(--color-neutral-500);
+}
+
+/* ================================================================
+   EJEMPLARES INFO
+   ================================================================ */
+
+.ejemplares-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+}
+
+.ejemplares-info__count {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-neutral-900);
+    font-size: var(--font-size-base);
+}
+
+.ejemplares-info__label {
+    font-size: var(--font-size-xs);
+    color: var(--color-neutral-500);
+}
+
+/* ================================================================
+   TABLE ACTIONS CELL
+   ================================================================ */
+
+.table-actions-cell {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    justify-content: flex-end;
+}
+
+/* Delete button red icon */
+.btn-delete i,
+.btn-eliminar i {
+    color: #EF4444 !important;
+}
+
+.btn-delete:hover i,
+.btn-eliminar:hover i {
+    color: #DC2626 !important;
+}
+
+/* ================================================================
+   MODAL STYLES
+   ================================================================ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+    /* Oculto por defecto */
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Mostrar modal cuando tiene clase active */
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal-container {
+    background: var(--bg-white);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    border: 1px solid var(--card-border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 800px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--title-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--title-dark);
+}
+
+.modal-close {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: none;
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    transform: scale(1.1);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--card-border);
+}
+
+/* ================================================================
+   FORM GRID FOUR
+   ================================================================ */
+
+.form-grid-four {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-6);
+}
+
+.form-group--full {
+    grid-column: 1 / -1;
+}
+
+/* ================================================================
+   ANIMATIONS
+   ================================================================ */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+
+@media (max-width: 768px) {
+    .form-grid-four {
+        grid-template-columns: 1fr;
+    }
+
+    .table-actions-cell {
+        justify-content: flex-start;
+        width: 100%;
+    }
+
+    .modal-container {
+        max-height: 95vh;
+    }
+}
+
+/* ================================================================
+   TEMA OSCURO
+   ================================================================ */
+
+[data-theme="dark"] .ejemplares-info__count {
+    color: var(--color-neutral-50);
+}
+
+[data-theme="dark"] .modal-header h3 {
+    color: var(--color-neutral-50);
+}
+
+[data-theme="dark"] .modal-title {
+    color: var(--title-dark);
+}
+
+/* ================================================================
+   MODERN FORM STYLES (Refactored from inline)
+   ================================================================ */
+
+.modal-body .form-input,
+.modal-body .form-select,
+.modal-body .form-textarea {
+    border: 2px solid var(--bg-gray-200);
+    border-radius: var(--radius-small);
+    padding: 0.9rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: var(--bg-gray-50);
+    width: 100%;
+    color: var(--title-dark);
+    font-family: var(--font-family);
+}
+
+.modal-body .form-input:hover,
+.modal-body .form-select:hover,
+.modal-body .form-textarea:hover {
+    border-color: var(--subtitle-gray);
+    background: var(--bg-white);
+}
+
+.modal-body .form-input:focus,
+.modal-body .form-select:focus,
+.modal-body .form-textarea:focus {
+    border-color: var(--accent-blue);
+    background: var(--bg-white);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.1);
+    outline: none;
+}
+
+.modal-body .form-label {
+    font-weight: 600;
+    color: var(--title-dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.9rem;
+}
+
+/* Unified Button Style */
+.btn-unified-modal {
+    background: linear-gradient(90deg, var(--accent-blue) 0%, var(--accent-blue-dark) 100%);
+    color: white !important;
+    padding: 0.9rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 20px -5px rgba(0, 180, 216, 0.4);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-unified-modal:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(0, 180, 216, 0.6);
+}
+
+/* Cancel Button Update */
+.btn-cancel-modal {
+    padding: 0.9rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    border: 1px solid var(--bg-gray-200);
+    background: var(--bg-white);
+    color: var(--subtitle-gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-cancel-modal:hover {
+    background: var(--bg-gray-100);
+    color: var(--title-dark);
+}
+
+/* Layout */
+.form-grid-two {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 640px) {
+    .form-grid-two {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dark Mode Specific Overrides */
+[data-theme="dark"] .modal-body .form-input,
+[data-theme="dark"] .modal-body .form-select,
+[data-theme="dark"] .modal-body .form-textarea {
+    background: var(--bg-white);
+    /* 1E293B in dark */
+    border-color: var(--bg-gray-200);
+    color: var(--title-dark);
+}
+
+[data-theme="dark"] .modal-body .form-input:focus,
+[data-theme="dark"] .modal-body .form-select:focus,
+[data-theme="dark"] .modal-body .form-textarea:focus {
+    background: var(--bg-light);
+    /* Darker shade */
+}

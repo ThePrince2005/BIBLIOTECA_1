@@ -1,0 +1,963 @@
+/* ========================================================================
+   BIBLIOTECA ESCOLAR DANIEL HERNÁNDEZ
+   Archivo: /public/css/registro.css
+   Propósito: Estilos para vista de registro de usuarios (Estudiante/Docente)
+   ======================================================================== */
+
+/* --- Variables de Color y Diseño --- */
+:root {
+    /* Tipografía */
+    --font-family: 'Poppins', sans-serif;
+    
+    /* Colores Institucionales - TEMA CLARO */
+    --title-dark: #1E293B;           /* Azul oscuro - Títulos principales */
+    --subtitle-gray: #64748B;        /* Gris medio - Subtítulos */
+    --text-gray: #475569;            /* Gris texto */
+    --accent-blue: #00B4D8;          /* Azul celeste - Acentos principales */
+    --accent-blue-dark: #0077B6;     /* Azul oscuro - Hover y sombras */
+    --accent-blue-light: #90E0EF;    /* Azul claro - Degradados */
+    --bg-light: #F8FAFC;             /* Fondo claro principal */
+    --bg-white: #FFFFFF;             /* Blanco puro */
+    --auth-bg-image: url('/img/bg-biblioteca.jpg');
+    
+    /* Colores de Estado */
+    --success-green: #10B981;
+    --success-green-dark: #059669;
+    --error-red: #EF4444;
+    --error-red-dark: #DC2626;
+    --warning-yellow: #F59E0B;
+    
+    /* Efectos Glassmorphism */
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-bg-hover: rgba(255, 255, 255, 1);
+    --card-border: rgba(0, 180, 216, 0.15);
+    --glass-blur: 20px;
+    
+    /* Sombras */
+    --shadow-sm: 0 2px 8px rgba(30, 41, 59, 0.08);
+    --shadow-md: 0 8px 24px rgba(0, 119, 182, 0.12);
+    --shadow-lg: 0 12px 32px rgba(0, 119, 182, 0.18);
+    --shadow-hover: 0 16px 40px rgba(0, 180, 216, 0.25);
+    --shadow-input: 0 4px 12px rgba(0, 180, 216, 0.08);
+    
+    /* Espaciado y Medidas */
+    --radius-card: 32px;
+    --radius-input: 12px;
+    --radius-button: 20px;
+    --transition-speed: 0.4s;
+    --transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Estilos Base --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-family);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* --- Fondo principal con imagen blur --- */
+.min-h-screen {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 3vw, 2.75rem);
+    background: #030b1a;
+    overflow-y: auto;
+}
+
+.min-h-screen::before {
+    content: '';
+    position: absolute;
+    inset: -10%;
+    background-image: var(--auth-bg-image);
+    background-size: cover;
+    background-position: center;
+    filter: blur(9px) saturate(1);
+    opacity: 0.6;
+    transform: scale(1.05);
+    animation: authPan 36s ease-in-out alternate infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.min-h-screen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(120deg, rgba(2, 8, 23, 0.5), rgba(5, 17, 39, 0.45)),
+        radial-gradient(circle at 12% 20%, rgba(0, 180, 216, 0.18), transparent 55%),
+        radial-gradient(circle at 80% 70%, rgba(144, 224, 239, 0.12), transparent 60%);
+    opacity: 0.7;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes authPan {
+    0% { transform: scale(1.05) translate3d(0, 0, 0); }
+    50% { transform: scale(1.1) translate3d(-2%, -1%, 0); }
+    100% { transform: scale(1.05) translate3d(2%, 1%, 0); }
+}
+
+/* --- Contenedor Principal del Formulario --- */
+.auth-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+}
+
+.mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.space-y-8 > * + * {
+    margin-top: 2rem;
+}
+
+/* --- Header: Logo y Título --- */
+.text-center {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+/* Logo con animación flotante */
+.text-center img {
+    display: block;
+    margin: 0 auto 1.5rem;
+    height: 96px;
+    width: auto;
+    filter: drop-shadow(0 8px 16px rgba(0, 119, 182, 0.25));
+    transition: all var(--transition-speed) var(--transition-ease);
+    animation: floatLogo 3s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+    0%, 100% { 
+        transform: translateY(0) scale(1); 
+    }
+    50% { 
+        transform: translateY(-10px) scale(1.05); 
+    }
+}
+
+.text-center img:hover {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 12px 24px rgba(0, 180, 216, 0.4));
+    animation: none;
+}
+
+/* Títulos */
+h2.text-3xl {
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 1.875rem;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    color: var(--title-dark);
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+/* Subrayado decorativo animado */
+h2.text-3xl::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 140px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+    border-radius: 2px;
+    animation: underlineGrow 2s ease-in-out infinite;
+}
+
+@keyframes underlineGrow {
+    0%, 100% { width: 140px; opacity: 0.6; }
+    50% { width: 200px; opacity: 1; }
+}
+
+/* --- Formulario Principal --- */
+form {
+    position: relative;
+    z-index: 2;
+}
+
+.mt-8 {
+    margin-top: 2rem;
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
+
+/* --- Card del Formulario (Glassmorphism) --- */
+.form-card {
+    position: relative;
+    background: var(--card-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border-radius: var(--radius-card);
+    border: 2px solid var(--card-border);
+    box-shadow: var(--shadow-lg);
+    padding: 2.25rem;
+    overflow: hidden;
+    animation: cardEntrance 0.8s ease-out;
+}
+
+/* Animación de entrada del card */
+@keyframes cardEntrance {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Borde superior decorativo animado */
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: linear-gradient(
+        90deg, 
+        var(--accent-blue-dark) 0%, 
+        var(--accent-blue) 50%, 
+        var(--accent-blue-light) 100%
+    );
+    background-size: 200% 100%;
+    animation: borderFlow 3s ease infinite;
+}
+
+@keyframes borderFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Efecto de brillo sutil */
+.form-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+        circle, 
+        rgba(0, 180, 216, 0.08) 0%, 
+        transparent 70%
+    );
+    animation: pulseGlow 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes pulseGlow {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+}
+
+/* --- Grid de Campos --- */
+.form-row {
+    display: grid;
+    gap: 1.25rem;
+    position: relative;
+    z-index: 2;
+}
+
+.form-row.two-cols {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .form-row.two-cols {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+    }
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- Labels --- */
+label {
+    display: block;
+    font-family: var(--font-family);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-gray);
+    margin-bottom: 0.5rem;
+    transition: color 0.3s var(--transition-ease);
+}
+
+label:has(+ input:focus),
+label:has(+ select:focus),
+label:has(+ .relative input:focus) {
+    color: var(--accent-blue-dark);
+}
+
+/* --- Inputs y Selects --- */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+    appearance: none;
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(0, 180, 216, 0.2);
+    border-radius: var(--radius-input);
+    background: var(--bg-white);
+    color: var(--title-dark);
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    transition: all var(--transition-speed) var(--transition-ease);
+    box-shadow: var(--shadow-input);
+    outline: none;
+}
+
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+/* Placeholder */
+input::placeholder {
+    color: var(--subtitle-gray);
+    opacity: 0.7;
+    font-weight: 400;
+}
+
+/* Estados Focus */
+input:focus,
+select:focus {
+    border-color: var(--accent-blue);
+    background: var(--bg-white);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15), var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* Estados Hover */
+input:hover:not(:focus),
+select:hover:not(:focus) {
+    border-color: rgba(0, 180, 216, 0.3);
+    box-shadow: var(--shadow-md);
+}
+
+/* Select - Flecha personalizada */
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300B4D8' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230077B6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+/* --- Input Password con Toggle --- */
+.relative {
+    position: relative;
+}
+
+.relative input[type="password"],
+.relative input[type="text"] {
+    padding-right: 3rem;
+}
+
+.relative button[type="button"] {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--subtitle-gray);
+    transition: all 0.3s var(--transition-ease);
+    z-index: 10;
+}
+
+.relative button[type="button"]:hover {
+    color: var(--accent-blue-dark);
+    transform: scale(1.1);
+}
+
+.relative button[type="button"]:active {
+    transform: scale(0.95);
+}
+
+.relative button[type="button"] i {
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+/* --- Indicador de Contraseña --- */
+.password-field {
+    transition: margin-bottom 0.3s var(--transition-ease);
+}
+
+.password-field.hint-visible {
+    margin-bottom: 0.5rem;
+}
+
+.password-hint {
+    margin-top: 0.5rem;
+    padding: 0;
+    background: rgba(0, 180, 216, 0.05);
+    border-radius: var(--radius-input);
+    border: 1px solid rgba(0, 180, 216, 0.15);
+    opacity: 0;
+    transform: scaleY(0.8);
+    transform-origin: top;
+    pointer-events: none;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.25s var(--transition-ease), transform 0.25s var(--transition-ease), max-height 0.25s var(--transition-ease), padding 0.25s var(--transition-ease);
+}
+
+.password-hint ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.password-hint li {
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.25rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    transition: all 0.3s var(--transition-ease);
+}
+
+/* Iconos de check/cross antes del texto */
+.password-hint li::before {
+    content: '✕';
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+    font-size: 0.9rem;
+    transition: all 0.3s var(--transition-ease);
+}
+
+.password-hint li.text-green-500 {
+    color: var(--success-green-dark) !important;
+}
+
+.password-hint li.text-green-500::before {
+    content: '✓';
+    color: var(--success-green);
+}
+
+.password-hint li.text-red-500 {
+    color: var(--error-red-dark) !important;
+}
+
+.password-hint li.text-red-500::before {
+    content: '✕';
+    color: var(--error-red);
+}
+
+.password-hint.hidden {
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+}
+
+.password-hint.visible {
+    opacity: 1;
+    transform: scaleY(1);
+    padding: 0.75rem 1rem;
+    max-height: 300px;
+}
+
+/* --- Campos Condicionales (Estudiante/Docente) --- */
+.hidden {
+    display: none !important;
+}
+
+/* Animación de aparición de campos condicionales */
+#camposEstudiante:not(.hidden),
+#camposDocente:not(.hidden) {
+    animation: slideDown 0.4s var(--transition-ease);
+}
+
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Botón Submit Principal --- */
+button[type="submit"] {
+    position: relative;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--accent-blue-dark), var(--accent-blue));
+    color: var(--bg-white);
+    font-family: var(--font-family);
+    font-weight: 600;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+    transition: all var(--transition-speed) var(--transition-ease);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    z-index: 1;
+    margin-top: 1.5rem;
+}
+
+/* Efecto de brillo animado en el botón */
+button[type="submit"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: left 0.6s ease;
+}
+
+button[type="submit"]:hover::before {
+    left: 100%;
+}
+
+/* Estados Hover */
+button[type="submit"]:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--shadow-hover);
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-blue-light));
+}
+
+/* Estados Active (Click) */
+button[type="submit"]:active {
+    transform: translateY(-2px) scale(0.98);
+    transition: transform 0.1s ease;
+}
+
+/* Estados Focus (Accesibilidad) */
+button[type="submit"]:focus {
+    outline: none;
+    box-shadow: var(--shadow-hover), 0 0 0 4px rgba(0, 180, 216, 0.3);
+}
+
+/* Estado Disabled (Cargando) */
+button[type="submit"]:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+button[type="submit"]:disabled:hover {
+    transform: none;
+    box-shadow: var(--shadow-md);
+}
+
+/* --- Enlaces --- */
+.mt-4 {
+    margin-top: 1rem;
+}
+
+a {
+    font-family: var(--font-family);
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    color: var(--accent-blue-dark);
+    transition: all 0.3s var(--transition-ease);
+    position: relative;
+    display: inline-block;
+}
+
+a:hover {
+    color: var(--accent-blue);
+}
+
+/* Subrayado animado en hover */
+a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width 0.3s var(--transition-ease);
+}
+
+a:hover::after {
+    width: 100%;
+}
+
+/* --- Toast Notifications (Mensajes de Éxito/Error) --- */
+#toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 9999;
+    min-width: 300px;
+    max-width: 400px;
+    background: var(--bg-white);
+    border-radius: var(--radius-input);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    animation: slideInRight 0.4s var(--transition-ease);
+    transition: all 0.3s var(--transition-ease);
+}
+
+/* Animación de entrada del toast */
+@keyframes slideInRight {
+    0% {
+        opacity: 0;
+        transform: translateX(400px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Toast cuando está oculto */
+#toast.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(400px);
+    pointer-events: none;
+}
+
+/* Borde lateral según tipo */
+#toast.border-green-500 {
+    border-left: 5px solid var(--success-green);
+}
+
+#toast.border-red-500 {
+    border-left: 5px solid var(--error-red);
+}
+
+/* Texto del toast */
+#toastMessage {
+    font-family: var(--font-family);
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 0;
+    color: var(--title-dark);
+}
+
+/* --- Diseño Responsivo --- */
+
+/* Tablets (769px - 1024px) */
+@media (max-width: 1024px) {
+    .auth-card {
+        max-width: 500px;
+    }
+    
+    .form-card {
+        padding: 2rem;
+    }
+}
+
+/* Tablets pequeñas y móviles grandes (481px - 768px) */
+@media (max-width: 768px) {
+    :root {
+        --radius-card: 24px;
+        --radius-input: 10px;
+        --radius-button: 16px;
+    }
+
+    .min-h-screen {
+        padding: 1rem;
+    }
+
+    .auth-card {
+        max-width: 100%;
+    }
+
+    .form-card {
+        padding: 1.75rem;
+    }
+
+    .text-center img {
+        height: 80px;
+    }
+
+    h2.text-3xl {
+        font-size: 1.5rem;
+    }
+
+    h2.text-3xl::after {
+        width: 100px;
+    }
+
+    .grid {
+        gap: 1.25rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        padding: 0.625rem 0.875rem;
+        font-size: 0.9rem;
+    }
+
+    button[type="submit"] {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+    }
+
+    #toast {
+        min-width: 280px;
+        max-width: calc(100vw - 2rem);
+        right: 1rem;
+        bottom: 1rem;
+    }
+
+    .password-strength-hint {
+        padding: 0.625rem 0.875rem;
+    }
+
+    .password-strength-hint li {
+        font-size: 0.75rem;
+    }
+}
+
+/* Mobile Small (320px - 480px) */
+@media (max-width: 480px) {
+    .min-h-screen {
+        padding: 0.5rem;
+    }
+
+    .form-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .text-center img {
+        height: 72px;
+    }
+
+    h2.text-3xl {
+        font-size: 1.375rem;
+        margin-top: 1rem;
+    }
+
+    h2.text-3xl::after {
+        width: 80px;
+        bottom: -6px;
+    }
+
+    .grid {
+        gap: 1rem;
+    }
+
+    label {
+        font-size: 0.8rem;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+        padding: 0.625rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .relative input[type="password"],
+    .relative input[type="text"] {
+        padding-right: 2.75rem;
+    }
+
+    .relative button[type="button"] {
+        padding: 0 0.75rem;
+    }
+
+    .relative button[type="button"] i {
+        font-size: 1rem;
+    }
+
+    button[type="submit"] {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    a {
+        font-size: 0.8rem;
+    }
+
+    .password-hint {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .password-hint li {
+        font-size: 0.7rem;
+        padding-left: 1.25rem;
+    }
+}
+
+/* --- Preferencias de Accesibilidad --- */
+
+/* Reducción de movimiento */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .min-h-screen {
+        animation: none;
+    }
+
+    .text-center img {
+        animation: none;
+    }
+
+    .form-card::after {
+        animation: none;
+    }
+
+    button[type="submit"]::before {
+        display: none;
+    }
+
+    #camposEstudiante:not(.hidden),
+    #camposDocente:not(.hidden) {
+        animation: none;
+    }
+}
+
+/* --- Mejoras de Performance --- */
+.form-card,
+input,
+select,
+button,
+a,
+#toast {
+    will-change: transform;
+}
+
+/* Optimización para GPU */
+.form-card::before,
+.form-card::after,
+button[type="submit"]::before {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* --- Utilidades Adicionales --- */
+
+/* Estado de carga del formulario */
+form.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+form.loading button[type="submit"] {
+    position: relative;
+}
+
+/* Spinner de carga */
+form.loading button[type="submit"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* --- Estilos para validación de formulario --- */
+input:invalid:not(:placeholder-shown) {
+    border-color: var(--error-red);
+}
+
+input:invalid:not(:placeholder-shown):focus {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), var(--shadow-md);
+}
+
+input:valid:not(:placeholder-shown) {
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+input:valid:not(:placeholder-shown):focus {
+    border-color: var(--success-green);
+}
+
+/* --- Mejoras visuales para select --- */
+select option {
+    padding: 0.5rem;
+    background: var(--bg-white);
+    color: var(--title-dark);
+}
+
+select option:hover {
+    background: rgba(0, 180, 216, 0.1);
+}
+
+/* --- Estilos para campos deshabilitados --- */
+input:disabled,
+select:disabled {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--subtitle-gray);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+input:disabled:hover,
+select:disabled:hover {
+    transform: none;
+    box-shadow: var(--shadow-input);
+}

@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Gestión de Libros - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+        <style>
+            .user-avatar-placeholder {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                background: linear-gradient(135deg, #4f46e5 0%, #8b5cf6 100%);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+            }
+
+            .libro-row {
+                transition: background-color 0.2s;
+            }
+
+            .libro-row:hover {
+                background-color: var(--bg-gray-50);
+            }
+
+            /* Compact Actions - Reduced Padding for buttons in table */
+            .table-actions-cell .btn-modern {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.85rem;
+            }
+
+            /* Modal Styles */
+            #modalNuevoLibro {
+                position: fixed !important;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999999 !important;
+                backdrop-filter: blur(4px);
+                display: none;
+                /* Changed via JS */
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-container {
+                background: #fff;
+                padding: 2.5rem;
+                border-radius: 20px;
+                width: 90%;
+                max-width: 900px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+                max-height: 90vh;
+                overflow-y: auto;
+                position: relative;
+            }
+
+            .modal-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 2rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--card-border);
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--dash-text);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .modal-title i {
+                color: var(--primary-color);
+            }
+
+            .modal-close {
+                background: rgba(0, 0, 0, 0.05);
+                border: none;
+                cursor: pointer;
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.1rem;
+                color: var(--dash-muted);
+                transition: all 0.2s;
+            }
+
+            .modal-close:hover {
+                background: rgba(239, 68, 68, 0.1);
+                color: var(--error-color);
+                transform: rotate(90deg);
+            }
+
+            .form-grid-two {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1.5rem;
+            }
+
+            @media (max-width: 768px) {
+                .form-grid-two {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .form-group--full {
+                grid-column: 1 / -1;
+            }
+
+            .form-label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                color: var(--dash-text);
+                font-size: 0.95rem;
+            }
+
+            .form-input,
+            .form-select,
+            .form-textarea {
+                width: 100%;
+                padding: 0.875rem 1rem;
+                border: 2px solid var(--card-border);
+                border-radius: 10px;
+                font-size: 1rem;
+                transition: all 0.2s;
+                background-color: #f8fafc;
+            }
+
+            .form-input:focus,
+            .form-select:focus,
+            .form-textarea:focus {
+                border-color: var(--primary-color);
+                background-color: #fff;
+                outline: none;
+                box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+            }
+
+            /* Dark Mode Overrides */
+            [data-theme='dark'] .modal-container {
+                background-color: #1e293b;
+                border: 1px solid #334155;
+            }
+
+            [data-theme='dark'] .modal-title {
+                color: #f8fafc;
+            }
+
+            [data-theme='dark'] .form-label {
+                color: #e2e8f0;
+            }
+
+            [data-theme='dark'] .form-input,
+            [data-theme='dark'] .form-select,
+            [data-theme='dark'] .form-textarea {
+                background-color: #0f172a;
+                border-color: #334155;
+                color: #f8fafc;
+            }
+
+            [data-theme='dark'] .form-input:focus,
+            [data-theme='dark'] .form-select:focus,
+            [data-theme='dark'] .form-textarea:focus {
+                background-color: #1e293b;
+                border-color: #818cf8;
+            }
+
+            [data-theme='dark'] .libro-row:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+
+            [data-theme='dark'] .dropdown-content {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
+
+            /* Export Dropdown Styles */
+            .dropdown-wrapper {
+                position: relative;
+                display: inline-block;
+            }
+
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                right: 0;
+                top: 100%;
+                margin-top: 5px;
+                background-color: var(--bg-surface);
+                min-width: 160px;
+                box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+                z-index: 10;
+                border-radius: 8px;
+                overflow: hidden;
+                border: 1px solid var(--card-border);
+            }
+
+            .dropdown-content.show {
+                display: block;
+            }
+
+            .export-item-link {
+                color: var(--dash-text);
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+                transition: background-color 0.2s;
+            }
+
+            .export-item-link:hover {
+                background-color: var(--bg-subtle);
+            }
+
+            .export-item-link i {
+                margin-right: 8px;
+            }
+        </style>
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <div class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-book"></i>
+                        <span>Catálogo</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Libros Físicos</h1>
+                        <p>Gestiona el inventario de libros, disponibilidad y catalogación.</p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right">
+                    <% if ((typeof usuario !=='undefined' && usuario && usuario.rol==='admin' ) || (typeof user
+                        !=='undefined' && user && user.rol==='admin' )) { %>
+                        <!-- Added ID for JS Listener -->
+                        <button type="button" id="btnNuevoLibro" class="btn-modern btn-modern--primary">
+                            <i class="fas fa-plus"></i>
+                            <span>Nuevo Libro</span>
+                        </button>
+                        <% } %>
+                </div>
+            </header>
+
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                <article class="card-modern" style="grid-column: 1 / -1;">
+                    <div class="card-modern__header">
+                        <div class="card-modern__title">
+                            <i class="fas fa-list"></i>
+                            Listado de Libros
+                            <span class="badge-modern badge-modern--neutral" style="font-size: 0.9rem;">
+                                <%= typeof total !=='undefined' ? total : libros.length %>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Filters Modern -->
+                    <div class="filters-modern">
+                        <form action="/libros" method="GET" class="filters-modern__grid" style="align-items: end;"
+                            id="filterForm">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label"
+                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">Buscar</label>
+                                <div class="input-wrapper-modern">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" name="titulo" value="<%= filtros.titulo || '' %>"
+                                        class="input-modern" placeholder="Título, autor o ISBN...">
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label class="form-label"
+                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600;">Área</label>
+                                <select name="area" class="input-modern" onchange="this.form.submit()">
+                                    <option value="">Todas las Áreas</option>
+                                    <% areas.forEach(area=> { %>
+                                        <option value="<%= area %>" <%=filtros.area===area ? 'selected' : '' %>><%= area
+                                                %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+
+                            <div style="display: flex; gap: 0.5rem;">
+                                <!-- Button removed for instant search -->
+                                <!-- 
+                                <button type="submit" class="btn-modern btn-modern--secondary" title="Buscar">
+                                    <i class="fas fa-search"></i>
+                                </button> 
+                                -->
+                                <% if (filtros.titulo || filtros.area) { %>
+                                    <a href="/libros" class="btn-modern btn-modern--neutral" title="Limpiar filtros">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                    <% } %>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Table Modern Enhanced -->
+                    <div class="table-container-modern">
+                        <table class="table-modern-enhanced">
+                            <thead>
+                                <tr>
+                                    <th>Libro</th>
+                                    <th>Autor</th>
+                                    <th>Área</th>
+                                    <th>Grado</th>
+                                    <th>Ejemplares</th>
+                                    <th>Estado</th>
+                                    <th class="text-end">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (libros.length===0) { %>
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4 text-muted">
+                                            <div
+                                                style="display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 2rem;">
+                                                <i class="fas fa-book-open"
+                                                    style="font-size: 2.5rem; opacity: 0.3;"></i>
+                                                <p>No se encontraron libros.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                        <% libros.forEach(libro=> {
+                                            const disponible = libro.estado === 'disponible' &&
+                                            libro.ejemplares_disponibles > 0;
+                                            let estadoBadge = disponible ? 'badge-modern--success' :
+                                            'badge-modern--danger';
+                                            let estadoIcon = disponible ? 'fa-check-circle' : 'fa-times-circle';
+                                            let estadoText = disponible ? 'Disponible' : 'Agotado';
+                                            %>
+                                            <tr class="libro-row">
+                                                <td data-label="Libro">
+                                                    <div style="display: flex; align-items: center; gap: 1rem;">
+                                                        <div class="user-avatar-placeholder">
+                                                            <i class="fas fa-book"></i>
+                                                        </div>
+                                                        <div style="display: flex; flex-direction: column;">
+                                                            <span style="font-weight: 600; color: var(--dash-text);">
+                                                                <%= libro.titulo %>
+                                                            </span>
+                                                            <span
+                                                                style="font-size: 0.85rem; color: var(--dash-muted);">ISBN:
+                                                                <%= libro.isbn || 'N/A' %>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Autor">
+                                                    <span style="color: var(--dash-text); font-weight: 500;">
+                                                        <%= libro.autor %>
+                                                    </span>
+                                                </td>
+                                                <td data-label="Área">
+                                                    <span class="badge-modern badge-modern--secondary">
+                                                        <%= libro.area %>
+                                                    </span>
+                                                </td>
+                                                <td data-label="Grado">
+                                                    <span style="color: var(--dash-muted);">
+                                                        <%= libro.grado_recomendado %>°
+                                                    </span>
+                                                </td>
+                                                <td data-label="Ejemplares">
+                                                    <div
+                                                        style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem;">
+                                                        <span style="font-weight: 600; color: var(--primary-color);">
+                                                            <%= libro.ejemplares_disponibles %>
+                                                        </span>
+                                                        <span style="color: var(--dash-muted);">/ <%=
+                                                                libro.ejemplares_totales %></span>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Estado">
+                                                    <span class="badge-modern <%= estadoBadge %>">
+                                                        <i class="fas <%= estadoIcon %>" style="margin-right: 4px;"></i>
+                                                        <%= estadoText %>
+                                                    </span>
+                                                </td>
+                                                <td data-label="Acciones" class="text-end">
+                                                    <div class="table-actions-cell"
+                                                        style="justify-content: flex-end; display: flex; gap: 0.25rem; flex-direction: row; align-items: center;">
+                                                        <a href="/libros/libro/<%= libro.id %>"
+                                                            class="btn-modern btn-modern--neutral" title="Ver Detalle">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <% if ((typeof usuario !=='undefined' && usuario &&
+                                                            usuario.rol==='admin' ) || (typeof user !=='undefined' &&
+                                                            user && user.rol==='admin' )) { %>
+                                                            <a href="/libros/editar/<%= libro.id %>"
+                                                                class="btn-modern btn-modern--secondary" title="Editar">
+                                                                <i class="fas fa-edit"></i>
+                                                            </a>
+                                                            <button type="button" data-id="<%= libro.id %>"
+                                                                class="btn-modern btn-modern--danger js-btn-eliminar-libro"
+                                                                title="Eliminar">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                            <% } else { %>
+                                                                <% if (libro.ejemplares_disponibles> 0) { %>
+                                                                    <a href="/prestamos/crear/<%= libro.id %>"
+                                                                        class="btn-modern btn-modern--primary"
+                                                                        title="Solicitar Préstamo">
+                                                                        <i class="fas fa-hand-holding-heart"></i>
+                                                                    </a>
+                                                                    <% } %>
+                                                                        <% const vIds=(typeof favoritosIds
+                                                                            !=='undefined' &&
+                                                                            Array.isArray(favoritosIds)) ?
+                                                                            favoritosIds.map(String) : []; const
+                                                                            cId=String(libro.id); const
+                                                                            isFav=vIds.includes(cId); %>
+                                                                            <button type="button"
+                                                                                data-libro-id="<%= cId %>"
+                                                                                class="js-toggle-favorito <%= isFav ? 'btn-modern btn-modern--danger' : 'btn-modern' %>"
+                                                                                style="<%= isFav ? '' : 'color: #ef4444 !important; border: 1px solid #ef4444 !important; background: transparent !important;' %>"
+                                                                                title="<%= isFav ? 'Quitar de favoritos' : 'Agregar a favoritos' %>">
+                                                                                <i
+                                                                                    class="<%= isFav ? 'fas' : 'far' %> fa-heart"></i>
+                                                                            </button>
+                                                                            <% } %>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer Pagination -->
+                    <div class="card-modern__footer">
+                        <div style="font-size: 0.9rem; color: var(--dash-muted);">
+                            Página <strong>
+                                <%= paginaActual %>
+                            </strong> de <strong>
+                                <%= typeof totalPaginas !=='undefined' ? totalPaginas : paginas %>
+                            </strong>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <% if (paginaActual> 1) { %>
+                                <a href="?pagina=<%= paginaActual - 1 %>&porPagina=<%= typeof porPagina !== 'undefined' ? porPagina : 20 %><%= filtros.titulo ? '&titulo=' + filtros.titulo : '' %><%= filtros.area ? '&area=' + filtros.area : '' %>"
+                                    class="btn-modern btn-modern--neutral">
+                                    <i class="fas fa-chevron-left"></i> Anterior
+                                </a>
+                                <% } else { %>
+                                    <button class="btn-modern btn-modern--neutral" disabled
+                                        style="opacity: 0.5; cursor: not-allowed;">
+                                        <i class="fas fa-chevron-left"></i> Anterior
+                                    </button>
+                                    <% } %>
+
+                                        <% if (paginaActual < (typeof totalPaginas !=='undefined' ? totalPaginas :
+                                            paginas)) { %>
+                                            <a href="?pagina=<%= paginaActual + 1 %>&porPagina=<%= typeof porPagina !== 'undefined' ? porPagina : 20 %><%= filtros.titulo ? '&titulo=' + filtros.titulo : '' %><%= filtros.area ? '&area=' + filtros.area : '' %>"
+                                                class="btn-modern btn-modern--neutral">
+                                                Siguiente <i class="fas fa-chevron-right"></i>
+                                            </a>
+                                            <% } else { %>
+                                                <button class="btn-modern btn-modern--neutral" disabled
+                                                    style="opacity: 0.5; cursor: not-allowed;">
+                                                    Siguiente <i class="fas fa-chevron-right"></i>
+                                                </button>
+                                                <% } %>
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
+
+        <!-- Modal Nuevo Libro (ALWAYS RENDERED) -->
+        <div id="modalNuevoLibro" class="modal-overlay" style="display: none;">
+            <div class="modal-container">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fa-solid fa-plus-circle"></i> Registrar Nuevo Libro
+                    </div>
+                    <button type="button" class="modal-close" id="btnCloseModal">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+                <form id="formNuevoLibro">
+                    <div class="modal-body">
+                        <div class="form-grid-two">
+                            <div class="form-group form-group--full">
+                                <label class="form-label">Título *</label>
+                                <input type="text" name="titulo" required placeholder="Ej: Don Quijote de la Mancha"
+                                    class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Autor *</label>
+                                <input type="text" name="autor" required placeholder="Ej: Miguel de Cervantes"
+                                    class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Editorial *</label>
+                                <input type="text" name="editorial" required placeholder="Ej: Santillana"
+                                    class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">ISBN</label>
+                                <input type="text" name="isbn" pattern="^(?:\d{10}|\d{13})$"
+                                    placeholder="10 o 13 dígitos" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Área *</label>
+                                <select name="area" required class="form-select">
+                                    <option value="">Seleccione un área</option>
+                                    <% areas.forEach(area=> { %>
+                                        <option value="<%= area %>">
+                                            <%= area %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Grado recomendado</label>
+                                <select name="grado_recomendado" required class="form-select">
+                                    <option value="">Seleccione un grado</option>
+                                    <% for(let i=1; i<=11; i++) { %>
+                                        <option value="<%= i %>">
+                                            <%= i %>° grado
+                                        </option>
+                                        <% } %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Año de publicación</label>
+                                <input type="number" name="anio_publicacion" min="1800"
+                                    max="<%= new Date().getFullYear() %>" placeholder="Ej: 2023" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Ejemplares *</label>
+                                <input type="number" name="ejemplares_totales" required min="1" value="1"
+                                    class="form-input">
+                            </div>
+                            <div class="form-group form-group--full">
+                                <label class="form-label">Imagen de portada</label>
+                                <input type="file" name="imagen_portada" accept="image/*" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn-modern btn-modern--neutral"
+                            id="btnCancelModal">Cancelar</button>
+                        <button type="submit" class="btn-modern btn-modern--primary">
+                            <i class="fas fa-save"></i> Guardar Libro
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Include Footer -->
+        <%- include('../partials/footer') %>
+
+            <!-- External Scripts -->
+            <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+            <!-- Main Logic Script -->
+            <script>
+                console.log('Admin Libros Script Started');
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    console.log('DOM Content Loaded');
+
+                    // Initialize AOS
+                    AOS.init({ duration: 800, once: true });
+
+                    // Main Modal Logic - ID Based to prevent function scope issues
+                    const btnNuevoLibro = document.getElementById('btnNuevoLibro');
+                    const modalNuevoLibro = document.getElementById('modalNuevoLibro');
+                    const btnCloseModal = document.getElementById('btnCloseModal');
+                    const btnCancelModal = document.getElementById('btnCancelModal');
+                    const formNuevoLibro = document.getElementById('formNuevoLibro');
+
+                    // Open Modal
+                    if (btnNuevoLibro) {
+                        btnNuevoLibro.addEventListener('click', (e) => {
+                            e.preventDefault(); // Just in case
+                            console.log('Click on Nuevo Libro');
+                            if (modalNuevoLibro) {
+                                modalNuevoLibro.style.display = 'flex';
+                                document.body.style.overflow = 'hidden';
+                            } else {
+                                alert('Error: Modal element not found');
+                            }
+                        });
+                    } else {
+                        console.log('Button Nuevo Libro not found (User might not be admin)');
+                    }
+
+                    // Close Modal Functions
+                    const closeModal = () => {
+                        if (modalNuevoLibro) {
+                            modalNuevoLibro.style.display = 'none';
+                            document.body.style.overflow = '';
+                        }
+                    };
+
+                    if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
+                    if (btnCancelModal) btnCancelModal.addEventListener('click', closeModal);
+
+                    // Close clicking outside
+                    if (modalNuevoLibro) {
+                        modalNuevoLibro.addEventListener('click', (e) => {
+                            if (e.target === modalNuevoLibro) {
+                                closeModal();
+                            }
+                        });
+                    }
+
+                    // Dropdown Logic
+                    const dropdownBtn = document.getElementById('dropdownMenuButton');
+                    const dropdownContent = document.querySelector('.dropdown-content');
+                    if (dropdownBtn && dropdownContent) {
+                        dropdownBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            const isVisible = dropdownContent.style.display === 'block';
+                            dropdownContent.style.display = isVisible ? 'none' : 'block';
+                        });
+                        window.addEventListener('click', () => {
+                            dropdownContent.style.display = 'none';
+                        });
+                    }
+
+                    // Submit Form Logic
+                    if (formNuevoLibro) {
+                        formNuevoLibro.addEventListener('submit', async (e) => {
+                            e.preventDefault();
+                            console.log('Form submitting...');
+
+                            const formData = new FormData(e.target);
+
+                            try {
+                                const response = await fetch('/libros', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                if (response.ok) {
+                                    closeModal();
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: '¡Libro Creado!',
+                                        text: 'El libro se ha registrado correctamente.',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(() => location.reload());
+                                } else {
+                                    const errorData = await response.json();
+                                    throw new Error(errorData.errors ? errorData.errors.map(e => e.msg).join(', ') : 'Error al crear libro');
+                                }
+                            } catch (error) {
+                                Swal.fire('Error', error.message, 'error');
+                            }
+                        });
+                    }
+                });
+
+                // Global function for existing onclicks in table (Eliminar) - REPLACED BY EVENT DELEGATION
+                document.addEventListener('click', async function (e) {
+                    const btn = e.target.closest('.js-btn-eliminar-libro');
+                    if (!btn) return;
+
+                    e.preventDefault();
+                    const id = btn.dataset.id;
+
+                    const result = await Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "No podrás revertir esta acción.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#ef4444',
+                        cancelButtonColor: '#6B7280',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        background: document.documentElement.getAttribute('data-theme') === 'dark' ? '#1e293b' : '#fff',
+                        color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#fff' : '#000'
+                    });
+
+                    if (result.isConfirmed) {
+                        try {
+                            const response = await fetch(`/libros/${id}`, { method: 'DELETE' });
+
+                            if (response.ok) {
+                                await Swal.fire({
+                                    icon: 'success',
+                                    title: 'Excelente',
+                                    text: 'Libro eliminado correctamente.',
+                                    showConfirmButton: false,
+                                    timer: 700,
+                                    timerProgressBar: false
+                                });
+                                window.location.reload();
+                            } else {
+                                const data = await response.json();
+                                throw new Error(data.message || 'Error al eliminar');
+                            }
+                        } catch (error) {
+                            console.error(error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'No se pudo eliminar el libro.',
+                                confirmButtonColor: '#EF4444'
+                            });
+                        }
+                    }
+                });
+
+                // --- INSTANT SEARCH & FILTER LOGIC ---
+                const filterForm = document.getElementById('filterForm');
+                const searchInput = filterForm.querySelector('input[name="titulo"]');
+                const areaSelect = filterForm.querySelector('select[name="area"]');
+                const tableContainer = document.querySelector('.table-container-modern');
+                const tableBody = document.querySelector('.table-modern-enhanced tbody');
+                const paginationContainer = document.querySelector('.card-modern__footer');
+
+                // Debounce function to limit API calls
+                function debounce(func, wait) {
+                    let timeout;
+                    return function (...args) {
+                        const later = () => {
+                            clearTimeout(timeout);
+                            func(...args);
+                        };
+                        clearTimeout(timeout);
+                        timeout = setTimeout(later, wait);
+                    };
+                }
+
+                // Main Update Function
+                async function updateTable() {
+                    const formData = new FormData(filterForm);
+                    const params = new URLSearchParams(formData);
+                    const url = `${window.location.pathname}?${params.toString()}`;
+
+                    // Update URL without reload
+                    window.history.pushState({}, '', url);
+
+                    // Add loading state opacity
+                    tableContainer.style.opacity = '0.5';
+
+                    try {
+                        const response = await fetch(url);
+                        const html = await response.text();
+
+                        // Parse HTML response
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+
+                        // Update Table Body
+                        const newBody = doc.querySelector('.table-modern-enhanced tbody');
+                        if (newBody && tableBody) {
+                            tableBody.innerHTML = newBody.innerHTML;
+                        }
+
+                        // Update Pagination
+                        const newPagination = doc.querySelector('.card-modern__footer');
+                        if (newPagination && paginationContainer) {
+                            paginationContainer.innerHTML = newPagination.innerHTML;
+                        }
+
+                        // Re-attach event listeners for new elements (like favorites) if needed
+                        // (Delegated listeners on document will still work, so mostly defined)
+
+                    } catch (error) {
+                        console.error('Error fetching search results:', error);
+                    } finally {
+                        tableContainer.style.opacity = '1';
+                    }
+                }
+
+                // Event Listeners
+                if (searchInput) {
+                    searchInput.addEventListener('input', debounce(updateTable, 500)); // 500ms delay
+                }
+
+                if (areaSelect) {
+                    areaSelect.removeAttribute('onchange'); // Remove inline handler
+                    areaSelect.addEventListener('change', updateTable);
+                }
+
+                // Handle Pagination Links via AJAX (Optional but recommended for consistency)
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('.card-modern__footer a');
+                    if (link) {
+                        e.preventDefault();
+                        const url = link.href;
+                        // Similar update logic for links
+                        const params = new URL(url).searchParams;
+
+                        // Update form values to match link (sync state)
+                        if (params.has('titulo') && searchInput) searchInput.value = params.get('titulo');
+                        if (params.has('area') && areaSelect) areaSelect.value = params.get('area');
+
+                        // reuse updateTable logic but with specific URL? 
+                        // Simpler: Just manual fetch:
+                        window.history.pushState({}, '', url);
+
+                        tableContainer.style.opacity = '0.5';
+                        fetch(url)
+                            .then(res => res.text())
+                            .then(html => {
+                                const parser = new DOMParser();
+                                const doc = parser.parseFromString(html, 'text/html');
+                                const newBody = doc.querySelector('.table-modern-enhanced tbody');
+                                const newPagination = doc.querySelector('.card-modern__footer');
+                                if (newBody) tableBody.innerHTML = newBody.innerHTML;
+                                if (newPagination) paginationContainer.innerHTML = newPagination.innerHTML;
+                            })
+                            .finally(() => tableContainer.style.opacity = '1');
+                    }
+                });
+
+                // Favorites Toggle Function
+                // Favorites Logic - Event Delegation
+                document.addEventListener('click', async (e) => {
+                    const btn = e.target.closest('.js-toggle-favorito');
+                    if (!btn) return;
+
+                    e.preventDefault();
+                    console.log('Delegated Click detected on Favorite Button');
+
+                    const libroId = btn.dataset.libroId;
+                    console.log('Libro ID:', libroId);
+
+                    if (typeof Swal === 'undefined') {
+                        alert('Error: SweetAlert2 no está cargado. Recarga la página.');
+                        return;
+                    }
+
+                    try {
+                        const icon = btn.querySelector('i');
+                        const isAdding = icon.classList.contains('far'); // currently empty = adding
+
+                        let url = '/favoritos';
+                        let method = 'POST';
+                        let body = JSON.stringify({ libro_id: libroId });
+
+                        if (!isAdding) { // removing
+                            url = `/favoritos/${libroId}`;
+                            method = 'DELETE';
+                            body = undefined;
+                        }
+
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: { 'Content-Type': 'application/json' },
+                            body: body
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            // Success - Toggle UI
+                            if (!isAdding) {
+                                // Switched to Inactive (Outline)
+                                icon.classList.replace('fas', 'far');
+                                btn.classList.remove('btn-modern--danger');
+                                btn.classList.add('btn-modern');
+                                btn.style.cssText = 'color: #ef4444 !important; border: 1px solid #ef4444 !important; background: transparent !important;';
+                                btn.title = 'Agregar a favoritos';
+                            } else {
+                                // Switched to Active (Solid Red)
+                                icon.classList.replace('far', 'fas');
+                                btn.classList.add('btn-modern--danger');
+                                btn.style.cssText = '';
+                                btn.title = 'Quitar de favoritos';
+                            }
+
+                            // Toast
+                            const Toast = Swal.mixin({
+                                toast: true,
+                                position: 'top-end',
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true
+                            });
+                            Toast.fire({
+                                icon: 'success',
+                                title: data.message || (isAdding ? 'Añadido a favoritos' : 'Eliminado de favoritos')
+                            });
+                        } else {
+                            throw new Error(data.message || 'Error al actualizar favoritos');
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'error',
+                            title: error.message || 'Error de conexión',
+                            showConfirmButton: false,
+                            timer: 3000
+                        });
+                    }
+                });
+            </script>
+</body>
+
+</html>
+```

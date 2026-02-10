@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Mis Préstamos - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/prestamos.css">
+        <link rel="stylesheet" href="/css/resenas.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-book"></i>
+                        <span>Gestión de préstamos</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Mis Préstamos</h1>
+                        <p>Controla tus préstamos activos, vencidos y reservas en un solo lugar.</p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right">
+                    <a href="/libros" class="btn-modern btn-modern--primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Solicitar préstamo</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Solicitudes Pendientes -->
+            <% if (prestamos.filter(p=> p.estado === 'pendiente').length > 0) { %>
+                <section class="perfil-grid" data-aos="fade-up" data-aos-delay="50">
+                    <article class="card card--elevated" style="border-left: 4px solid #f59e0b;">
+                        <div class="card__header">
+                            <div>
+                                <p class="card__eyebrow" style="color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <span>En espera de aprobación</span>
+                                </p>
+                                <h2 class="card__title">Solicitudes Pendientes</h2>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <div class="table-container-modern">
+                                <table class="table-modern">
+                                    <thead>
+                                        <tr>
+                                            <th>Libro</th>
+                                            <th>Fecha Solicitud</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% prestamos.filter(p=> p.estado === 'pendiente').forEach(prestamo => { %>
+                                            <tr>
+                                                <td data-label="Libro">
+                                                    <div class="libro-info">
+                                                        <div class="libro-info__title">
+                                                            <%= prestamo.titulo %>
+                                                        </div>
+                                                        <div class="libro-info__author">
+                                                            <%= prestamo.autor %>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td data-label="Fecha Solicitud">
+                                                    <%= new Date(prestamo.fecha_prestamo).toLocaleString('es-PE', {
+                                                        timeZone: 'America/Lima' , hour12: true }) %>
+                                                </td>
+                                                <td data-label="Estado">
+                                                    <span class="badge badge--warning">
+                                                        <i class="fas fa-clock" style="margin-right: 4px;"></i>
+                                                        Pendiente
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <% }) %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-4 text-sm text-gray-500"
+                                style="padding: 1rem; background: #fffbeb; border-radius: 8px;">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Acércate al bibliotecario para confirmar tu préstamo y recoger el libro.
+                            </div>
+                        </div>
+                    </article>
+                </section>
+                <% } %>
+
+                    <!-- Préstamos Activos -->
+                    <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                        <article class="card card--elevated">
+                            <div class="card__header">
+                                <div>
+                                    <p class="card__eyebrow">
+                                        <i class="fas fa-book-open"></i>
+                                        <span>En curso</span>
+                                    </p>
+                                    <h2 class="card__title">Préstamos Activos</h2>
+                                </div>
+                            </div>
+                            <div class="card__body">
+                                <% if (prestamos.filter(p=> p.estado === 'activo').length === 0) { %>
+                                    <div class="empty-state">
+                                        <i class="fas fa-book-open"></i>
+                                        <p>No tienes préstamos activos</p>
+                                    </div>
+                                    <% } else { %>
+                                        <div class="table-container-modern">
+                                            <table class="table-modern">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Libro</th>
+                                                        <th>Fecha Préstamo</th>
+                                                        <th>Fecha Devolución</th>
+                                                        <th>Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <% prestamos.filter(p=> p.estado === 'activo').forEach(prestamo => {
+                                                        %>
+                                                        <tr>
+                                                            <td data-label="Libro">
+                                                                <div class="libro-info">
+                                                                    <div class="libro-info__title">
+                                                                        <%= prestamo.titulo %>
+                                                                    </div>
+                                                                    <div class="libro-info__author">
+                                                                        <%= prestamo.autor %>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td data-label="Fecha Préstamo">
+                                                                <%= new
+                                                                    Date(prestamo.fecha_prestamo).toLocaleString('es-PE',
+                                                                    { timeZone: 'America/Lima' , hour12: true }) %>
+                                                            </td>
+                                                            <td data-label="Fecha Devolución">
+                                                                <%= new
+                                                                    Date(prestamo.fecha_devolucion_esperada).toLocaleString('es-PE',
+                                                                    { timeZone: 'America/Lima' , hour12: true }) %>
+                                                            </td>
+                                                            <td data-label="Acciones">
+                                                                <div class="prestamo-actions">
+                                                                    <span class="badge badge--success">Activo</span>
+
+                                                                    <button type="button"
+                                                                        class="btn btn--sm btn--ghost resena-btn"
+                                                                        data-resena-open
+                                                                        data-libro-id="<%= prestamo.libro_id %>">
+                                                                        <i class="fas fa-pen"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </article>
+                    </section>
+
+                    <!-- Préstamos Vencidos -->
+                    <% if (prestamos.filter(p=> p.estado === 'vencido').length > 0) { %>
+                        <section class="perfil-grid" data-aos="fade-up" data-aos-delay="200">
+                            <article class="card card--elevated prestamo-card-danger">
+                                <div class="card__header">
+                                    <div>
+                                        <p class="card__eyebrow prestamo-eyebrow-danger">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span>Atención requerida</span>
+                                        </p>
+                                        <h2 class="card__title">Préstamos Vencidos</h2>
+                                    </div>
+                                </div>
+                                <div class="card__body">
+                                    <div class="table-container-modern">
+                                        <table class="table-modern">
+                                            <thead>
+                                                <tr>
+                                                    <th>Libro</th>
+                                                    <th>Fecha Préstamo</th>
+                                                    <th>Fecha Vencimiento</th>
+                                                    <th>Días de Retraso</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <% prestamos.filter(p=> p.estado === 'vencido').forEach(prestamo => {
+                                                    const now = new Date();
+                                                    now.setHours(0, 0, 0, 0);
+
+                                                    const due = new Date(prestamo.fecha_devolucion_esperada);
+                                                    due.setHours(0, 0, 0, 0); // Normalize to start of day
+
+                                                    const diffTime = now - due;
+                                                    // Diff should be positive if overdue.
+                                                    // e.g. Now 9th, Due 8th. Diff = 1 day.
+                                                    let daysOverdue = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                                                    // Ensure minimum 1 day if it appears here (since it's 'vencido')
+                                                    daysOverdue = daysOverdue < 1 ? 1 : daysOverdue; %>
+                                                        <tr>
+                                                            <td data-label="Libro">
+                                                                <div class="libro-info">
+                                                                    <div class="libro-info__title">
+                                                                        <%= prestamo.titulo %>
+                                                                    </div>
+                                                                    <div class="libro-info__author">
+                                                                        <%= prestamo.autor %>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td data-label="Fecha Préstamo">
+                                                                <%= new
+                                                                    Date(prestamo.fecha_prestamo).toLocaleString('es-PE',
+                                                                    { timeZone: 'America/Lima' , hour12: true }) %>
+                                                            </td>
+                                                            <td data-label="Fecha Vencimiento">
+                                                                <%= new
+                                                                    Date(prestamo.fecha_devolucion_esperada).toLocaleString('es-PE',
+                                                                    { timeZone: 'America/Lima' , hour12: true }) %>
+                                                            </td>
+                                                            <td data-label="Días de Retraso">
+                                                                <span class="badge badge--error">
+                                                                    <%= daysOverdue %>
+                                                                        <%= daysOverdue===1 ? 'día' : 'días' %>
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </article>
+                        </section>
+                        <% } %>
+
+
+
+                            <!-- Próximos Vencimientos -->
+                            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="400">
+                                <article class="card card--elevated">
+                                    <div class="card__header">
+                                        <div>
+                                            <p class="card__eyebrow"
+                                                style="color: #ea580c; background: rgba(234, 88, 12, 0.1);">
+                                                <i class="fas fa-clock"></i>
+                                                <span>Prioridad</span>
+                                            </p>
+                                            <h2 class="card__title">Próximos Vencimientos</h2>
+                                        </div>
+                                    </div>
+                                    <div class="card__body">
+                                        <% const proximos=prestamos.filter(p=> p.estado === 'activo').sort((a, b) => new
+                                            Date(a.fecha_devolucion_esperada) - new Date(b.fecha_devolucion_esperada));
+                                            %>
+                                            <% if (proximos.length===0) { %>
+                                                <div class="empty-state">
+                                                    <i class="far fa-check-circle"></i>
+                                                    <p>¡Estás al día! No tienes devoluciones pendientes.</p>
+                                                </div>
+                                                <% } else { %>
+                                                    <div class="table-container-modern">
+                                                        <table class="table-modern">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Libro</th>
+                                                                    <th>Fecha Préstamo</th>
+                                                                    <th>Vence</th>
+                                                                    <th>Restante</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <% proximos.slice(0, 5).forEach(prestamo=> {
+                                                                    const hoy = new Date();
+                                                                    hoy.setHours(0, 0, 0, 0);
+
+                                                                    const vence = new
+                                                                    Date(prestamo.fecha_devolucion_esperada);
+                                                                    vence.setHours(0, 0, 0, 0);
+
+                                                                    const diffTime = vence - hoy;
+                                                                    const diffDays = Math.ceil(diffTime / (1000 * 60 *
+                                                                    60 *
+                                                                    24));
+
+                                                                    let badgeClass = 'badge--success';
+                                                                    let texto = diffDays + ' días';
+
+                                                                    if (diffDays < 0) { badgeClass='badge--error' ;
+                                                                        texto='Vencido' ; } else if (diffDays===0) {
+                                                                        badgeClass='badge--warning' ; texto='Hoy' ; }
+                                                                        else if (diffDays===1) {
+                                                                        badgeClass='badge--warning' ; texto='Mañana' ; }
+                                                                        else if (diffDays <=3) {
+                                                                        badgeClass='badge--warning' ; } %>
+                                                                        <tr>
+                                                                            <td data-label="Libro">
+                                                                                <div class="libro-info">
+                                                                                    <div class="libro-info__title">
+                                                                                        <%= prestamo.titulo %>
+                                                                                    </div>
+                                                                                    <div class="libro-info__author">
+                                                                                        <%= prestamo.autor %>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </td>
+                                                                            <td data-label="Fecha Préstamo">
+                                                                                <%= new
+                                                                                    Date(prestamo.fecha_prestamo).toLocaleString('es-PE',
+                                                                                    { timeZone: 'America/Lima' , hour12:
+                                                                                    true }) %>
+                                                                            </td>
+                                                                            <td data-label="Vence">
+                                                                                <%= new
+                                                                                    Date(prestamo.fecha_devolucion_esperada).toLocaleString('es-PE',
+                                                                                    { timeZone: 'America/Lima' , hour12:
+                                                                                    true }) %>
+                                                                            </td>
+                                                                            <td data-label="Restante">
+                                                                                <span class="badge <%= badgeClass %>">
+                                                                                    <%= texto %>
+                                                                                </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <% }) %>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <% } %>
+                                    </div>
+                                </article>
+                            </section>
+        </main>
+
+        <%- include('../resenas/resena-modal', { modalId: 'resenaModalPrestamos' , librosElegibles: librosElegibles ||
+            [], dynamicLibro: true, submitLabel: 'Publicar reseña' }) %>
+
+            <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+            <script>
+                AOS.init({ duration: 800, once: true });
+
+                // Registrar listeners para los botones de devolución
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Script de devolución removido para estudiantes
+                });
+            </script>
+            <script type="application/json" id="resena-config">
+        <%- JSON.stringify({
+            scope: 'prestamos',
+            modalId: 'resenaModalPrestamos',
+            usuario: usuario || null,
+            endpoints: {
+                crear: '/resenas',
+                actualizar: '/resenas/:id',
+                eliminar: '/resenas/:id',
+                contexto: '/resenas/contexto/:libroId',
+                listar: '/resenas/libro/:libroId'
+            }
+        }) %>
+    </script>
+            <script src="/js/resenas.js" defer></script>
+</body>
+
+</html>

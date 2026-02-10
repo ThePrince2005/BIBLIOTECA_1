@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Gestión de Documentos | Biblioteca' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+        <style>
+            .upload-area {
+                border: 2px dashed var(--dash-border);
+                background-color: var(--bg-gray-50);
+                border-radius: 12px;
+                padding: 3rem;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .upload-area:hover {
+                background-color: var(--bg-gray-100);
+                border-color: var(--primary-color);
+            }
+
+            .upload-area.dragover {
+                border-color: var(--primary-color);
+                background-color: rgba(99, 102, 241, 0.05);
+            }
+        </style>
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <div class="perfil-wrapper">
+
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>
+                            <%= user && user.rol==='docente' ? 'Panel Docente' : 'Administración' %>
+                        </span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Gestión de Documentos</h1>
+                        <p>Gestiona los recursos educativos y documentos de la biblioteca.</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Mensajes Flash -->
+            <% if (typeof session !=='undefined' && session && session.flash && session.flash.mensaje) { %>
+                <div data-flash-message data-flash-type="<%= session.flash.tipo %>" class="d-none">
+                    <%= session.flash.mensaje %>
+                </div>
+                <% if (session.flash) session.flash=null; %>
+                    <% } %>
+
+                        <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+
+                            <!-- FORMULARIO DE SUBIDA -->
+                            <article class="card-modern" style="grid-column: 1 / -1; margin-bottom: 2rem;">
+                                <div class="card-modern__header">
+                                    <div class="card-modern__title">
+                                        <i class="fas fa-cloud-upload-alt"></i>
+                                        Subir Nuevo Documento
+                                    </div>
+                                </div>
+
+                                <div style="padding: 1.5rem;">
+                                    <form action="/admin/documentos" method="POST" enctype="multipart/form-data">
+                                        <div
+                                            style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                                            <div class="form-group" style="margin-bottom: 0;">
+                                                <label class="form-label"
+                                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">
+                                                    Título <span style="color: #e74c3c;">*</span>
+                                                </label>
+                                                <div class="input-wrapper-modern">
+                                                    <i class="fas fa-heading"></i>
+                                                    <input type="text" id="titulo" name="titulo" class="input-modern"
+                                                        placeholder="Ej. Guía de Matemáticas" required>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" style="margin-bottom: 0;">
+                                                <label class="form-label"
+                                                    style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">
+                                                    Tipo de Documento
+                                                </label>
+                                                <div class="input-wrapper-modern">
+                                                    <i class="fas fa-tag"></i>
+                                                    <select name="tipo_documento" class="input-modern">
+                                                        <option value="otro">Otro</option>
+                                                        <option value="examen">Examen</option>
+                                                        <option value="guia">Guía</option>
+                                                        <option value="resolucion">Resolución</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                                            <label class="form-label"
+                                                style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">
+                                                Descripción <span style="color: #e74c3c;">*</span>
+                                            </label>
+                                            <div class="input-wrapper-modern">
+                                                <i class="fas fa-align-left"
+                                                    style="align-self: flex-start; margin-top: 0.8rem;"></i>
+                                                <textarea id="descripcion" name="descripcion" class="input-modern"
+                                                    rows="3" placeholder="Descripción breve del documento..." required
+                                                    style="padding-top: 0.8rem; resize: vertical;"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" style="margin-bottom: 1.5rem;">
+                                            <label class="form-label"
+                                                style="font-size: 0.9rem; margin-bottom: 0.5rem; display: block; font-weight: 600; color: var(--dash-text);">
+                                                Archivo adjunto <span style="color: #e74c3c;">*</span>
+                                            </label>
+                                            <div class="upload-area" id="dropZone">
+                                                <div style="margin-bottom: 1rem;">
+                                                    <i class="fas fa-file-upload"
+                                                        style="font-size: 2.5rem; color: var(--dash-muted);"></i>
+                                                </div>
+                                                <p
+                                                    style="font-weight: 600; margin-bottom: 0.5rem; color: var(--dash-text);">
+                                                    Arrastra tu archivo aquí o haz clic para buscar
+                                                </p>
+                                                <p style="color: var(--dash-muted); font-size: 0.85rem; margin: 0;">
+                                                    PDF, DOC, DOCX, XLS, PPT, TXT (Máx. 25MB)
+                                                </p>
+                                                <input type="file" id="documentos" name="documentos" class="d-none"
+                                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" required>
+                                            </div>
+                                            <div id="fileInfo"
+                                                style="margin-top: 0.75rem; font-size: 0.875rem; text-align: center; color: var(--primary-color); font-weight: 500;">
+                                            </div>
+                                        </div>
+
+                                        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                                            <button type="reset" class="btn-modern btn-modern--secondary">
+                                                <i class="fas fa-undo"></i> Limpiar
+                                            </button>
+                                            <button type="submit" class="btn-modern btn-modern--primary">
+                                                <i class="fas fa-save"></i> Guardar Documento
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </article>
+
+                            <!-- LISTA DE DOCUMENTOS -->
+                            <article class="card-modern" style="grid-column: 1 / -1;">
+                                <div class="card-modern__header">
+                                    <div class="card-modern__title">
+                                        <i class="fas fa-folder-open"></i>
+                                        Documentos Disponibles
+                                        <span class="badge-modern badge-modern--primary" style="font-size: 0.9rem;">
+                                            <% var totalDocs=0; if (typeof documentos !=='undefined' ) { for (var key in
+                                                documentos) { if (documentos.hasOwnProperty(key) &&
+                                                Array.isArray(documentos[key])) { totalDocs +=documentos[key].length; }
+                                                } } %>
+                                                <%= totalDocs %>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="table-container-modern">
+                                    <table class="table-modern-enhanced">
+                                        <thead>
+                                            <tr>
+                                                <th>Documento</th>
+                                                <th>Tipo</th>
+                                                <th>Descripción</th>
+                                                <th class="text-end">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% if (totalDocs===0) { %>
+                                                <tr>
+                                                    <td colspan="4" class="text-center py-4"
+                                                        style="color: var(--dash-muted);">
+                                                        <i class="fas fa-inbox"
+                                                            style="font-size: 2rem; margin-bottom: 0.5rem; display: block;"></i>
+                                                        No hay documentos registrados.
+                                                    </td>
+                                                </tr>
+                                                <% } else { var allDocs=[]; if (typeof documentos !=='undefined' ) { for
+                                                    (var key in documentos) { if (documentos.hasOwnProperty(key) &&
+                                                    Array.isArray(documentos[key])) { for (var i=0; i <
+                                                    documentos[key].length; i++) { allDocs.push(documentos[key][i]); } }
+                                                    } } allDocs.forEach(function(doc) { %>
+                                                    <tr>
+                                                        <td data-label="Documento">
+                                                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                                                <div class="user-avatar-placeholder"
+                                                                    style="background: var(--bg-gray-100); color: var(--primary-color);">
+                                                                    <i class="fas fa-file-alt"></i>
+                                                                </div>
+                                                                <div style="display: flex; flex-direction: column;">
+                                                                    <span
+                                                                        style="font-weight: 600; color: var(--dash-text);">
+                                                                        <%= doc.titulo || 'Sin Título' %>
+                                                                    </span>
+                                                                    <span
+                                                                        style="font-size: 0.8rem; color: var(--dash-muted);">
+                                                                        <%= doc.nombre_archivo %>
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td data-label="Tipo">
+                                                            <span class="badge-modern badge-modern--secondary"
+                                                                style="text-transform: capitalize;">
+                                                                <%= doc.tipo_documento || 'Otro' %>
+                                                            </span>
+                                                        </td>
+                                                        <td data-label="Descripción">
+                                                            <span
+                                                                style="color: var(--dash-subtext); font-size: 0.9rem;">
+                                                                <%= (doc.descripcion && doc.descripcion.length> 50) ?
+                                                                    doc.descripcion.substring(0, 50) + '...' :
+                                                                    (doc.descripcion || '-') %>
+                                                            </span>
+                                                        </td>
+                                                        <td data-label="Acciones" class="text-end">
+                                                            <div class="table-actions-cell"
+                                                                style="justify-content: flex-end;">
+                                                                <a href="/admin/documentos/descargar/<%= doc.id_documento || doc.id %>"
+                                                                    class="btn-modern btn-modern--secondary"
+                                                                    style="padding: 0.35rem 0.65rem; font-size: 0.75rem;"
+                                                                    title="Descargar">
+                                                                    <i class="fas fa-download"></i>
+                                                                </a>
+                                                                <a href="/admin/documentos/eliminar/<%= doc.id_documento || doc.id %>"
+                                                                    class="btn-modern btn-eliminar d-inline"
+                                                                    style="padding: 0.35rem 0.65rem; font-size: 0.75rem; background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.2);"
+                                                                    title="Eliminar"
+                                                                    onclick="return confirm('¿Seguro que deseas eliminar este documento?')">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    <% }); } %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </article>
+
+                        </section>
+        </div>
+
+        <!-- Contenedor para toasts -->
+        <div id="toastStack" class="toast-stack"></div>
+
+        <%- include('../partials/footer') %>
+            <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+            <script>
+                AOS.init({ duration: 800, once: true });
+
+                // SHOW TOAST LOGIC
+                (function () {
+                    const stack = document.getElementById('toastStack');
+                    if (!stack) return;
+
+                    function showToast(type, message) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'toast-message toast-message--' + type;
+                        wrapper.innerHTML = `
+                    <div class="toast-message__icon">${type === 'success' ? '✓' : '⚠'}</div>
+                    <div class="toast-message__text">${message}</div>
+                    <button class="toast-message__close">&times;</button>
+                `;
+                        stack.appendChild(wrapper);
+                        requestAnimationFrame(() => wrapper.classList.add('is-visible'));
+
+                        const remove = () => {
+                            wrapper.classList.remove('is-visible');
+                            setTimeout(() => wrapper.remove(), 220);
+                        };
+
+                        wrapper.querySelector('.toast-message__close').addEventListener('click', remove);
+                        setTimeout(remove, 3500);
+                    }
+
+                    const flashEl = document.querySelector('[data-flash-message]');
+                    if (flashEl) {
+                        const message = flashEl.textContent.trim();
+                        if (message) {
+                            showToast(flashEl.getAttribute('data-flash-type') || 'success', message);
+                        }
+                        flashEl.remove();
+                    }
+                })();
+
+                // File Upload Interface Logic
+                document.addEventListener('DOMContentLoaded', function () {
+                    var dropZone = document.getElementById('dropZone');
+                    var fileInput = document.getElementById('documentos');
+                    var fileInfo = document.getElementById('fileInfo');
+
+                    if (!dropZone || !fileInput || !fileInfo) return;
+
+                    dropZone.addEventListener('click', function () {
+                        fileInput.click();
+                    });
+
+                    fileInput.addEventListener('change', function (e) {
+                        if (fileInput.files.length > 0) {
+                            updateFileInfo(fileInput.files[0]);
+                        }
+                    });
+
+                    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function (eventName) {
+                        dropZone.addEventListener(eventName, preventDefaults, false);
+                    });
+
+                    function preventDefaults(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+                    ['dragenter', 'dragover'].forEach(function (eventName) {
+                        dropZone.addEventListener(eventName, function () {
+                            dropZone.classList.add('dragover');
+                        }, false);
+                    });
+
+                    ['dragleave', 'drop'].forEach(function (eventName) {
+                        dropZone.addEventListener(eventName, function () {
+                            dropZone.classList.remove('dragover');
+                        }, false);
+                    });
+
+                    dropZone.addEventListener('drop', function (e) {
+                        var dt = e.dataTransfer;
+                        var files = dt.files;
+                        if (files.length) {
+                            fileInput.files = files;
+                            updateFileInfo(files[0]);
+                        }
+                    });
+
+                    function updateFileInfo(file) {
+                        var fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                        fileInfo.innerHTML = '<i class="fas fa-check-circle"></i> ' +
+                            file.name + ' (' + fileSize + ' MB)';
+                    }
+                });
+            </script>
+</body>
+
+</html>

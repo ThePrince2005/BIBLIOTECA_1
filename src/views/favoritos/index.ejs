@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Mis Libros Favoritos' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/prestamos.css">
+        <link rel="stylesheet" href="/css/componentes-mejorados.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+        <style>
+            .favorites-grid-modern {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 1.5rem;
+                margin-top: 1.5rem;
+            }
+
+            .fav-card {
+                background: var(--bg-surface);
+                border: 1px solid var(--border-surface);
+                border-radius: 1rem;
+                overflow: hidden;
+                transition: all 0.3s ease;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+
+            .fav-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+                border-color: #cbd5e1;
+            }
+
+            .fav-card__cover {
+                height: 200px;
+                background: var(--bg-subtle);
+                position: relative;
+                overflow: hidden;
+                border-bottom: 1px solid var(--border-surface);
+            }
+
+            .fav-card__cover img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.5s ease;
+            }
+
+            .fav-card:hover .fav-card__cover img {
+                transform: scale(1.05);
+            }
+
+            .fav-card__placeholder {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #cbd5e1;
+                font-size: 3rem;
+            }
+
+            .fav-card__remove {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
+                width: 2.5rem;
+                height: 2.5rem;
+                background: var(--bg-surface);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ef4444;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                border: 1px solid #fee2e2;
+                cursor: pointer;
+                transition: all 0.2s;
+                z-index: 10;
+            }
+
+            .fav-card__remove:hover {
+                background: #ef4444;
+                color: white;
+                transform: scale(1.1);
+            }
+
+            .fav-card__body {
+                padding: 1.5rem;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .fav-card__category {
+                display: inline-flex;
+                padding: 0.25rem 0.75rem;
+                background: #f0f9ff;
+                color: #0369a1;
+                border-radius: 999px;
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                margin-bottom: 0.75rem;
+                align-self: flex-start;
+            }
+
+            .fav-card__title {
+                font-size: 1.125rem;
+                font-weight: 700;
+                color: var(--dash-text);
+                margin-bottom: 0.5rem;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .fav-card__title a {
+                color: inherit;
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+
+            .fav-card__title a:hover {
+                color: #3b82f6;
+            }
+
+            .fav-card__author {
+                color: #64748b;
+                font-size: 0.875rem;
+                margin-bottom: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .fav-card__footer {
+                margin-top: auto;
+                padding-top: 1rem;
+                border-top: 1px solid var(--border-surface);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 0.875rem;
+                color: #94a3b8;
+            }
+
+            .fav-card__link {
+                color: #3b82f6;
+                font-weight: 600;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
+            .fav-card__link:hover {
+                gap: 0.5rem;
+            }
+
+            /* Stats adjustments for consistency */
+            .stats-overview {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            /* Empty State */
+            .empty-favorites {
+                text-align: center;
+                padding: 4rem 2rem;
+                background: var(--bg-surface);
+                border-radius: 1rem;
+                border: 2px dashed var(--border-surface);
+            }
+
+            /* Dashboard-style Stat Cards */
+            .stats-overview {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .stat-card {
+                padding: 1.75rem;
+                border-radius: 24px;
+                background: var(--bg-surface);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border: 1px solid var(--border-surface);
+                box-shadow: 0 8px 32px rgba(15, 23, 42, 0.05);
+                transition: transform 0.35s ease, box-shadow 0.35s ease;
+                display: flex;
+                align-items: center;
+                gap: 1.25rem;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1);
+            }
+
+            .stat-card__icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 20px;
+                display: grid;
+                place-items: center;
+                font-size: 1.5rem;
+                color: #fff;
+                background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+                box-shadow: 0 20px 30px rgba(30, 58, 138, 0.2);
+                flex-shrink: 0;
+            }
+
+            .stat-card__info {
+                flex: 1;
+            }
+
+            .stat-card__info h3 {
+                font-size: 0.85rem;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                color: #64748b;
+                margin-bottom: 0.4rem;
+                font-weight: 600;
+            }
+
+            .stat-card__value {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--dash-text);
+                line-height: 1;
+            }
+
+            .stat-card__meta {
+                font-size: 0.9rem;
+                color: #94a3b8;
+                margin-top: 0.25rem;
+            }
+
+            /* Variants */
+            .stat-card[data-color="green"] .stat-card__icon {
+                background: linear-gradient(135deg, #059669, #10B981);
+                box-shadow: 0 18px 30px rgba(16, 185, 129, 0.3);
+            }
+
+            .stat-card[data-color="amber"] .stat-card__icon {
+                background: linear-gradient(135deg, #B45309, #F59E0B);
+                box-shadow: 0 18px 30px rgba(245, 158, 11, 0.25);
+            }
+
+            /* Simple entry animation for numbers */
+            @keyframes slideUpFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .animate-value {
+                animation: slideUpFade 0.6s ease-out forwards;
+            }
+        </style>
+</head>
+
+<body class="perfil-body"><%- include('../partials/navbar') %>
+        <main class="perfil-wrapper">
+            <!-- Unified Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge"
+                        style="background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2);">
+                        <i class="fas fa-heart"></i><span>Colección Personal</span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Mis Libros Favoritos</h1>
+                        <p>Gestiona y accede rápidamente a tu selección personal de lecturas.</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid (Dashboard Style) -->
+            <section class="stats-overview" data-aos="fade-up" data-aos-delay="100">
+                <!-- Total Favoritos -->
+                <article class="stat-card" data-color="blue" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-card__icon">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Total Guardados</h3>
+                        <div class="stat-card__value">
+                            <%= estadisticas.total_favoritos || 0 %>
+                        </div>
+                        <p class="stat-card__meta">Libros en tu lista personal.</p>
+                    </div>
+                </article>
+
+                <!-- Libros Leídos -->
+                <article class="stat-card" data-color="green" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-card__icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Libros Leídos</h3>
+                        <div class="stat-card__value">
+                            <%= estadisticas.favoritos_leidos || 0 %>
+                        </div>
+                        <p class="stat-card__meta">Lecturas completadas.</p>
+                    </div>
+                </article>
+
+                <!-- Categorías -->
+                <article class="stat-card" data-color="amber" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-card__icon">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Categorías</h3>
+                        <div class="stat-card__value">
+                            <%= estadisticas.categorias_diferentes || 0 %>
+                        </div>
+                        <p class="stat-card__meta">Diversidad de temas.</p>
+                    </div>
+                </article>
+            </section>
+            <!-- Favorites Grid -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="200">
+                <% if (favoritos.length===0) { %>
+                    <div class="empty-favorites">
+                        <div
+                            class="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center mx-auto mb-4 text-gray-300 text-3xl">
+                            <i class="far fa-heart"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Tu colección está vacía</h3>
+                        <p class="text-gray-500 mb-6 max-w-md mx-auto">Aún no has agregado libros a tus
+                            favoritos. Explora nuestro catálogo y guarda los que más te interesen.</p><a href="/libros"
+                            class="btn btn-modern btn-modern--primary"><i class="fas fa-compass mr-2"></i>Explorar
+                            Catálogo </a>
+                    </div>
+                    <% } else { %>
+                        <div class="card card--elevated">
+                            <div class="card__header border-b border-gray-100 p-6">
+                                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2"><i
+                                        class="fas fa-book text-blue-500"></i>Mi Biblioteca </h2>
+                            </div>
+                            <div class="favorites-grid-modern p-6 pt-0">
+                                <% favoritos.forEach((favorito, index)=> {
+                                    %> <article class="fav-card">
+                                        <div class="fav-card__cover">
+                                            <% if (favorito.portada_url) { %> <img src="<%= favorito.portada_url %>"
+                                                    alt="<%= favorito.titulo %>" loading="lazy">
+                                                <% } else { %>
+                                                    <div class="fav-card__placeholder"> <i class="fas fa-book-open"></i>
+                                                    </div>
+                                                    <% } %> <button class="fav-card__remove js-remove-favorito"
+                                                            data-id="<%= favorito.libro_id %>"
+                                                            title="Quitar de favoritos">
+                                                            <i class="fas fa-trash-alt"></i> </button>
+                                        </div>
+                                        <div class="fav-card__body"> <span class="fav-card__category">
+                                                <%=favorito.categoria || 'General' %>
+                                            </span>
+                                            <h3 class="fav-card__title"> <a
+                                                    href="/libros/libro/<%= favorito.libro_id %>">
+                                                    <%=favorito.titulo %>
+                                                </a> </h3>
+                                            <div class="fav-card__author"> <i class="fas fa-pen-nib text-gray-400"></i>
+                                                <%=favorito.autor %>
+                                            </div>
+                                            <div class="fav-card__footer"> <span> <i
+                                                        class="far fa-calendar-alt mr-1"></i>
+                                                    <%=new Date(favorito.fecha_agregado).toLocaleDateString() %>
+                                                </span> <a href="/libros/libro/<%= favorito.libro_id %>"
+                                                    class="fav-card__link"> Ver <i class="fas fa-arrow-right"></i>
+                                                </a> </div>
+                                        </div>
+                                    </article>
+                                    <% }) %>
+                            </div>
+                        </div>
+                        <% } %>
+            </section>
+        </main>
+        <!-- Toast Notification Container -->
+        <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+        <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script>AOS.init({
+                duration: 800,
+                once: true,
+                offset: 50
+            });
+
+            // Simple Toast Notification
+            function showToast(message, type = 'success') {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+
+                toast.className = `mb-4 p-4 rounded-lg shadow-lg text-white transform transition-all duration-300 translate-y-2 opacity-0 flex items-center gap-3 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
+
+                toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i><span>${message}</span>`;
+
+                container.appendChild(toast);
+
+                // Animate in
+                requestAnimationFrame(() => {
+                    toast.classList.remove('translate-y-2', 'opacity-0');
+                });
+
+                // Remove after 3s
+                setTimeout(() => {
+                    toast.classList.add('translate-y-2', 'opacity-0');
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            }
+
+            // Favorites Removal - Event Delegation
+            document.addEventListener('click', async (e) => {
+                const btn = e.target.closest('.js-remove-favorito');
+                if (!btn) return;
+
+                const id = btn.dataset.id;
+                if (!id) return;
+
+                const result = await Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "Se eliminará este libro de tus favoritos.",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#9ca3af',
+                    confirmButtonText: 'Sí, quitar',
+                    cancelButtonText: 'Cancelar',
+                    background: '#fff',
+                    borderRadius: '1rem',
+                    customClass: {
+                        popup: 'rounded-2xl'
+                    }
+                });
+
+                if (!result.isConfirmed) return;
+
+                try {
+                    const response = await fetch(`/favoritos/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Eliminado!',
+                            text: 'El libro ha sido eliminado de favoritos.',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => window.location.reload());
+                    } else {
+                        Swal.fire('Error', data.message || 'Error al eliminar', 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire('Error', 'Error de conexión', 'error');
+                }
+            });
+
+        </script>
+</body>
+
+</html>

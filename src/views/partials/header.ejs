@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>Sistema de Biblioteca</title>
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/img/logo.ico" type="image/x-icon">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/core/main.css">
+    <link rel="stylesheet" href="/css/core/sidebar.css">
+    <link rel="stylesheet" href="/css/core/navbar.css">
+    
+    <!-- Additional styles -->
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fc;
+        }
+        .content-wrapper {
+            min-height: calc(100vh - 56px);
+            padding-top: 20px;
+            padding-bottom: 40px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2653d4;
+        }
+    </style>
+    
+    <!-- Additional head content -->
+    <%- typeof additionalStyles !== 'undefined' ? additionalStyles : '' %>
+</head>
+<body>
+    <!-- Navbar -->
+    <%- include('navbar') %>
+    
+    <!-- Page Content -->
+    <div class="container-fluid">
+        <div class="content-wrapper">
+            <div class="container">
+                <!-- Page Heading -->
+                <% if (typeof title !== 'undefined') { %>
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800"><%= title %></h1>
+                </div>
+                <% } %>
+                
+                <!-- Main Content -->
+                <div class="row">
+                    <% if (typeof hideSidebar === 'undefined' || !hideSidebar) { %>
+                    <!-- Sidebar -->
+                    <div class="col-md-3 d-none d-md-block">
+                        <%- include('sidebar') %>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="col-md-9">
+                    <% } else { %>
+                    <!-- Contenido sin barra lateral -->
+                    <div class="col-12">
+                    <% } %>

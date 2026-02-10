@@ -1,0 +1,183 @@
+/* ========================================================================
+   MOBILE TABLES & RESPONSIVENESS
+   Transform tables into "Cards" for better mobile UX
+   ======================================================================== */
+
+@media (max-width: 768px) {
+
+    /* Force tables to behave like blocks */
+    .table-modern,
+    .table-modern-enhanced,
+    .data-table,
+    .table-modern tbody,
+    .table-modern-enhanced tbody,
+    .data-table tbody,
+    .table-modern th,
+    .table-modern-enhanced th,
+    .data-table th,
+    .table-modern td,
+    .table-modern-enhanced td,
+    .data-table td,
+    .table-modern tr,
+    .table-modern-enhanced tr,
+    .data-table tr {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    /* Hide table headers (but keep for accessibility if needed, usually display:none is fine for visual) */
+    .table-modern thead,
+    .table-modern-enhanced thead,
+    .data-table thead {
+        display: none !important;
+    }
+
+    /* Card styling for rows */
+    .table-modern tr,
+    .table-modern-enhanced tr,
+    .data-table tr {
+        background: var(--bg-surface);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        margin-bottom: 1.25rem;
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+    }
+
+    /* Add a subtle accent border to the left for "striking" look */
+    .table-modern tr,
+    .table-modern-enhanced tr,
+    .data-table tr {
+        border-left: 4px solid var(--accent-blue);
+    }
+
+    [data-theme="dark"] .table-modern tr,
+    [data-theme="dark"] .table-modern-enhanced tr,
+    [data-theme="dark"] .data-table tr {
+        background: rgba(30, 41, 59, 0.6);
+        border-color: rgba(148, 224, 239, 0.2);
+    }
+
+    .table-modern tr:hover,
+    .table-modern-enhanced tr:hover,
+    .data-table tr:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    /* Cell styling */
+    .table-modern td,
+    .table-modern-enhanced td,
+    .data-table td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        text-align: right !important;
+        padding: 0.75rem 0 !important;
+        border: none !important;
+        border-bottom: 1px solid var(--border-surface) !important;
+        position: relative;
+        min-height: 3rem;
+    }
+
+    /* Remove border from last cell */
+    .table-modern td:last-child,
+    .table-modern-enhanced td:last-child,
+    .data-table td:last-child {
+        border-bottom: none !important;
+        padding-bottom: 0 !important;
+        margin-top: 0.5rem;
+        justify-content: flex-end !important;
+        /* Actions often need full width or right align */
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* Label generation */
+    .table-modern td::before,
+    .table-modern-enhanced td::before,
+    .data-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--dash-muted);
+        text-align: left;
+        margin-right: 1rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+        /* Ensure label doesn't squish */
+        max-width: 40%;
+    }
+
+    /* Special handling for empty cells or specific content */
+    .table-modern td[data-label="Acciones"],
+    .table-modern-enhanced td[data-label="Acciones"],
+    .data-table td[data-label="Acciones"] {
+        justify-content: flex-end !important;
+    }
+
+    /* Hide label for Actions if redundant/obvious (optional, but requested "striking" usually means cleaner) */
+    .table-modern td[data-label="Acciones"]::before,
+    .table-modern-enhanced td[data-label="Acciones"]::before,
+    .data-table td[data-label="Acciones"]::before {
+        display: none;
+    }
+
+    /* User Avatar/Profile in card adjustments */
+    .user-avatar-placeholder {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+}
+
+/* ========================================================================
+   ADDITIONAL MOBILE POLISH
+   ======================================================================== */
+
+@media (max-width: 640px) {
+
+    /* Adjust Hero sections */
+    .hero-modern {
+        padding: 2.5rem 1.5rem !important;
+        border-radius: 20px !important;
+        text-align: left !important;
+    }
+
+    .hero-modern__content {
+        padding: 0 !important;
+        text-align: left !important;
+    }
+
+    .hero-modern__title {
+        font-size: 2rem !important;
+    }
+
+    /* Adjust Filters Grid */
+    .filters-modern {
+        padding: 1.25rem !important;
+    }
+
+    /* Buttons full width on very small screens? Maybe too aggressive. 
+       Let's stick to making them touch-friendly */
+    .btn-modern {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* Adjust modal content */
+    .modal-container {
+        padding: 0 !important;
+        /* Let inner content handle padding */
+        border-radius: 16px !important;
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+        padding: 1.25rem !important;
+    }
+}

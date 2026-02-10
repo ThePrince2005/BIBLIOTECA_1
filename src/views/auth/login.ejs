@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Iniciar Sesión - Biblioteca Escolar' }) %>
+        <link rel="stylesheet" href="/css/auth-shared.css">
+</head>
+
+<body class="auth-body">
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <!-- Header -->
+            <!-- Header -->
+            <div class="auth-header">
+                <img src="/img/logo.png" alt="Logo Colegio Daniel Hernández" class="auth-logo">
+                <h2 class="auth-institution">INSTITUCIÓN EDUCATIVA “DANIEL HERNÁNDEZ”</h2>
+                <h1 class="auth-title">Acceso al Sistema</h1>
+                <p class="auth-subtitle">Ingresa tus credenciales para continuar</p>
+            </div>
+
+            <!-- Selector de Rol -->
+            <div class="role-selector mb-3" style="grid-template-columns: repeat(3, 1fr);">
+                <a href="/auth/login?role=estudiante" class="role-option <%= role === 'estudiante' ? 'active' : '' %>">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    <span>Estudiante</span>
+                </a>
+                <a href="/auth/login?role=docente" class="role-option <%= role === 'docente' ? 'active' : '' %>">
+                    <i class="fa-solid fa-chalkboard-teacher"></i>
+                    <span>Docente</span>
+                </a>
+                <a href="/auth/login?role=admin" class="role-option <%= role === 'admin' ? 'active' : '' %>">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>Admin</span>
+                </a>
+            </div>
+
+            <!-- Formulario -->
+            <form class="auth-form" id="loginForm" method="POST">
+                <input type="hidden" name="role" value="<%= role %>">
+
+                <div class="form-group">
+                    <label for="correo" class="form-label">Correo electrónico</label>
+                    <input id="correo" name="correo" type="email" class="form-input" placeholder="tu.correo@ejemplo.com"
+                        required autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="contrasena" class="form-label">Contraseña</label>
+                    <div class="form-input-wrapper">
+                        <input id="contrasena" name="contrasena" type="password" class="form-input"
+                            placeholder="••••••••" required autocomplete="current-password">
+                        <button type="button" id="togglePassword" class="form-input-icon">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-unified">
+                    <span>Ingresar</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </form>
+
+            <!-- Enlaces -->
+            <div class="auth-links">
+                <a href="/auth/registro" class="auth-link">¿No tienes cuenta? Regístrate</a>
+            </div>
+
+            <div class="auth-footer">
+                <a href="/auth/select-role" class="auth-link">Volver a seleccionar rol</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/auth-shared.js?v=<%= Date.now() %>"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Inicializar toggle de contraseña
+            initPasswordToggle('contrasena', 'togglePassword');
+
+            // Mostrar mensaje de éxito si viene del registro
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('registered') === 'true') {
+                showToast('¡Registro exitoso! Ahora puedes iniciar sesión.', 'success');
+            }
+
+            // Manejar envío del formulario
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const formData = {
+                    correo: document.getElementById('correo').value,
+                    contrasena: document.getElementById('contrasena').value,
+                    role: urlParams.get('role')
+                };
+
+                if (!formData.role) {
+                    showToast('Por favor, seleccione un tipo de usuario', 'error');
+                    return;
+                }
+
+                // Validar email
+                if (!validateEmail(formData.correo)) {
+                    showToast('Por favor, ingrese un correo electrónico válido', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/auth/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await handleFetchError(response);
+
+                    // Redireccionar según el rol del usuario
+                    window.location.href = data.redirect || '/';
+                } catch (error) {
+                    showToast(error.message || 'Error al iniciar sesión', 'error');
+                }
+            });
+        });
+    </script>
+
+    <style>
+        /* Estilos específicos para selector de rol */
+        .role-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .role-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            border: 2px solid rgba(0, 180, 216, 0.2);
+            border-radius: 12px;
+            background: var(--bg-white);
+            color: var(--title-dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .role-option i {
+            font-size: 2rem;
+            color: var(--accent-blue);
+            transition: all 0.3s ease;
+        }
+
+        .role-option span {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .role-option:hover {
+            border-color: var(--accent-blue);
+            background: rgba(0, 180, 216, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 180, 216, 0.15);
+        }
+
+        .role-option:hover i {
+            transform: scale(1.1);
+            color: var(--accent-blue-dark);
+        }
+
+        /* Role options minor fix for consistency */
+        .role-option.active {
+            border-color: #0096C7;
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            color: var(--accent-blue-dark);
+        }
+
+        .role-option.active i {
+            color: #0077B6;
+        }
+
+        @media (max-width: 480px) {
+            .role-option {
+                padding: 0.875rem;
+            }
+
+            .role-option i {
+                font-size: 1.75rem;
+            }
+
+            .role-option span {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</body>
+
+</html>

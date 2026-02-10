@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Mi Perfil' }) %>
+        <link rel="stylesheet" href="/css/perfil.css">
+        <link rel="stylesheet" href="/css/resenas.css">
+        <link rel="stylesheet" href="/css/sistema-moderno.css">
+        <link rel="stylesheet" href="/css/components/export-dropdown.css">
+        <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body class="perfil-body">
+    <%- include('../partials/navbar') %>
+
+        <main class="perfil-wrapper">
+            <!-- Hero Section -->
+            <header class="perfil-hero" data-aos="fade-down">
+                <div class="perfil-hero__left">
+                    <div class="perfil-hero__badge">
+                        <i class="fas <%= 
+                            usuario.rol === 'docente' ? 'fa-chalkboard-teacher' : 
+                            usuario.rol === 'admin' ? 'fa-user-shield' : 'fa-user-graduate' 
+                        %>"></i>
+                        <span>
+                            <%= usuario.rol==='docente' ? 'Docente' : usuario.rol==='admin' ? 'Administrador'
+                                : 'Estudiante' %>
+                        </span>
+                    </div>
+                    <div class="perfil-hero__title">
+                        <h1>Mi Perfil</h1>
+                        <p>Gestiona tu información personal, revisa tu progreso y personaliza tu experiencia.</p>
+                    </div>
+                </div>
+                <div class="perfil-hero__right">
+                    <div class="perfil-avatar-card">
+                        <div class="perfil-avatar-placeholder">
+                            <i
+                                class="fas <%= usuario.rol === 'docente' ? 'fa-chalkboard-teacher' : 'fa-user-graduate' %>"></i>
+                        </div>
+                        <div class="perfil-avatar-info">
+                            <h3>
+                                <%= usuario.nombre %>
+                            </h3>
+                            <p>
+                                <%= usuario.correo %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Información Personal -->
+            <section class="perfil-grid" data-aos="fade-up" data-aos-delay="100">
+                <article class="card card--elevated">
+                    <div class="card__header">
+                        <div>
+                            <p class="card__eyebrow">
+                                <i class="fas fa-id-card"></i>
+                                <span>Información Personal</span>
+                            </p>
+                            <h2 class="card__title">Datos del Usuario</h2>
+                        </div>
+                    </div>
+                    <div class="card__body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Nombre completo</label>
+                                <p>
+                                    <%= usuario.nombre %>
+                                </p>
+                            </div>
+                            <div class="info-item">
+                                <label>DNI</label>
+                                <p>
+                                    <%= usuario.dni %>
+                                </p>
+                            </div>
+                            <div class="info-item">
+                                <label>Correo electrónico</label>
+                                <p>
+                                    <%= usuario.correo %>
+                                </p>
+                            </div>
+                            <% if (usuario.rol==='estudiante' ) { %>
+                                <div class="info-item">
+                                    <label>Grado y Sección</label>
+                                    <p>
+                                        <%= usuario.grado %>° <%= usuario.seccion || 'Sin sección' %>
+                                    </p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Año de ingreso</label>
+                                    <p>
+                                        <%= usuario.anio_ingreso %>
+                                    </p>
+                                </div>
+                                <% } else { %>
+                                    <div class="info-item">
+                                        <label>Área</label>
+                                        <p>
+                                            <%= usuario.area_docente %>
+                                        </p>
+                                    </div>
+                                    <% } %>
+                        </div>
+                    </div>
+                    <div class="card__footer">
+                        <div class="action-buttons" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <a href="/perfil/editar" class="btn-modern btn-modern--primary">
+                                <i class="fas fa-user-edit"></i>
+                                <span>Editar perfil</span>
+                            </a>
+                            <a href="/perfil/password" class="btn-modern btn-modern--secondary">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Cambiar contraseña</span>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+            </section>
+
+            <% if (usuario.rol==='estudiante' || usuario.rol==='docente' ) { %>
+                <!-- Progreso del Estudiante -->
+                <section class="perfil-grid perfil-grid--two" data-aos="fade-up" data-aos-delay="200">
+                    <article class="card card--elevated">
+                        <div class="card__header">
+                            <div>
+                                <p class="card__eyebrow">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Mi Progreso</span>
+                                </p>
+                                <h2 class="card__title">Estadísticas de Lectura</h2>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <div class="progress-section">
+                                <div class="progress-label">
+                                    <span>Nivel <%= estadisticas.nivel %></span>
+                                    <span>
+                                        <%= estadisticas.progreso %>%
+                                    </span>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress__bar" style="width: <%= estadisticas.progreso %>%"></div>
+                                </div>
+                            </div>
+                            <div class="stats-grid-mini">
+                                <div class="stat-card stat-card--success">
+                                    <div class="stat-card__icon">
+                                        <i class="fas fa-book-open"></i>
+                                    </div>
+                                    <div class="stat-card__content">
+                                        <p class="stat-card__label">Libros leídos</p>
+                                        <p class="stat-card__value">
+                                            <%= estadisticas.totalLeidos %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="stat-card stat-card--warning">
+                                    <div class="stat-card__icon">
+                                        <i class="fas fa-book"></i>
+                                    </div>
+                                    <div class="stat-card__content">
+                                        <p class="stat-card__label">Préstamos activos</p>
+                                        <p class="stat-card__value">
+                                            <%= estadisticas.prestamosActivos %>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="stat-card stat-card--purple">
+                                    <div class="stat-card__icon">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="stat-card__content">
+                                        <p class="stat-card__label">Reseñas escritas</p>
+                                        <p class="stat-card__value">
+                                            <%= estadisticas.resenas %>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Logros -->
+                    <article class="card card--elevated">
+                        <div class="card__header">
+                            <div>
+                                <p class="card__eyebrow">
+                                    <i class="fas fa-trophy"></i>
+                                    <span>Mis Logros</span>
+                                </p>
+                                <h2 class="card__title">Insignias Ganadas</h2>
+                            </div>
+                        </div>
+                        <div class="card__body">
+                            <% if (badges && badges.length> 0) { %>
+                                <div class="badges-grid">
+                                    <% badges.forEach(function(badge, index) { let tier='1' ; let level=index + 1; if
+                                        (level===2) tier='2' ; if (level>= 3) tier = '3';
+                                        %>
+                                        <div class="badge-item badge-tier-<%= tier %>">
+                                            <div class="badge-icon">
+                                                <%= level %>
+                                            </div>
+                                            <div class="badge-info">
+                                                <p class="badge-name">
+                                                    <%= badge.nombre %>
+                                                </p>
+                                                <p class="badge-desc">
+                                                    <%= badge.descripcion %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <% }); %>
+                                </div>
+                                <% } else { %>
+                                    <div class="empty-state">
+                                        <i class="fas fa-medal"></i>
+                                        <p>¡Devuelve libros a tiempo para ganar insignias!</p>
+                                    </div>
+                                    <% } %>
+                        </div>
+                    </article>
+                </section>
+
+                <!-- Reseñas del Estudiante -->
+                <section class="perfil-grid--full" data-aos="fade-up" data-aos-delay="300">
+                    <article class="card card--elevated">
+                        <div class="card__header">
+                            <div>
+                                <p class="card__eyebrow">
+                                    <i class="fas fa-pen"></i>
+                                    <span>Mi voz lectora</span>
+                                </p>
+                                <h2 class="card__title">Mis Reseñas</h2>
+                            </div>
+                            <button type="button" class="btn-modern btn-modern--primary" data-resena-open>
+                                <i class="fa-solid fa-pen"></i>
+                                <span>Nueva reseña</span>
+                            </button>
+                        </div>
+                        <div class="card__body">
+                            <% if (resenas && resenas.length) { %>
+                                <div class="resena-list">
+                                    <% resenas.forEach(resena=> { %>
+                                        <%- include('../resenas/resena-card', { resena, usuarioActual: usuario, options:
+                                            { showLibro: true, showLibroLink: true } }) %>
+                                            <% }) %>
+                                </div>
+                                <% } else { %>
+                                    <div class="empty-state">
+                                        <i class="fas fa-comments"></i>
+                                        <p>Aún no has escrito ninguna reseña. ¡Comparte tus lecturas!</p>
+                                    </div>
+                                    <% } %>
+                        </div>
+                    </article>
+                </section>
+
+                <%- include('../resenas/resena-modal', { modalId: 'resenaModalPerfil' , librosElegibles, dynamicLibro:
+                    librosElegibles && librosElegibles.length> 0, submitLabel: 'Guardar reseña' }) %>
+                    <script type="application/json" id="resena-config">
+                <%- JSON.stringify({
+                    scope: 'perfil',
+                    modalId: 'resenaModalPerfil',
+                    usuario: usuario || null,
+                    endpoints: {
+                        crear: '/resenas',
+                        actualizar: '/resenas/:id',
+                        eliminar: '/resenas/:id',
+                        contexto: '/resenas/contexto/:libroId',
+                        listar: '/resenas/libro/:libroId'
+                    }
+                }) %>
+            </script>
+                    <script src="/js/resenas.js" defer></script>
+
+                    <% } %>
+        </main>
+
+        <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+        <script src="/js/export-dropdown.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Initialize AOS if available
+                if (typeof AOS !== 'undefined') {
+                    AOS.init({ duration: 800, once: true });
+                }
+            });
+        </script>
+        <style>
+            .action-card-body {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            @media (max-width: 768px) {
+                .action-card-body {
+                    justify-content: center;
+                    text-align: center;
+                }
+
+                .action-card-body>div {
+                    width: 100%;
+                    margin-bottom: 0.5rem;
+                }
+            }
+        </style>
+</body>
+
+</html>

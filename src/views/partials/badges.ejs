@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="/css/partials.css">
+<div class="badges flex gap-3 mt-4">
+  <% if (badges && badges.length > 0) { %>
+    <% badges.forEach(b => { %>
+      <div class="flex flex-col items-center text-center p-2">
+        <img src="<%= b.icono_url || '/img/badges/default.svg' %>" alt="<%= b.nombre %>" class="w-16 h-16 mb-2">
+        <div class="text-sm font-medium"><%= b.nombre %></div>
+      </div>
+    <% }) %>
+  <% } else { %>
+    <div class="text-sm text-gray-500">Aún no tienes insignias. Devuelve libros para ganar logros.</div>
+  <% } %>
+</div>

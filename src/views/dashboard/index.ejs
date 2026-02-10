@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <%- include('../partials/head', { title: 'Dashboard - Biblioteca Escolar' }) %>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="/css/dashboard.css">
+</head>
+
+<body class="dashboard-body">
+
+    <script type="application/json"
+        id="jsonPrestamosPorMes"><%= JSON.stringify(stats.prestamosPorMes || { labels: [], data: [] }) %></script>
+    <script type="application/json"
+        id="jsonLibrosMasPrestados"><%= JSON.stringify(stats.librosMasPrestados || { labels: [], data: [] }) %></script>
+    <script type="application/json"
+        id="jsonPrestamosPorGrado"><%= JSON.stringify(stats.prestamosPorGrado || { labels: [], activos: [], vencidos: [] }) %></script>
+    <script>
+        const parsedPrestamosPorMes = JSON.parse(document.getElementById('jsonPrestamosPorMes').textContent || '{}');
+        const labelsPrestamosPorMes = parsedPrestamosPorMes.labels || [];
+        const dataPrestamosPorMes = parsedPrestamosPorMes.data || [];
+
+        const parsedLibrosMasPrestados = JSON.parse(document.getElementById('jsonLibrosMasPrestados').textContent || '{}');
+        const labelsLibrosMasPrestados = parsedLibrosMasPrestados.labels || [];
+        const dataLibrosMasPrestados = parsedLibrosMasPrestados.data || [];
+
+        const parsedPrestamosPorGrado = JSON.parse(document.getElementById('jsonPrestamosPorGrado').textContent || '{}');
+        const labelsPrestamosPorGrado = parsedPrestamosPorGrado.labels || [];
+        const dataPrestamosPorGradoActivos = parsedPrestamosPorGrado.activos || [];
+        const dataPrestamosPorGradoVencidos = parsedPrestamosPorGrado.vencidos || [];
+    </script>
+
+    <%- include('../partials/navbar') %>
+
+        <main class="dashboard-wrapper">
+            <section class="dashboard-hero" data-aos="fade-up" data-aos-duration="900">
+                <span class="glow-orb glow-orb--right"></span>
+                <span class="glow-orb glow-orb--bottom"></span>
+
+                <div class="dashboard-hero__content">
+                    <span class="dashboard-hero__badge">
+                        <i class="fa-solid fa-gauge-high"></i>
+                        Monitoreo en tiempo real
+                    </span>
+                    <div class="dashboard-hero__title">
+                        <h1>Panel general de la biblioteca</h1>
+                        <p>Visualiza el pulso de préstamos, colecciones y participación estudiantil con el nuevo estilo
+                            dinámico.</p>
+                    </div>
+
+                    <div class="dashboard-hero__meta">
+                        <div class="meta-chip" data-aos="fade-up" data-aos-delay="100">
+                            <span>Total de libros</span>
+                            <strong data-count="<%= stats.totalLibros %>">
+                                <%= stats.totalLibros %>
+                            </strong>
+                        </div>
+                        <div class="meta-chip" data-aos="fade-up" data-aos-delay="200">
+                            <span>Préstamos activos</span>
+                            <strong data-count="<%= stats.prestamosActivos %>">
+                                <%= stats.prestamosActivos %>
+                            </strong>
+                        </div>
+                        <div class="meta-chip" data-aos="fade-up" data-aos-delay="300">
+                            <span>Préstamos vencidos</span>
+                            <strong data-count="<%= stats.prestamosVencidos %>">
+                                <%= stats.prestamosVencidos %>
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-hero__status" data-aos="fade-left" data-aos-delay="200">
+                    <div class="hero-highlight">
+                        <span class="hero-highlight__label">Estudiantes activos hoy</span>
+                        <span class="hero-highlight__value" data-count="<%= stats.estudiantesActivos %>">
+                            <%= stats.estudiantesActivos %>
+                        </span>
+                        <small>Usuarios con actividad registrada en el día.</small>
+                    </div>
+
+                    <div class="panel-meta">
+                        <span class="chip positive">Colección en crecimiento</span>
+                        <span class="chip warning">Seguimiento de vencidos</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-grid" data-aos="fade-up" data-aos-delay="150">
+                <article class="stat-card" data-color="blue" data-aos="fade-up" data-aos-delay="100">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-books"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Catálogo disponible</h3>
+                        <div class="stat-card__value" data-count="<%= stats.totalLibros %>">
+                            <%= stats.totalLibros %>
+                        </div>
+                        <p class="stat-card__meta">Libros registrados en la biblioteca.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="green" data-aos="fade-up" data-aos-delay="200">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-hand-holding"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Préstamos activos</h3>
+                        <div class="stat-card__value" data-count="<%= stats.prestamosActivos %>">
+                            <%= stats.prestamosActivos %>
+                        </div>
+                        <p class="stat-card__meta">Operaciones vigentes y en curso.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="amber" data-aos="fade-up" data-aos-delay="300">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Préstamos vencidos</h3>
+                        <div class="stat-card__value" data-count="<%= stats.prestamosVencidos %>">
+                            <%= stats.prestamosVencidos %>
+                        </div>
+                        <p class="stat-card__meta">Casos que requieren seguimiento.</p>
+                    </div>
+                </article>
+
+                <article class="stat-card" data-color="purple" data-aos="fade-up" data-aos-delay="400">
+                    <div class="stat-card__icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="stat-card__info">
+                        <h3>Comunidad activa</h3>
+                        <div class="stat-card__value" data-count="<%= stats.estudiantesActivos %>">
+                            <%= stats.estudiantesActivos %>
+                        </div>
+                        <p class="stat-card__meta">Estudiantes con préstamos recientes.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="dashboard-panels">
+                <article class="dash-panel" data-aos="fade-up">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Préstamos por mes</h3>
+                            <p>Comportamiento mensual del último periodo.</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="prestamosPorMes"></canvas>
+                    </div>
+                </article>
+
+                <article class="dash-panel" data-aos="fade-up" data-aos-delay="150">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Libros más prestados</h3>
+                            <p>Top 5 títulos con mayor rotación.</p>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="librosMasPrestados"></canvas>
+                    </div>
+                </article>
+            </section>
+
+            <section class="dashboard-panels">
+                <article class="dash-panel dash-panel--full" data-aos="fade-up" data-aos-delay="200">
+                    <div class="dash-panel__header">
+                        <div class="dash-panel__title">
+                            <h3>Préstamos por grado</h3>
+                            <p>Comparativa de actividad entre grados escolares.</p>
+                        </div>
+                        <div class="panel-actions">
+                            <button class="btn-soft" type="button">Exportar CSV</button>
+                            <button class="btn-gradient" type="button">Ver detalles</button>
+                        </div>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="prestamosPorGrado"></canvas>
+                    </div>
+                </article>
+            </section>
+        </main>
+
+        <script>
+            // Debug logging
+            console.log('Index dashboard script loaded');
+            console.log('Stats data:', '<%= JSON.stringify(stats) %>');
+
+            Chart.defaults.font.family = '"Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+            Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--subtitle-gray') || '#4B5563';
+            Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+            const accentBlue = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue') || '#00B4D8';
+            const accentBlueDark = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue-dark') || '#0077B6';
+            const warningColor = getComputedStyle(document.documentElement).getPropertyValue('--warning-yellow') || '#F59E0B';
+            const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-green') || '#10B981';
+            const purpleColor = getComputedStyle(document.documentElement).getPropertyValue('--purple') || '#7C3AED';
+
+            new Chart(document.getElementById('prestamosPorMes'), {
+                type: 'line',
+                data: {
+                    labels: labelsPrestamosPorMes,
+                    datasets: [{
+                        label: 'Préstamos',
+                        data: dataPrestamosPorMes,
+                        borderColor: accentBlueDark.trim(),
+                        backgroundColor: 'rgba(0, 180, 216, 0.15)',
+                        tension: 0.35,
+                        fill: true,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('librosMasPrestados'), {
+                type: 'doughnut',
+                data: {
+                    labels: labelsLibrosMasPrestados,
+                    datasets: [{
+                        data: dataLibrosMasPrestados,
+                        backgroundColor: [accentBlueDark.trim(), accentBlue.trim(), purpleColor.trim(), warningColor.trim(), successColor.trim()],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true }
+                        }
+                    }
+                }
+            });
+
+            new Chart(document.getElementById('prestamosPorGrado'), {
+                type: 'bar',
+                data: {
+                    labels: labelsPrestamosPorGrado,
+                    datasets: [
+                        {
+                            label: 'Activos',
+                            data: dataPrestamosPorGradoActivos,
+                            backgroundColor: accentBlueDark.trim(),
+                            borderRadius: 12,
+                            maxBarThickness: 38
+                        },
+                        {
+                            label: 'Vencidos',
+                            data: dataPrestamosPorGradoVencidos,
+                            backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                            borderRadius: 12,
+                            maxBarThickness: 38
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: { autoSkip: false }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+            </div>
+        </section>
+
+        <section class="stats-grid" data-aos="fade-up" data-aos-delay="150">
+            <article class="stat-card" data-color="blue" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-card__icon">
+                    <i class="fa-solid fa-books"></i>
+                </div>
+                <div class="stat-card__info">
+                    <h3>Catálogo disponible</h3>
+                    <div class="stat-card__value" data-count="<%= stats.totalLibros %>"><%= stats.totalLibros %></div>
+                    <p class="stat-card__meta">Libros registrados en la biblioteca.</p>
+                </div>
+            </article>
+
+            <article class="stat-card" data-color="green" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-card__icon">
+                    <i class="fa-solid fa-hand-holding"></i>
+                </div>
+                <div class="stat-card__info">
+                    <h3>Préstamos activos</h3>
+                    <div class="stat-card__value" data-count="<%= stats.prestamosActivos %>"><%= stats.prestamosActivos %></div>
+                    <p class="stat-card__meta">Operaciones vigentes y en curso.</p>
+                </div>
+            </article>
+
+            <article class="stat-card" data-color="amber" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-card__icon">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="stat-card__info">
+                    <h3>Préstamos vencidos</h3>
+                    <div class="stat-card__value" data-count="<%= stats.prestamosVencidos %>"><%= stats.prestamosVencidos %></div>
+                    <p class="stat-card__meta">Casos que requieren seguimiento.</p>
+                </div>
+            </article>
+
+            <article class="stat-card" data-color="purple" data-aos="fade-up" data-aos-delay="400">
+                <div class="stat-card__icon">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="stat-card__info">
+                    <h3>Comunidad activa</h3>
+                    <div class="stat-card__value" data-count="<%= stats.estudiantesActivos %>"><%= stats.estudiantesActivos %></div>
+                    <p class="stat-card__meta">Estudiantes con préstamos recientes.</p>
+                </div>
+            </article>
+        </section>
+
+        <section class="dashboard-panels">
+            <article class="dash-panel" data-aos="fade-up">
+                <div class="dash-panel__header">
+                    <div class="dash-panel__title">
+                        <h3>Préstamos por mes</h3>
+                        <p>Comportamiento mensual del último periodo.</p>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="prestamosPorMes"></canvas>
+                </div>
+            </article>
+
+            <article class="dash-panel" data-aos="fade-up" data-aos-delay="150">
+                <div class="dash-panel__header">
+                    <div class="dash-panel__title">
+                        <h3>Libros más prestados</h3>
+                        <p>Top 5 títulos con mayor rotación.</p>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="librosMasPrestados"></canvas>
+                </div>
+            </article>
+        </section>
+
+        <section class="dashboard-panels">
+            <article class="dash-panel dash-panel--full" data-aos="fade-up" data-aos-delay="200">
+                <div class="dash-panel__header">
+                    <div class="dash-panel__title">
+                        <h3>Préstamos por grado</h3>
+                        <p>Comparativa de actividad entre grados escolares.</p>
+                    </div>
+                    <div class="panel-actions">
+                        <button class="btn-soft" type="button">Exportar CSV</button>
+                        <button class="btn-gradient" type="button">Ver detalles</button>
+                    </div>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="prestamosPorGrado"></canvas>
+                </div>
+            </article>
+        </section>
+    </main>
+
+                    <script>
+        // Debug logging
+                        console.log('Index dashboard script loaded');
+                        console.log('Stats data:', '<%= JSON.stringify(stats) %>');
+
+                        Chart.defaults.font.family = '"Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+                        Chart.defaults.color = getComputedStyle(document.documentElement).getPropertyValue('--subtitle-gray') || '#4B5563';
+                        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+
+                        const accentBlue = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue') || '#00B4D8';
+                        const accentBlueDark = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue-dark') || '#0077B6';
+                        const warningColor = getComputedStyle(document.documentElement).getPropertyValue('--warning-yellow') || '#F59E0B';
+                        const successColor = getComputedStyle(document.documentElement).getPropertyValue('--success-green') || '#10B981';
+                        const purpleColor = getComputedStyle(document.documentElement).getPropertyValue('--purple') || '#7C3AED';
+
+                        new Chart(document.getElementById('prestamosPorMes'), {
+                            type: 'line',
+                        data: {
+                            labels: labelsPrestamosPorMes,
+                        datasets: [{
+                            label: 'Préstamos',
+                        data: dataPrestamosPorMes,
+                        borderColor: accentBlueDark.trim(),
+                        backgroundColor: 'rgba(0, 180, 216, 0.15)',
+                        tension: 0.35,
+                        fill: true,
+                        borderWidth: 3
+                }]
+            },
+                        options: {
+                            responsive: true,
+                        plugins: {
+                            legend: {display: false }
+                },
+                        scales: {
+                            y: {
+                            beginAtZero: true,
+                        ticks: {precision: 0 }
+                    }
+                }
+            }
+        });
+
+                        new Chart(document.getElementById('librosMasPrestados'), {
+                            type: 'doughnut',
+                        data: {
+                            labels: labelsLibrosMasPrestados,
+                        datasets: [{
+                            data: dataLibrosMasPrestados,
+                        backgroundColor: [accentBlueDark.trim(), accentBlue.trim(), purpleColor.trim(), warningColor.trim(), successColor.trim()],
+                        borderWidth: 0
+                }]
+            },
+                        options: {
+                            responsive: true,
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                            position: 'bottom',
+                        labels: {usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+                        new Chart(document.getElementById('prestamosPorGrado'), {
+                            type: 'bar',
+                        data: {
+                            labels: labelsPrestamosPorGrado,
+                        datasets: [
+                        {
+                            label: 'Activos',
+                        data: dataPrestamosPorGradoActivos,
+                        backgroundColor: accentBlueDark.trim(),
+                        borderRadius: 12,
+                        maxBarThickness: 38
+                    },
+                        {
+                            label: 'Vencidos',
+                        data: dataPrestamosPorGradoVencidos,
+                        backgroundColor: 'rgba(239, 68, 68, 0.85)',
+                        borderRadius: 12,
+                        maxBarThickness: 38
+                    }
+                        ]
+            },
+                        options: {
+                            responsive: true,
+                        scales: {
+                            x: {
+                            stacked: true,
+                        ticks: {autoSkip: false }
+                    },
+                        y: {
+                            stacked: true,
+                        beginAtZero: true,
+                        ticks: {precision: 0 }
+                    }
+                },
+                        plugins: {
+                            legend: {
+                            display: true
+                    }
+                }
+            }
+        });
+        </script>
+
+        <!-- Dashboard Shared JS -->
+        <script src="/js/dashboard-shared.js"></script>
+
+</body>
+
+</html>
