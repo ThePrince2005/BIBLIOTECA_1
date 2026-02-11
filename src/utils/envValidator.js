@@ -26,8 +26,24 @@ function validateEnvVars(env = process.env.NODE_ENV || 'development') {
   const required = requiredEnvVars[env] || requiredEnvVars.development;
 
   // Validar variables requeridas
+  // Validar variables requeridas (Soporte para Railway automatizado)
+  const envMap = {
+    'DB_HOST': ['DB_HOST', 'MYSQLHOST'],
+    'DB_USER': ['DB_USER', 'MYSQLUSER'],
+    'DB_NAME': ['DB_NAME', 'MYSQLDATABASE'],
+    'JWT_SECRET': ['JWT_SECRET'],
+    'SESSION_SECRET': ['SESSION_SECRET']
+  };
+
   required.forEach(varName => {
-    if (!process.env[varName]) {
+    // Si la variable tiene alternativas (ej. DB_HOST o MYSQLHOST), verificar si alguna existe
+    if (envMap[varName]) {
+      const hasDefinedVar = envMap[varName].some(v => process.env[v]);
+      if (!hasDefinedVar) {
+        errors.push(`Variable requerida faltante: ${varName} (o su alternativa ${envMap[varName].join('/')})`);
+      }
+    } else if (!process.env[varName]) {
+      // Fallback para variables sin mapeo explícito
       errors.push(`Variable de entorno requerida faltante: ${varName}`);
     }
   });

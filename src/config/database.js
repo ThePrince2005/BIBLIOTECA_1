@@ -3,11 +3,11 @@ require('dotenv').config();
 
 // Configuración para XAMPP usando variables de entorno
 const config = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'biblioteca_escolar',
-  port: parseInt(process.env.DB_PORT) || 3306,
+  host: process.env.DB_HOST || process.env.MYSQLHOST || 'localhost',
+  user: process.env.DB_USER || process.env.MYSQLUSER || 'root',
+  password: process.env.DB_PASSWORD || process.env.MYSQLPASSWORD || '',
+  database: process.env.DB_NAME || process.env.MYSQLDATABASE || 'biblioteca_escolar',
+  port: parseInt(process.env.DB_PORT) || parseInt(process.env.MYSQLPORT) || 3306,
   waitForConnections: true,
   connectionLimit: parseInt(process.env.DB_CONNECTION_LIMIT) || 10,
   queueLimit: 0,
@@ -39,7 +39,7 @@ const testConnection = async () => {
     console.log(`   Usuario: ${config.user}`);
     console.log(`   Base de datos: ${config.database}`);
     console.log(`   Contraseña: ${config.password ? '***configurada***' : '(vacía)'}`);
-    
+
     if (error.code === 'ER_ACCESS_DENIED_ERROR') {
       console.log('\n💡 SOLUCIÓN:');
       console.log('   1. Verifica que XAMPP esté corriendo y MySQL iniciado');
