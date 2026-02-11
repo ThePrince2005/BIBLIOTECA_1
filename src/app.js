@@ -103,10 +103,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// Servir archivos estáticos desde múltiples directorios
+// Servir archivos estáticos
 app.use(express.static(path.join(__dirname, '../public')));
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/img', express.static(path.join(__dirname, '../public/img')));
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 const { attachUser } = require('./middlewares/auth.middleware');
 
