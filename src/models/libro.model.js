@@ -105,7 +105,7 @@ class Libro {
 
             // Agregar paginación
             query += ' LIMIT ? OFFSET ?';
-            valores.push(porPagina, (pagina - 1) * porPagina);
+            valores.push(Number(porPagina), Number((pagina - 1) * porPagina));
 
             // Ejecutar búsqueda
             const [rows] = await connection.execute(query, valores);
