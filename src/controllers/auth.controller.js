@@ -17,9 +17,9 @@ class AuthController {
 
         // Si hay rol seleccionado, mostrar el formulario específico de login
         const view = role === 'estudiante' ? 'auth/login-estudiante' :
-                     role === 'docente' ? 'auth/login-docente' :
-                     role === 'admin' ? 'auth/login-admin' :
-                     'auth/select-role'; // Fallback
+            role === 'docente' ? 'auth/login-docente' :
+                role === 'admin' ? 'auth/login-admin' :
+                    'auth/select-role'; // Fallback
 
         res.render(view, {
             registered,
@@ -33,7 +33,7 @@ class AuthController {
     static async showRegistro(req, res) {
         const selectedRole = req.query.role || '';
         const isAdmin = req.user && req.user.rol === 'admin';
-        res.render('auth/registro', { 
+        res.render('auth/registro', {
             selectedRole,
             isAdmin,
             usuario: req.user || null
@@ -135,7 +135,7 @@ class AuthController {
             const token = jwt.sign(
                 { id: userId, rol: req.body.rol },
                 process.env.JWT_SECRET,
-                { expiresIn: process.env.JWT_EXPIRES_IN }
+                { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
             );
 
             // Establecer cookie
@@ -237,7 +237,7 @@ class AuthController {
             const token = jwt.sign(
                 payload,
                 process.env.JWT_SECRET,
-                { expiresIn: process.env.JWT_EXPIRES_IN }
+                { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
             );
 
             // Establecer cookie

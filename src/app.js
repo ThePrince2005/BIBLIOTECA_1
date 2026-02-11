@@ -281,60 +281,28 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 3000;
 const MAX_PORT_ATTEMPTS = 10;
 
-// 🔹 Probar conexión a la base de datos antes de levantar el servidor
-(async () => {
+const startServer = async () => {
   try {
+    console.log('⏳ Iniciando verificación de conexión a base de datos...');
     await testConnection();
+    console.log('✅ Verificación de DB completada.');
 
-    const tryPort = async (port) => {
-      try {
-        await new Promise((resolve, reject) => {
-          const server = app
-            .listen(port)
-            .once('listening', () => {
-              console.log(`🚀 Servidor iniciado en puerto ${port}`);
-              resolve();
-            })
-            .once('error', (err) => {
-              if (err.code === 'EADDRINUSE') {
-                console.log(`Puerto ${port} en uso, intentando siguiente...`);
-                reject(err);
-              } else {
-                reject(err);
-              }
-            });
-        });
-        return true;
-      } catch (err) {
-        if (err.code === 'EADDRINUSE') {
-          return false;
-        }
-        throw err;
-      }
-    };
+    console.log(`⏳ Intentando iniciar servidor en puerto ${PORT}...`);
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Servidor iniciado exitosamente en puerto ${PORT}`);
+    });
 
-    let currentPort = PORT;
-    let success = false;
-
-    for (let attempt = 0; attempt < MAX_PORT_ATTEMPTS; attempt++) {
-      success = await tryPort(currentPort);
-      if (success) break;
-      currentPort++;
-    }
-
-    if (!success) {
-      console.error(
-        `❌ No se pudo encontrar un puerto disponible después de ${MAX_PORT_ATTEMPTS} intentos`
-      );
+    server.on('error', (err) => {
+      console.error('❌ Error fatal al iniciar el servidor HTTP:', err);
       process.exit(1);
-    }
+    });
+
   } catch (err) {
-    console.error(
-      '❌ No se pudo conectar a la base de datos, el servidor no se inició:',
-      err.message
-    );
+    console.error('❌ No se pudo conectar a la base de datos o iniciar el servidor:', err.message);
     process.exit(1);
   }
-})();
+};
+
+startServer();
 
 module.exports = app;
