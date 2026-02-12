@@ -977,7 +977,24 @@
         font-size: 1.25rem;
     }
 
-    .admin-stat-value {
         font-size: 1.75rem;
     }
+}
+
+/* Fix: Dark Mode Input Visibility */
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .form-select,
+[data-theme="dark"] .form-textarea {
+    background-color: rgba(30, 41, 59, 0.6);
+    border-color: rgba(148, 224, 239, 0.2);
+    color: #f8fafc;
+}
+
+[data-theme="dark"] .form-input::placeholder,
+[data-theme="dark"] .form-textarea::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .form-label {
+    color: #94a3b8;
 }
