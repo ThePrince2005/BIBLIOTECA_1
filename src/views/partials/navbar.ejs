@@ -237,39 +237,48 @@
           </a>
           <% } %>
 
-
-            <% if (!user || user.rol==='estudiante' || user.rol==='docente' ) { %>
-              <a href="/prestamos" class="nav-link <%= uiNav.prestamos ? 'nav-link--active' : '' %>">
-                Préstamos
+            <!-- Material de Estudio (Recursos) Mobile -->
+            <% if (user && (user.rol==='estudiante' || user.rol==='docente' )) { %>
+              <a href="/admin/material" class="nav-link <%= uiNav.material ? 'nav-link--active' : '' %>">
+                Recursos
               </a>
               <% } %>
 
                 <% if (!user || user.rol==='estudiante' || user.rol==='docente' ) { %>
-                  <a href="/favoritos" class="nav-link <%= uiNav.favoritos ? 'nav-link--active' : '' %>">
-                    Favoritos
+                  <a href="/prestamos" class="nav-link <%= uiNav.prestamos ? 'nav-link--active' : '' %>">
+                    Préstamos
                   </a>
                   <% } %>
 
-                    <% /* Enlace a reseñas removido según requerimiento */ %>
+                    <% if (!user || user.rol==='estudiante' || user.rol==='docente' ) { %>
+                      <a href="/favoritos" class="nav-link <%= uiNav.favoritos ? 'nav-link--active' : '' %>">
+                        Favoritos
+                      </a>
+                      <% } %>
 
-                      <!-- Alumnos SOLO admin (móvil) -->
-                      <% if (user && user.rol==='admin' ) { %>
-                        <a href="/prestamos/admin" class="nav-link">
-                          Gestión de Préstamos
-                        </a>
-                        <a href="/usuario/admin/alumnos" class="nav-link">
-                          Gestión de Usuarios
-                        </a>
-                        <a href="/admin/resenas" class="nav-link">
-                          Gestión de Reseñas
-                        </a>
-                        <% } %>
+                        <% /* Enlace a reseñas removido según requerimiento */ %>
 
-                          <a href="/configuracion"
-                            class="nav-link <%= uiNav.configuracion ? 'nav-link--active' : '' %>">
-                            <i class="fa-solid fa-sliders"></i>
-                            Configuración
-                          </a>
+                          <!-- Alumnos SOLO admin (móvil) -->
+                          <% if (user && user.rol==='admin' ) { %>
+                            <a href="/prestamos/admin" class="nav-link">
+                              Gestión de Préstamos
+                            </a>
+                            <a href="/usuario/admin/alumnos" class="nav-link">
+                              Gestión de Usuarios
+                            </a>
+                            <a href="/admin/documentos" class="nav-link">
+                              Gestión de Documentos
+                            </a>
+                            <a href="/admin/resenas" class="nav-link">
+                              Gestión de Reseñas
+                            </a>
+                            <% } %>
+
+                              <a href="/configuracion"
+                                class="nav-link <%= uiNav.configuracion ? 'nav-link--active' : '' %>">
+                                <i class="fa-solid fa-sliders"></i>
+                                Configuración
+                              </a>
     </div>
 
     <div class="mobile-nav-section">
