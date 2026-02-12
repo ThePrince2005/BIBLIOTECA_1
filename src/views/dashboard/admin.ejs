@@ -596,17 +596,10 @@
                                     </div>
 
                                     <!-- Acción -->
-                                    <% if ((alerta.tipo==='VENCIMIENTO' || alerta.tipo==='PENDIENTE' ) &&
-                                        alerta.prestamo_id && !isNaN(alerta.prestamo_id)) { %>
-                                        <a href="/prestamos/<%= parseInt(alerta.prestamo_id) %>/detalle"
-                                            class="btn-check-detail" target="_self">
-                                            Ver detalle
-                                        </a>
-                                        <% } else { %>
-                                            <a href="/prestamos/admin" class="btn-check-detail" target="_self">
-                                                Ver detalle
-                                            </a>
-                                            <% } %>
+                                    <!-- Acción: Redireccionar siempre a gestión de préstamos -->
+                                    <a href="/prestamos/admin" class="btn-check-detail" target="_self">
+                                        Ver detalle
+                                    </a>
                                 </div>
                                 <% }) %>
                         </div>
