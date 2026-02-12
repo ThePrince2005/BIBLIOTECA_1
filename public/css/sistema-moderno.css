@@ -567,6 +567,31 @@
 }
 
 /* ========================================================================
+   FIX: VISIBILIDAD DE INPUTS EN MODO OSCURO (FORZADO)
+   ======================================================================== */
+:root[data-theme="dark"] .form-input,
+:root[data-theme="dark"] .form-select,
+:root[data-theme="dark"] .form-textarea,
+:root[data-theme="dark"] input.form-input,
+:root[data-theme="dark"] select.form-select,
+:root[data-theme="dark"] textarea.form-textarea,
+:root[data-theme="dark"] .input-modern,
+:root[data-theme="dark"] .input-control,
+:root[data-theme="dark"] .form-control {
+    background-color: rgba(30, 41, 59, 0.8) !important;
+    border-color: rgba(148, 224, 239, 0.3) !important;
+    color: #ffffff !important;
+}
+
+:root[data-theme="dark"] .form-input::placeholder,
+:root[data-theme="dark"] .form-textarea::placeholder,
+:root[data-theme="dark"] .input-modern::placeholder,
+:root[data-theme="dark"] .input-control::placeholder,
+:root[data-theme="dark"] .form-control::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* ========================================================================
    DARK MODE VARIABLES & OVERRIDES
    ======================================================================== */
 
