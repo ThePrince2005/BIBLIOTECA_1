@@ -137,6 +137,55 @@
         -webkit-text-fill-color: transparent;
         margin-bottom: 1rem;
       }
+
+      /* Responsive Search Form */
+      .virtual-search__form {
+        display: flex;
+        gap: 0.5rem;
+        position: relative;
+      }
+
+      .virtual-search__input-wrapper {
+        position: relative;
+        flex-grow: 1;
+      }
+
+      .virtual-search__button {
+        padding: 0 1.5rem;
+        background: #6366f1;
+        color: white;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s;
+      }
+
+      .virtual-search__button:hover {
+        background: #4f46e5;
+      }
+
+      @media (min-width: 641px) {
+        .virtual-search__button {
+          position: absolute;
+          right: 0.5rem;
+          top: 0.5rem;
+          bottom: 0.5rem;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .virtual-search__form {
+          flex-direction: column;
+          gap: 1rem;
+        }
+
+        .virtual-search__button {
+          width: 100%;
+          padding: 1rem;
+          position: static;
+        }
+      }
     </style>
 </head>
 
@@ -164,13 +213,14 @@
 
             <!-- Buscador -->
             <div class="virtual-search__container" style="margin-bottom: 2rem;">
-              <form id="form-busqueda-virtual" class="virtual-search__form" style="position: relative;">
-                <i class="fa-solid fa-search virtual-search__icon"
-                  style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
-                <input type="text" id="busqueda-virtual" class="virtual-search__input"
-                  placeholder="Buscar por título, autor, tema o ISBN..." autocomplete="off">
-                <button type="submit" class="virtual-search__button btn-modern"
-                  style="position: absolute; right: 0.5rem; top: 0.5rem; bottom: 0.5rem; padding: 0 1.5rem; background: #6366f1; color: white; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">
+              <form id="form-busqueda-virtual" class="virtual-search__form">
+                <div class="virtual-search__input-wrapper">
+                  <i class="fa-solid fa-search virtual-search__icon"
+                    style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 10;"></i>
+                  <input type="text" id="busqueda-virtual" class="virtual-search__input"
+                    placeholder="Buscar por título, autor, tema o ISBN..." autocomplete="off">
+                </div>
+                <button type="submit" class="virtual-search__button btn-modern">
                   <span>Buscar</span>
                 </button>
               </form>

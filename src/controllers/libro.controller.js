@@ -10,8 +10,8 @@ class LibroController {
     static async obtenerLibros(req, res) {
         try {
             // Scroll infinito: cargar 20 libros por página
-            const pagina = parseInt(req.query.pagina) || 1;
-            const porPagina = parseInt(req.query.porPagina) || 20;
+            const pagina = Math.max(1, parseInt(req.query.pagina) || 1);
+            const porPagina = Math.max(1, parseInt(req.query.porPagina) || 20);
             const filtros = {
                 titulo: req.query.titulo,
                 autor: req.query.autor,
@@ -39,8 +39,8 @@ class LibroController {
 
             // Si es una petición AJAX, devolver JSON
             if (req.xhr || (req.headers.accept && req.headers.accept.indexOf('json') > -1)) {
-                return res.json({ 
-                    ...resultado, 
+                return res.json({
+                    ...resultado,
                     resumenPorLibro,
                     favoritosIds,
                     usuario: req.user ? { rol: req.user.rol } : null

@@ -105,7 +105,9 @@ class Libro {
 
             // Agregar paginación
             query += ' LIMIT ? OFFSET ?';
-            valores.push(Number(porPagina), Number((pagina - 1) * porPagina));
+            const limit = parseInt(porPagina) || 10;
+            const offset = Math.max(0, (parseInt(pagina) || 1) - 1) * limit;
+            valores.push(limit, offset);
 
             // Ejecutar búsqueda
             const [rows] = await connection.execute(query, valores);
