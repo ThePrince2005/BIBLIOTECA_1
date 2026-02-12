@@ -104,10 +104,11 @@ class Libro {
             const total = countRows[0].total;
 
             // Agregar paginación
-            query += ' LIMIT ? OFFSET ?';
+            // Agregar paginación (Interpolar directamente para evitar error ER_WRONG_ARGUMENTS)
             const limit = parseInt(porPagina) || 10;
             const offset = Math.max(0, (parseInt(pagina) || 1) - 1) * limit;
-            valores.push(limit, offset);
+            query += ` LIMIT ${limit} OFFSET ${offset}`;
+            // valores.push(limit, offset); // NO agregar a valores para prepared statements
 
             // Ejecutar búsqueda
             const [rows] = await connection.execute(query, valores);
