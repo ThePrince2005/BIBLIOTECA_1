@@ -260,16 +260,20 @@
 
                           <!-- Alumnos SOLO admin (móvil) -->
                           <% if (user && user.rol==='admin' ) { %>
-                            <a href="/prestamos/admin" class="nav-link">
+                            <a href="/prestamos/admin"
+                              class="nav-link <%= uiNav.gestionPrestamos ? 'nav-link--active' : '' %>">
                               Gestión de Préstamos
                             </a>
-                            <a href="/usuario/admin/alumnos" class="nav-link">
+                            <a href="/usuario/admin/alumnos"
+                              class="nav-link <%= uiNav.gestionUsuarios ? 'nav-link--active' : '' %>">
                               Gestión de Usuarios
                             </a>
-                            <a href="/admin/documentos" class="nav-link">
+                            <a href="/admin/documentos"
+                              class="nav-link <%= uiNav.gestionDocumentos ? 'nav-link--active' : '' %>">
                               Gestión de Documentos
                             </a>
-                            <a href="/admin/resenas" class="nav-link">
+                            <a href="/admin/resenas"
+                              class="nav-link <%= uiNav.gestionResenas ? 'nav-link--active' : '' %>">
                               Gestión de Reseñas
                             </a>
                             <% } %>
